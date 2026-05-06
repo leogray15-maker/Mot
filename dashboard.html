@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Premier MOT & Service CRM</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body id="dashboardApp">
+
+<!-- Mobile sidebar toggle -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle menu">
+  <i class="fas fa-bars"></i>
+</button>
+
+<div class="dash-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon"><i class="fas fa-car-burst"></i></div>
+      <div class="sidebar-brand-text">
+        <strong>Premier MOT</strong>
+        <span>Admin CRM</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <button class="sidebar-link active" data-section="overview">
+        <i class="fas fa-chart-line"></i> Overview
+      </button>
+      <button class="sidebar-link" data-section="enquiries">
+        <i class="fas fa-inbox"></i> Enquiries
+        <span class="badge" id="enquiryBadge">0</span>
+      </button>
+
+      <div class="nav-section-label" style="margin-top:16px">Management</div>
+      <button class="sidebar-link" data-section="customers">
+        <i class="fas fa-users"></i> Customers
+      </button>
+      <button class="sidebar-link" data-section="mot">
+        <i class="fas fa-calendar-check"></i> MOT Tracker
+      </button>
+
+      <div class="nav-section-label" style="margin-top:16px">System</div>
+      <button class="sidebar-link" data-section="settings">
+        <i class="fas fa-gear"></i> Settings
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="index.html" target="_blank" class="sidebar-link">
+        <i class="fas fa-external-link-alt"></i> View Public Site
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="dash-main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="topbar-title">Premier MOT & Service</div>
+        <div class="topbar-breadcrumb">/ <span>Overview</span></div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-user">
+          <div class="topbar-user-avatar">A</div>
+          <span class="topbar-user-name">admin</span>
+        </div>
+        <button class="btn-sm btn-danger" id="logoutBtn">
+          <i class="fas fa-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT AREA -->
+    <main class="dash-content">
+
+      <!-- ========================
+           OVERVIEW PAGE
+           ======================== -->
+      <div class="section-page active" id="page-overview">
+        <div class="overview-header">
+          <h1>Good morning, Admin</h1>
+          <p>Here's what's happening at Premier MOT & Service today.</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-info">
+              <div class="stat-label">Total Enquiries</div>
+              <div class="stat-value" id="stat-total">0</div>
+              <div class="stat-delta up"><i class="fas fa-arrow-up"></i> All time</div>
+            </div>
+            <div class="stat-icon red"><i class="fas fa-inbox"></i></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <div class="stat-label">New Today</div>
+              <div class="stat-value" id="stat-today">0</div>
+              <div class="stat-delta"><i class="fas fa-calendar"></i> Today</div>
+            </div>
+            <div class="stat-icon blue"><i class="fas fa-star"></i></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <div class="stat-label">Awaiting Response</div>
+              <div class="stat-value" id="stat-awaiting">0</div>
+              <div class="stat-delta down"><i class="fas fa-clock"></i> Need attention</div>
+            </div>
+            <div class="stat-icon amber"><i class="fas fa-hourglass-half"></i></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <div class="stat-label">Completed Jobs</div>
+              <div class="stat-value" id="stat-completed">0</div>
+              <div class="stat-delta up"><i class="fas fa-check"></i> All time</div>
+            </div>
+            <div class="stat-icon green"><i class="fas fa-circle-check"></i></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fas fa-clock"></i> Recent Enquiries</div>
+            <button class="btn-sm btn-ghost-sm" onclick="navigate('enquiries')">View All <i class="fas fa-arrow-right"></i></button>
+          </div>
+          <div class="panel-body no-pad">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Service</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="recentEnquiriesBody">
+                  <tr><td colspan="6" class="table-empty"><i class="fas fa-inbox"></i>No enquiries yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fas fa-bolt"></i> Quick Actions</div>
+          </div>
+          <div class="panel-body">
+            <div class="quick-actions">
+              <button class="btn-sm btn-primary-sm" id="quickAddCustomer">
+                <i class="fas fa-user-plus"></i> Add New Customer
+              </button>
+              <button class="btn-sm btn-ghost-sm" id="quickViewEnquiries">
+                <i class="fas fa-inbox"></i> View All Enquiries
+              </button>
+              <button class="btn-sm btn-ghost-sm" onclick="navigate('mot')">
+                <i class="fas fa-calendar-check"></i> Check MOT Due Dates
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================
+           ENQUIRIES PAGE
+           ======================== -->
+      <div class="section-page" id="page-enquiries">
+        <div class="overview-header">
+          <h1>Enquiries</h1>
+          <p>All booking requests and customer enquiries submitted through the website.</p>
+        </div>
+
+        <div class="panel">
+          <div class="toolbar">
+            <div class="search-wrap">
+              <i class="fas fa-search"></i>
+              <input type="text" id="enquirySearch" placeholder="Search by name, email or reg...">
+            </div>
+            <select class="filter-select" id="enquiryFilter">
+              <option value="all">All Statuses</option>
+              <option value="New">New</option>
+              <option value="Contacted">Contacted</option>
+              <option value="Booked In">Booked In</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                  <th>Reg</th>
+                  <th>Service</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="enquiriesBody">
+                <tr><td colspan="8" class="table-empty"><i class="fas fa-inbox"></i>Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================
+           CUSTOMERS PAGE
+           ======================== -->
+      <div class="section-page" id="page-customers">
+        <div class="overview-header">
+          <h1>Customers</h1>
+          <p>Manage your customer records, vehicle details and job history.</p>
+        </div>
+
+        <div class="panel" style="margin-bottom:24px">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fas fa-user-plus"></i> Add New Customer</div>
+          </div>
+          <div class="panel-body">
+            <form id="addCustomerForm" class="dash-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Full Name *</label>
+                  <input type="text" name="name" placeholder="John Smith" required>
+                </div>
+                <div class="form-group">
+                  <label>Phone Number *</label>
+                  <input type="tel" name="phone" placeholder="07700 900000" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Email Address</label>
+                  <input type="email" name="email" placeholder="john@email.com">
+                </div>
+                <div class="form-group">
+                  <label>Vehicle Registration</label>
+                  <input type="text" name="reg" placeholder="AB21 XYZ" style="text-transform:uppercase">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Make</label>
+                  <input type="text" name="make" placeholder="Ford">
+                </div>
+                <div class="form-group">
+                  <label>Model</label>
+                  <input type="text" name="model" placeholder="Focus">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Year</label>
+                  <input type="number" name="year" placeholder="2020" min="1990" max="2026">
+                </div>
+                <div class="form-group">
+                  <label>MOT Due Date</label>
+                  <input type="date" name="motDue">
+                </div>
+              </div>
+              <div>
+                <button type="submit" class="btn-sm btn-primary-sm" style="padding:10px 24px">
+                  <i class="fas fa-plus"></i> Add Customer
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fas fa-users"></i> Customer List</div>
+          </div>
+          <div class="toolbar">
+            <div class="search-wrap">
+              <i class="fas fa-search"></i>
+              <input type="text" id="customerSearch" placeholder="Search customers...">
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                  <th>Reg</th>
+                  <th>Vehicle</th>
+                  <th>Year</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="customersBody">
+                <tr><td colspan="7" class="table-empty"><i class="fas fa-users"></i>Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================
+           MOT TRACKER PAGE
+           ======================== -->
+      <div class="section-page" id="page-mot">
+        <div class="overview-header">
+          <h1>MOT Tracker</h1>
+          <p>Track upcoming and overdue MOT dates for all customers. Send WhatsApp reminders with one click.</p>
+        </div>
+
+        <div class="mot-summary-bar">
+          <div class="mot-summary-item red">
+            <div class="mot-summary-num" id="mot-overdue">0</div>
+            <div class="mot-summary-label"><i class="fas fa-exclamation-triangle"></i> Overdue</div>
+          </div>
+          <div class="mot-summary-item amber">
+            <div class="mot-summary-num" id="mot-soon">0</div>
+            <div class="mot-summary-label"><i class="fas fa-clock"></i> Due within 30 days</div>
+          </div>
+          <div class="mot-summary-item green">
+            <div class="mot-summary-num" id="mot-ok">0</div>
+            <div class="mot-summary-label"><i class="fas fa-check"></i> Up to date</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fas fa-calendar-check"></i> MOT Due Dates</div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Reg</th>
+                  <th>Vehicle</th>
+                  <th>MOT Due</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="motBody">
+                <tr><td colspan="6" class="table-empty"><i class="fas fa-car"></i>Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fab fa-whatsapp"></i> WhatsApp Reminder Template</div>
+          </div>
+          <div class="panel-body">
+            <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:12px">Click "Send Reminder" next to any customer to copy this message to your clipboard, pre-filled with their details:</p>
+            <div style="background:var(--dark-3);border:1px solid var(--border);border-radius:var(--radius);padding:16px;font-size:0.85rem;color:var(--text-muted);font-style:italic;line-height:1.6">
+              "Hi [Name], just a reminder your MOT is due on [date] for your [Make Model]. Give us a call on 01234 567890 to book in — Premier MOT & Service"
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================
+           SETTINGS PAGE
+           ======================== -->
+      <div class="section-page" id="page-settings">
+        <div class="overview-header">
+          <h1>Settings</h1>
+          <p>Manage garage details, admin credentials and system preferences.</p>
+        </div>
+
+        <div class="settings-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><i class="fas fa-building"></i> Garage Details</div>
+            </div>
+            <div class="panel-body">
+              <form id="settingsGarageForm" class="dash-form">
+                <div class="form-group">
+                  <label>Garage Name</label>
+                  <input type="text" id="settingGarageName" placeholder="Premier MOT & Service">
+                </div>
+                <div class="form-group">
+                  <label>Phone Number</label>
+                  <input type="tel" id="settingPhone" placeholder="01234 567890">
+                </div>
+                <div class="form-group">
+                  <label>Email Address</label>
+                  <input type="email" id="settingEmail" placeholder="info@premiermot.co.uk">
+                </div>
+                <div class="form-group">
+                  <label>Address</label>
+                  <input type="text" id="settingAddress" placeholder="14 Industrial Way, Chelmsford, Essex">
+                </div>
+                <button type="submit" class="btn-sm btn-primary-sm" style="padding:10px 24px">
+                  <i class="fas fa-save"></i> Save Details
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><i class="fas fa-lock"></i> Change Password</div>
+            </div>
+            <div class="panel-body">
+              <form id="settingsPasswordForm" class="dash-form">
+                <div class="form-group">
+                  <label>Username</label>
+                  <input type="text" id="settingUsername" disabled style="opacity:0.5;cursor:not-allowed">
+                </div>
+                <div class="form-group">
+                  <label>Current Password</label>
+                  <input type="password" id="currentPassword" placeholder="Enter current password" required>
+                </div>
+                <div class="form-group">
+                  <label>New Password</label>
+                  <input type="password" id="newPassword" placeholder="Enter new password (min 6 chars)" required>
+                </div>
+                <div class="form-group">
+                  <label>Confirm New Password</label>
+                  <input type="password" id="confirmPassword" placeholder="Confirm new password" required>
+                </div>
+                <button type="submit" class="btn-sm btn-primary-sm" style="padding:10px 24px">
+                  <i class="fas fa-key"></i> Update Password
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><i class="fas fa-database"></i> Data Management</div>
+            </div>
+            <div class="panel-body">
+              <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px">All data is stored locally in your browser's localStorage. Use these options to export or reset your data.</p>
+              <div style="display:flex;gap:12px;flex-wrap:wrap">
+                <button class="btn-sm btn-ghost-sm" onclick="exportData()">
+                  <i class="fas fa-download"></i> Export All Data (JSON)
+                </button>
+                <button class="btn-sm btn-danger" onclick="clearAllData()">
+                  <i class="fas fa-trash"></i> Clear All Data
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><i class="fas fa-info-circle"></i> System Info</div>
+            </div>
+            <div class="panel-body">
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;justify-content:space-between;font-size:0.85rem;padding:8px 0;border-bottom:1px solid var(--border)">
+                  <span style="color:var(--text-dim)">Version</span>
+                  <span>Premier CRM v1.0</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:0.85rem;padding:8px 0;border-bottom:1px solid var(--border)">
+                  <span style="color:var(--text-dim)">Storage</span>
+                  <span>localStorage</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:0.85rem;padding:8px 0;border-bottom:1px solid var(--border)">
+                  <span style="color:var(--text-dim)">Enquiries Stored</span>
+                  <span id="infoEnquiries">—</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:0.85rem;padding:8px 0">
+                  <span style="color:var(--text-dim)">Customers Stored</span>
+                  <span id="infoCustomers">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ENQUIRY DETAIL MODAL -->
+<div class="dash-modal-overlay" id="enquiryDetailModal">
+  <div class="dash-modal">
+    <div class="dash-modal-header">
+      <h2><i class="fas fa-inbox" style="color:var(--red);margin-right:8px"></i> Enquiry Details</h2>
+      <button class="dash-modal-close" id="closeEnquiryModal"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="dash-modal-body" id="enquiryDetailContent"></div>
+  </div>
+</div>
+
+<!-- CUSTOMER PROFILE MODAL -->
+<div class="dash-modal-overlay" id="customerProfileModal">
+  <div class="dash-modal" style="max-width:700px">
+    <div class="dash-modal-header">
+      <h2><i class="fas fa-user" style="color:var(--red);margin-right:8px"></i> Customer Profile</h2>
+      <button class="dash-modal-close" id="closeCustomerModal"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="dash-modal-body" id="customerProfileContent"></div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+  // Data export / clear utilities (defined inline so they're accessible from onclick)
+  function exportData() {
+    const data = {
+      enquiries: JSON.parse(localStorage.getItem('premier_enquiries') || '[]'),
+      customers: JSON.parse(localStorage.getItem('premier_customers') || '[]'),
+      settings: JSON.parse(localStorage.getItem('premier_settings') || '{}'),
+      exportedAt: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `premier-mot-data-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function clearAllData() {
+    if (!confirm('This will permanently delete ALL enquiries, customers and settings. This cannot be undone. Are you sure?')) return;
+    if (!confirm('Last chance — are you absolutely sure? All data will be lost.')) return;
+    localStorage.removeItem('premier_enquiries');
+    localStorage.removeItem('premier_customers');
+    localStorage.removeItem('premier_settings');
+    location.reload();
+  }
+</script>
+
+<script src="js/auth.js"></script>
+<script src="js/dashboard.js"></script>
+
+<script>
+  // Update system info panel
+  function updateInfoPanel() {
+    const eq = JSON.parse(localStorage.getItem('premier_enquiries') || '[]').length;
+    const cu = JSON.parse(localStorage.getItem('premier_customers') || '[]').length;
+    const infoEq = document.getElementById('infoEnquiries');
+    const infoCu = document.getElementById('infoCustomers');
+    if (infoEq) infoEq.textContent = eq;
+    if (infoCu) infoCu.textContent = cu;
+  }
+  updateInfoPanel();
+  // Re-update when settings section is loaded
+  const origLoadSettings = typeof loadSettings === 'function' ? loadSettings : null;
+  document.querySelectorAll('.sidebar-link[data-section="settings"]').forEach(btn => {
+    btn.addEventListener('click', updateInfoPanel);
+  });
+</script>
+</body>
+</html>

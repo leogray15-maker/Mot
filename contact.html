@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us | Premier MOT & Service Chelmsford</title>
+  <meta name="description" content="Get in touch with Premier MOT & Service in Chelmsford, Essex. Call 01234 567890, email info@premiermot.co.uk or use our online enquiry form.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav scrolled" id="mainNav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <span class="logo-main">Premier MOT & Service</span>
+      <span class="logo-sub">Chelmsford, Essex</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="services.html">Services</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <button class="btn btn-primary nav-cta open-modal">Book Now</button>
+    <button class="nav-hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="mobile-menu">
+  <a href="index.html">Home</a>
+  <a href="services.html">Services</a>
+  <a href="contact.html">Contact</a>
+  <button class="btn btn-primary open-modal">Book Now</button>
+</div>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <div class="section-tag">Get in Touch</div>
+  <h1 class="section-title" style="margin-bottom:16px">We're Here to <span>Help</span></h1>
+  <p>Got a question about your vehicle? Need a quote? Ready to book? We're easy to reach — call us, email us, or use the form below.</p>
+</div>
+
+<!-- CONTACT SECTION -->
+<section class="contact-section">
+  <div class="contact-grid">
+
+    <!-- Info side -->
+    <div class="contact-info">
+      <h2>Talk to the <span style="color:var(--red)">Team</span></h2>
+      <p>We're a friendly, family-run garage and we're always happy to talk through any concerns about your vehicle. No question is too small — we'd rather you ask than ignore a potential problem.</p>
+
+      <div class="contact-details">
+        <div class="contact-detail-item">
+          <div class="contact-detail-icon"><i class="fas fa-phone"></i></div>
+          <div class="contact-detail-text">
+            <strong>Phone</strong>
+            <p><a href="tel:01234567890">01234 567890</a></p>
+          </div>
+        </div>
+        <div class="contact-detail-item">
+          <div class="contact-detail-icon"><i class="fas fa-envelope"></i></div>
+          <div class="contact-detail-text">
+            <strong>Email</strong>
+            <p><a href="mailto:info@premiermot.co.uk">info@premiermot.co.uk</a></p>
+          </div>
+        </div>
+        <div class="contact-detail-item">
+          <div class="contact-detail-icon"><i class="fas fa-location-dot"></i></div>
+          <div class="contact-detail-text">
+            <strong>Address</strong>
+            <p>14 Industrial Way, Chelmsford<br>Essex, CM1 2AB</p>
+          </div>
+        </div>
+        <div class="contact-detail-item">
+          <div class="contact-detail-icon"><i class="fas fa-clock"></i></div>
+          <div class="contact-detail-text">
+            <strong>Response Time</strong>
+            <p>We reply to all enquiries within 1 hour during opening hours</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="hours-grid">
+        <h3>Opening Hours</h3>
+        <div class="hours-row"><span class="day">Monday</span><span class="time">8:00am – 6:00pm</span></div>
+        <div class="hours-row"><span class="day">Tuesday</span><span class="time">8:00am – 6:00pm</span></div>
+        <div class="hours-row"><span class="day">Wednesday</span><span class="time">8:00am – 6:00pm</span></div>
+        <div class="hours-row"><span class="day">Thursday</span><span class="time">8:00am – 6:00pm</span></div>
+        <div class="hours-row"><span class="day">Friday</span><span class="time">8:00am – 6:00pm</span></div>
+        <div class="hours-row"><span class="day">Saturday</span><span class="time">8:00am – 5:00pm</span></div>
+        <div class="hours-row"><span class="day">Sunday</span><span class="time closed">Closed</span></div>
+      </div>
+    </div>
+
+    <!-- Form side -->
+    <div class="contact-form-card">
+      <h2>Send Us an <span style="color:var(--red)">Enquiry</span></h2>
+      <p>Fill in the form below and we'll come back to you within 1 hour. For urgent enquiries, please call us directly.</p>
+
+      <form id="contactForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input type="text" name="name" placeholder="John Smith" required>
+          </div>
+          <div class="form-group">
+            <label>Phone Number *</label>
+            <input type="tel" name="phone" placeholder="07700 900000" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email Address *</label>
+            <input type="email" name="email" placeholder="john@email.com" required>
+          </div>
+          <div class="form-group">
+            <label>Vehicle Registration</label>
+            <input type="text" name="reg" placeholder="AB21 XYZ" style="text-transform:uppercase">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Service Required *</label>
+            <select name="service" required>
+              <option value="">Select a service...</option>
+              <option>MOT</option>
+              <option>Full Service</option>
+              <option>Interim Service</option>
+              <option>MOT + Full Service</option>
+              <option>Brakes</option>
+              <option>Tyres</option>
+              <option>Diagnostics</option>
+              <option>Other / General Enquiry</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Preferred Date</label>
+            <input type="date" name="preferredDate">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Message</label>
+          <textarea name="message" placeholder="Tell us about your vehicle, the issue you're experiencing, or any questions you have..." style="min-height:120px"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:15px">
+          <i class="fas fa-paper-plane"></i> Send Enquiry
+        </button>
+        <p style="font-size:0.78rem;color:var(--text-dim);text-align:center;margin-top:12px">
+          We never share your details with third parties. Your privacy is important to us.
+        </p>
+      </form>
+
+      <div id="contactSuccess" style="display:none;text-align:center;padding:40px 20px">
+        <div class="success-icon" style="width:72px;height:72px;background:rgba(40,200,100,0.12);border:2px solid rgba(40,200,100,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
+          <i class="fas fa-check" style="font-size:2rem;color:#28c864"></i>
+        </div>
+        <h3 style="font-size:1.3rem;font-weight:800;margin-bottom:10px">Enquiry Sent!</h3>
+        <p style="color:var(--text-muted)">We'll be in touch within 1 hour.<br>For urgent matters, call us on <strong style="color:var(--white)">01234 567890</strong>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map -->
+  <div class="contact-map" style="margin-top:60px">
+    <div class="map-placeholder">
+      <i class="fas fa-map-location-dot" style="font-size:2.5rem;color:var(--grey);display:block;margin-bottom:8px"></i>
+      <p style="font-size:0.85rem;color:var(--text-dim)">14 Industrial Way, Chelmsford, Essex CM1 2AB</p>
+      <a href="https://maps.google.com" target="_blank" rel="noopener" class="btn btn-ghost" style="margin-top:12px;padding:8px 20px;font-size:0.82rem">
+        <i class="fas fa-external-link-alt"></i> Open in Google Maps
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="logo-main">Premier MOT & Service</span>
+      <span class="logo-sub">Chelmsford, Essex</span>
+      <p>Essex's most trusted MOT and vehicle service centre since 1994. Family-run, DVSA-authorised, and proud of every car we work on.</p>
+      <button class="btn btn-ghost open-modal"><i class="fas fa-calendar-check"></i> Book an Appointment</button>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a href="services.html">MOT Testing</a></li>
+        <li><a href="services.html">Full Service</a></li>
+        <li><a href="services.html">Interim Service</a></li>
+        <li><a href="services.html">Brake Inspection</a></li>
+        <li><a href="services.html">Tyre Fitting</a></li>
+        <li><a href="services.html">Diagnostics</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Opening Hours</h4>
+      <ul class="footer-hours">
+        <li><span>Mon – Fri</span><span>8:00 – 18:00</span></li>
+        <li><span>Saturday</span><span>8:00 – 17:00</span></li>
+        <li><span>Sunday</span><span class="closed">Closed</span></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact Us</h4>
+      <ul class="footer-contact">
+        <li><i class="fas fa-phone"></i><a href="tel:01234567890">01234 567890</a></li>
+        <li><i class="fas fa-envelope"></i><a href="mailto:info@premiermot.co.uk">info@premiermot.co.uk</a></li>
+        <li><i class="fas fa-location-dot"></i>14 Industrial Way,<br>Chelmsford, Essex, CM1 2AB</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Premier MOT & Service Ltd. All rights reserved.</p>
+    <div class="footer-bottom-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms & Conditions</a>
+      <a href="login.html">Staff Login</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ENQUIRY MODAL -->
+<div class="modal-overlay" id="enquiryModal">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h2><i class="fas fa-calendar-check" style="color:var(--red);margin-right:10px"></i>Book an Appointment</h2>
+      <button class="modal-close" aria-label="Close"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <form id="enquiryForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input type="text" name="name" placeholder="John Smith" required>
+          </div>
+          <div class="form-group">
+            <label>Phone Number *</label>
+            <input type="tel" name="phone" placeholder="07700 900000" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email Address *</label>
+            <input type="email" name="email" placeholder="john@email.com" required>
+          </div>
+          <div class="form-group">
+            <label>Vehicle Registration</label>
+            <input type="text" name="reg" placeholder="AB21 XYZ" style="text-transform:uppercase">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Service Required *</label>
+            <select name="service" required>
+              <option value="">Select a service...</option>
+              <option>MOT</option>
+              <option>Full Service</option>
+              <option>Interim Service</option>
+              <option>MOT + Full Service</option>
+              <option>Brakes</option>
+              <option>Tyres</option>
+              <option>Diagnostics</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Preferred Date</label>
+            <input type="date" name="preferredDate">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Additional Notes</label>
+          <textarea name="message" placeholder="Any other details about your vehicle or the work needed..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary form-submit">
+          <i class="fas fa-calendar-check"></i> Submit Booking Request
+        </button>
+        <p style="font-size:0.78rem;color:var(--text-dim);text-align:center;margin-top:12px">We'll call you back within 1 hour to confirm your booking.</p>
+      </form>
+      <div class="form-success" id="enquirySuccess">
+        <div class="success-icon"><i class="fas fa-check"></i></div>
+        <h3>Request Received!</h3>
+        <p>Thanks — we'll be in touch within 1 hour to confirm your booking.<br>If it's urgent, call us on <strong>01234 567890</strong>.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
