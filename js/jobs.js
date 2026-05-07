@@ -2,6 +2,8 @@
    Premier MOT — Job Cards (Firebase)
    =========================== */
 
+import { db, docsToArr, fsAdd, fsUpdate, fsDel, showSpinner, hideSpinner } from './firebase.js';
+
 let jobSearch = '', jobStatusFilter = 'all';
 window._jobsData = [];
 

@@ -2,47 +2,71 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Settings — public read (booking page needs it), auth write
+    // Helper — any authenticated user is an admin for this single-tenant app
+    function isAdmin() {
+      return request.auth != null;
+    }
+
+    // Settings — public read (booking page needs working hours / slot config),
+    //            authenticated write only
     match /settings/{document} {
       allow read:  if true;
-      allow write: if request.auth != null;
+      allow write: if isAdmin();
     }
 
-    // Enquiries — public create (contact forms), auth full access
+    // Enquiries — public create (contact/enquiry forms),
+    //             authenticated full access
     match /enquiries/{document} {
       allow create: if true;
-      allow read, update, delete: if request.auth != null;
+      allow read, update, delete: if isAdmin();
     }
 
-    // Bookings — public read + create (booking wizard), auth full access
+    // Bookings — public create (online booking wizard) + public read
+    //            (slot availability check needs existing booking count per slot).
+    //            Authenticated users get full access.
+    // Note: public read exposes booking metadata; acceptable trade-off for a
+    //       small single-garage app where slot checking is client-side.
     match /bookings/{document} {
       allow read, create: if true;
-      allow update, delete: if request.auth != null;
+      allow update, delete: if isAdmin();
     }
 
     // Customers — authenticated only
     match /customers/{document} {
-      allow read, write: if request.auth != null;
+      allow read, write: if isAdmin();
     }
 
     // Jobs — authenticated only
     match /jobs/{document} {
-      allow read, write: if request.auth != null;
+      allow read, write: if isAdmin();
     }
 
     // Invoices — authenticated only
     match /invoices/{document} {
-      allow read, write: if request.auth != null;
+      allow read, write: if isAdmin();
     }
 
     // Notifications — authenticated only
     match /notifications/{document} {
-      allow read, write: if request.auth != null;
+      allow read, write: if isAdmin();
     }
 
-    // WA logs — authenticated only
+    // WhatsApp send log — authenticated only
     match /wa_logs/{document} {
-      allow read, write: if request.auth != null;
+      allow read, write: if isAdmin();
+    }
+
+    // Users collection (admin identity store) — authenticated only.
+    // The app currently uses Firebase Auth directly and does not read
+    // from this collection at runtime, but the document is retained for
+    // reference and potential future role-checks.
+    match /users/{document} {
+      allow read, write: if isAdmin();
+    }
+
+    // Deny everything else by default (explicit safety net)
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
