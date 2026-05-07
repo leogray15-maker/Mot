@@ -1,69 +1,45 @@
 /* ===========================
-   Premier MOT — Auth Logic
+   Premier MOT — Auth (Firebase)
    =========================== */
 
-const ADMIN_CREDENTIALS_KEY = 'premier_admin_credentials';
-
-function getCredentials() {
-  const stored = localStorage.getItem(ADMIN_CREDENTIALS_KEY);
-  if (stored) return JSON.parse(stored);
-  return { username: 'admin', password: 'premier2024' };
-}
-
-function isLoggedIn() {
-  return sessionStorage.getItem('premier_session') === 'authenticated';
-}
-
-function requireAuth() {
-  if (!isLoggedIn()) {
-    window.location.href = 'login.html';
-    return false;
-  }
-  return true;
-}
-
-function logout() {
-  sessionStorage.removeItem('premier_session');
-  window.location.href = 'login.html';
-}
-
-// Login page logic
+// ——— Login page ———
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
-  if (isLoggedIn()) {
-    window.location.href = 'dashboard.html';
-  }
+  // Already logged in — skip to dashboard
+  auth.onAuthStateChanged(user => {
+    if (user) window.location.href = 'dashboard.html';
+  });
 
-  loginForm.addEventListener('submit', (e) => {
+  loginForm.addEventListener('submit', async e => {
     e.preventDefault();
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value;
-    const errorEl = document.getElementById('loginError');
-    const creds = getCredentials();
+    const email    = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errorEl  = document.getElementById('loginError');
+    const errMsg   = errorEl?.querySelector('span');
+    const btn      = loginForm.querySelector('.btn-login');
 
-    if (username === creds.username && password === creds.password) {
-      sessionStorage.setItem('premier_session', 'authenticated');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Signing in…';
+
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
       window.location.href = 'dashboard.html';
-    } else {
-      errorEl.classList.add('show');
-      const passwordInput = document.getElementById('password');
-      passwordInput.value = '';
-      passwordInput.focus();
-      setTimeout(() => errorEl.classList.remove('show'), 4000);
+    } catch (err) {
+      const friendly = ['auth/user-not-found','auth/wrong-password','auth/invalid-credential','auth/invalid-email']
+        .includes(err.code)
+        ? 'Incorrect email or password. Please try again.'
+        : 'Sign in failed. Please check your connection and try again.';
+      if (errMsg) errMsg.textContent = friendly;
+      errorEl?.classList.add('show');
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('loginPassword').focus();
+      setTimeout(() => errorEl?.classList.remove('show'), 5000);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-arrow-right-to-bracket"></i> Sign In';
     }
   });
 }
 
-// Dashboard auth check
-if (document.getElementById('dashboardApp')) {
-  if (!requireAuth()) {
-    // redirected
-  } else {
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', () => {
-        if (confirm('Are you sure you want to log out?')) logout();
-      });
-    }
-  }
-}
+// ——— Dashboard auth guard ———
+// Handled inside dashboard.js via auth.onAuthStateChanged

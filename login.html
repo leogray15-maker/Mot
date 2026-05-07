@@ -6,6 +6,11 @@
   <title>Staff Login | Premier MOT & Service</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="css/dashboard.css">
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="js/firebase.js"></script>
 </head>
 <body class="login-page">
 
@@ -30,17 +35,17 @@
 
   <form id="loginForm" autocomplete="off">
     <div class="form-group">
-      <label>Username</label>
+      <label>Email</label>
       <div class="input-wrap">
-        <i class="fas fa-user"></i>
-        <input type="text" id="username" name="username" placeholder="admin" autocomplete="username" required>
+        <i class="fas fa-envelope"></i>
+        <input type="email" id="loginEmail" name="email" placeholder="admin@premiermot.co.uk" autocomplete="email" required>
       </div>
     </div>
     <div class="form-group">
       <label>Password</label>
       <div class="input-wrap">
         <i class="fas fa-lock"></i>
-        <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required>
+        <input type="password" id="loginPassword" name="password" placeholder="••••••••" autocomplete="current-password" required>
       </div>
     </div>
     <button type="submit" class="btn-login">

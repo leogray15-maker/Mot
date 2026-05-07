@@ -6,8 +6,19 @@
   <title>Dashboard | Premier MOT & Service CRM</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="css/dashboard.css">
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="js/firebase.js"></script>
 </head>
 <body id="dashboardApp">
+
+<div id="appLoader" style="position:fixed;inset:0;background:#0d0d0d;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999">
+  <i class="fas fa-car-burst" style="font-size:2.5rem;color:#e02020;margin-bottom:16px"></i>
+  <div style="font-size:1rem;font-weight:600;color:#fff;margin-bottom:4px">Premier MOT CRM</div>
+  <div style="font-size:0.8rem;color:#666">Loading…</div>
+</div>
 
 <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle menu">
   <i class="fas fa-bars"></i>
@@ -577,38 +588,49 @@
 <script>
 function exportData() {
   const data = {
-    enquiries: JSON.parse(localStorage.getItem('premier_enquiries')||'[]'),
-    customers: JSON.parse(localStorage.getItem('premier_customers')||'[]'),
-    bookings: JSON.parse(localStorage.getItem('premier_bookings')||'[]'),
-    jobs: JSON.parse(localStorage.getItem('premier_jobs')||'[]'),
-    invoices: JSON.parse(localStorage.getItem('premier_invoices')||'[]'),
-    settings: JSON.parse(localStorage.getItem('premier_settings')||'{}'),
+    enquiries: window._enquiriesData || [],
+    customers: window._customersData || [],
+    bookings:  window._bookingsData  || [],
+    jobs:      window._jobsData      || [],
+    invoices:  window._invoicesData  || [],
+    settings:  typeof getSettings === 'function' ? getSettings() : {},
     exportedAt: new Date().toISOString()
   };
-  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url;
-  a.download=`premier-crm-${new Date().toISOString().split('T')[0]}.json`;
-  a.click(); URL.revokeObjectURL(url);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `premier-crm-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
-function clearAllData() {
+async function clearAllData() {
   if (!confirm('Delete ALL enquiries, customers, bookings, jobs, invoices and settings?')) return;
   if (!confirm('This cannot be undone. Confirm?')) return;
-  ['premier_enquiries','premier_customers','premier_bookings','premier_jobs','premier_invoices','premier_settings','premier_notifications','premier_wa_log'].forEach(k=>localStorage.removeItem(k));
-  location.reload();
+  try {
+    const cols = ['enquiries','customers','bookings','jobs','invoices','notifications','wa_logs'];
+    for (const col of cols) {
+      const snap = await db.collection(col).get();
+      const batch = db.batch();
+      snap.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+    }
+    await db.collection('settings').doc('config').delete();
+    location.reload();
+  } catch (e) {
+    alert('Failed to clear data. Please try again.');
+  }
 }
 function updateInfoPanel() {
-  const get=(k)=>JSON.parse(localStorage.getItem(k)||'[]').length;
-  const setText=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  setText('infoEnquiries', get('premier_enquiries'));
-  setText('infoCustomers', get('premier_customers'));
-  setText('infoBookings',  get('premier_bookings'));
-  setText('infoJobs',      get('premier_jobs'));
+  const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  setText('infoEnquiries', (window._enquiriesData || []).length);
+  setText('infoCustomers', (window._customersData || []).length);
+  setText('infoBookings',  (window._bookingsData  || []).length);
+  setText('infoJobs',      (window._jobsData      || []).length);
 }
-document.querySelectorAll('.sidebar-link[data-section="settings"]').forEach(b=>b.addEventListener('click',updateInfoPanel));
+document.querySelectorAll('.sidebar-link[data-section="settings"]').forEach(b => b.addEventListener('click', updateInfoPanel));
 </script>
 
-<script src="js/auth.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="js/dashboard.js"></script>
 <script src="js/whatsapp.js"></script>

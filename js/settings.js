@@ -5,37 +5,6 @@
 const DAYS = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
 const DAY_LABELS = { monday:'Mon',tuesday:'Tue',wednesday:'Wed',thursday:'Thu',friday:'Fri',saturday:'Sat',sunday:'Sun' };
 
-function getDefaultSettings() {
-  return {
-    garageName: 'Premier MOT & Service', phone: '01234 567890',
-    email: 'info@premiermot.co.uk', address: '14 Industrial Way, Chelmsford, Essex, CM1 2AB',
-    googleReviewLink: '', siteURL: 'https://mot-ruby.vercel.app',
-    whatsappTemplate: 'Hi [FirstName], just a reminder that your MOT is due on [MOTDueDate] for your [Year] [Make] [Model] ([Reg]). You can book online at [SiteURL] or call us on [PhoneNumber]. See you soon — [GarageName]',
-    reviewTemplate: 'Hi [FirstName], thanks for visiting [GarageName] today! If you\'re happy with the service, we\'d really appreciate a Google review — it takes just 30 seconds: [GoogleReviewLink]\nThanks again — [GarageName]',
-    bankDetails: '', vatRegistered: false, vatNumber: '', labourRate: 65,
-    reminderDays: [7, 14, 30], maxBookingsPerSlot: 2, blockedDates: [],
-    workingHours: {
-      monday:{open:true,start:'08:00',end:'18:00'}, tuesday:{open:true,start:'08:00',end:'18:00'},
-      wednesday:{open:true,start:'08:00',end:'18:00'}, thursday:{open:true,start:'08:00',end:'18:00'},
-      friday:{open:true,start:'08:00',end:'18:00'}, saturday:{open:true,start:'08:00',end:'17:00'},
-      sunday:{open:false,start:'09:00',end:'13:00'}
-    }
-  };
-}
-
-// Extend getSettings to include new defaults (merges with stored)
-const _origGetSettings = window.getSettings || function() { return JSON.parse(localStorage.getItem('premier_settings') || '{}'); };
-window.getSettings = function() {
-  const defaults = getDefaultSettings();
-  const stored = JSON.parse(localStorage.getItem('premier_settings') || '{}');
-  const merged = Object.assign({}, defaults, stored);
-  if (stored.workingHours) {
-    merged.workingHours = Object.assign({}, defaults.workingHours, stored.workingHours);
-  }
-  if (!merged.reminderDays || !Array.isArray(merged.reminderDays)) merged.reminderDays = defaults.reminderDays;
-  if (!merged.blockedDates || !Array.isArray(merged.blockedDates)) merged.blockedDates = [];
-  return merged;
-};
 
 function loadExtendedSettings() {
   const s = window.getSettings();
@@ -138,7 +107,8 @@ function addBlockedDate() {
   const s = window.getSettings();
   if (!(s.blockedDates || []).includes(input.value)) {
     s.blockedDates = [...(s.blockedDates || []), input.value];
-    window.saveSettings(s);
+    window._settings = s;
+    window.saveSettings(s).catch(() => {});
   }
   input.value = '';
   renderBlockedDates();
@@ -147,11 +117,12 @@ function addBlockedDate() {
 function removeBlockedDate(date) {
   const s = window.getSettings();
   s.blockedDates = (s.blockedDates || []).filter(d => d !== date);
-  window.saveSettings(s);
+  window._settings = s;
+  window.saveSettings(s).catch(() => {});
   renderBlockedDates();
 }
 
-function saveExtendedSettings() {
+async function saveExtendedSettings() {
   const s = window.getSettings();
 
   s.whatsappTemplate = document.getElementById('settingWATemplate')?.value || s.whatsappTemplate;
@@ -176,8 +147,12 @@ function saveExtendedSettings() {
   });
   s.workingHours = wh;
 
-  window.saveSettings(s);
-  showToast('Settings saved', 'success');
+  try {
+    await window.saveSettings(s);
+    showToast('Settings saved', 'success');
+  } catch (e) {
+    showToast('Failed to save settings', 'error');
+  }
 }
 
 // Hook into navigate for settings section
@@ -209,7 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('settingsHoursForm')?.addEventListener('submit', e => {
     e.preventDefault();
     saveExtendedSettings();
-    showToast('Working hours saved', 'success');
   });
 
   // Blocked dates

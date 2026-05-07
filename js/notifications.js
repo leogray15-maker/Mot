@@ -1,75 +1,99 @@
 /* ===========================
-   Premier MOT — Notifications
+   Premier MOT — Notifications (Firebase)
    =========================== */
 
-const NOTIF_KEY = 'premier_notifications';
+window._notifData = [];
 
-function getNotifications() { return JSON.parse(localStorage.getItem(NOTIF_KEY) || '[]'); }
-function saveNotificationsData(n) { localStorage.setItem(NOTIF_KEY, JSON.stringify(n)); }
+async function loadNotifications() {
+  try {
+    const snap = await db.collection('notifications').orderBy('createdAt','desc').limit(60).get();
+    window._notifData = docsToArr(snap);
+  } catch (e) {
+    window._notifData = [];
+  }
+  updateNotifBadge();
+}
 
 function addNotification(type, message, section) {
-  const notifs = getNotifications();
-  notifs.unshift({ id: Date.now(), type, message, section: section || 'overview', read: false, createdAt: new Date().toISOString() });
-  if (notifs.length > 60) notifs.length = 60;
-  saveNotificationsData(notifs);
+  const notif = { type, message, section: section || 'overview', read: false, createdAt: new Date().toISOString() };
+  window._notifData.unshift(notif);
+  if (window._notifData.length > 60) window._notifData.length = 60;
   updateNotifBadge();
   if (document.getElementById('notifDropdown')?.classList.contains('open')) renderNotifDropdown();
+  // Fire-and-forget Firestore write
+  db.collection('notifications').add(notif).catch(() => {});
 }
 
 function updateNotifBadge() {
   const badge = document.getElementById('notifBadge');
   if (!badge) return;
-  const count = getNotifications().filter(n => !n.read).length;
+  const count = window._notifData.filter(n => !n.read).length;
   badge.textContent = count > 9 ? '9+' : count;
-  badge.style.display = count > 0 ? 'flex' : 'none';
+  badge.classList.toggle('hidden', count === 0);
 }
 
 function renderNotifDropdown() {
   const list = document.getElementById('notifList');
   if (!list) return;
-  const notifs = getNotifications().slice(0, 25);
+  const notifs = window._notifData.slice(0, 25);
   if (notifs.length === 0) {
     list.innerHTML = `<div class="notif-empty"><i class="fas fa-bell-slash"></i><p>All caught up!</p></div>`;
     return;
   }
   const iconMap = {
-    new_enquiry: 'fa-inbox', new_booking: 'fa-calendar-plus', mot_reminder: 'fa-car',
-    job_complete: 'fa-circle-check', invoice_overdue: 'fa-file-invoice', info: 'fa-info-circle',
-    success: 'fa-check-circle', error: 'fa-exclamation-circle'
+    new_enquiry:'fa-inbox', new_booking:'fa-calendar-plus', mot_reminder:'fa-car',
+    job_complete:'fa-circle-check', invoice_overdue:'fa-file-invoice',
+    info:'fa-info-circle', success:'fa-check-circle', error:'fa-exclamation-circle'
   };
-  list.innerHTML = notifs.map(n => `
-    <div class="notif-item${n.read ? '' : ' unread'}" onclick="clickNotif(${n.id},'${n.section || 'overview'}')">
-      <div class="notif-icon-wrap type-${n.type}">
-        <i class="fas ${iconMap[n.type] || 'fa-bell'}"></i>
-      </div>
-      <div class="notif-content">
+  list.innerHTML = notifs.map((n, i) => `
+    <div class="notif-item${n.read ? '' : ' unread'}" onclick="clickNotif(${i},'${n.section||'overview'}')">
+      <div class="notif-dot${n.read ? ' read' : ''}"></div>
+      <div class="notif-icon ${iconClass(n.type)}"><i class="fas ${iconMap[n.type]||'fa-bell'}"></i></div>
+      <div class="notif-text">
         <p>${esc(n.message)}</p>
         <span class="notif-time">${timeAgo(n.createdAt)}</span>
       </div>
-      ${!n.read ? '<div class="notif-dot"></div>' : ''}
     </div>`).join('');
 }
 
-function clickNotif(id, section) {
-  const notifs = getNotifications();
-  const idx = notifs.findIndex(n => n.id === id);
-  if (idx !== -1) { notifs[idx].read = true; saveNotificationsData(notifs); }
+function iconClass(type) {
+  if (['new_booking','mot_reminder'].includes(type)) return 'amber';
+  if (['job_complete','success'].includes(type)) return 'green';
+  if (['error','invoice_overdue'].includes(type)) return 'red';
+  return 'blue';
+}
+
+function clickNotif(index, section) {
+  if (window._notifData[index]) window._notifData[index].read = true;
   updateNotifBadge();
   document.getElementById('notifDropdown')?.classList.remove('open');
   if (section && typeof navigate === 'function') navigate(section);
 }
 
 function markAllRead() {
-  const notifs = getNotifications().map(n => ({ ...n, read: true }));
-  saveNotificationsData(notifs);
+  window._notifData.forEach(n => { n.read = true; });
   updateNotifBadge();
   renderNotifDropdown();
+  // Best-effort batch mark-read in Firestore
+  db.collection('notifications').where('read','==',false).get()
+    .then(snap => {
+      const batch = db.batch();
+      snap.docs.forEach(d => batch.update(d.ref, { read: true }));
+      return batch.commit();
+    }).catch(() => {});
 }
 
 function clearAllNotifs() {
-  localStorage.removeItem(NOTIF_KEY);
+  window._notifData = [];
   updateNotifBadge();
   renderNotifDropdown();
+  // Best-effort delete in Firestore
+  db.collection('notifications').get()
+    .then(snap => {
+      const batch = db.batch();
+      snap.docs.forEach(d => batch.delete(d.ref));
+      return batch.commit();
+    }).catch(() => {});
 }
 
 function timeAgo(iso) {
@@ -83,8 +107,13 @@ function timeAgo(iso) {
   return `${Math.floor(h / 24)}d ago`;
 }
 
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  const bell = document.getElementById('notifBell');
+  const bell     = document.getElementById('notifBell');
   const dropdown = document.getElementById('notifDropdown');
   if (bell && dropdown) {
     bell.addEventListener('click', e => {
@@ -97,5 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   document.getElementById('clearNotifs')?.addEventListener('click', clearAllNotifs);
-  updateNotifBadge();
+  // Load notifications on init (after auth is ready, via a slight delay)
+  setTimeout(loadNotifications, 1000);
 });

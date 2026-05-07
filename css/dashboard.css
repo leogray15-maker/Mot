@@ -1751,3 +1751,21 @@ tbody tr:hover { background: rgba(255,255,255,0.02); }
   .parts-header { display: none; }
   .notif-dropdown { width: 280px; right: -80px; }
 }
+
+/* ===========================
+   Firestore loading spinner
+   =========================== */
+
+.fs-spinner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 0;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+.fs-spinner i {
+  font-size: 1.2rem;
+  color: var(--red);
+}

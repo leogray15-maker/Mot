@@ -83,13 +83,13 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeModal();
 });
 
-// Form submission — save to localStorage
+// Form submission — save to Firestore
 if (modalForm) {
-  modalForm.addEventListener('submit', (e) => {
+  modalForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const data = new FormData(modalForm);
     const enquiry = {
-      id: Date.now(),
+      createdAt: new Date().toISOString(),
       date: new Date().toISOString(),
       name: data.get('name'),
       phone: data.get('phone'),
@@ -101,10 +101,10 @@ if (modalForm) {
       status: 'New',
       source: 'Modal'
     };
-    saveEnquiry(enquiry);
     modalForm.style.display = 'none';
     if (modalSuccess) modalSuccess.classList.add('show');
     setTimeout(closeModal, 4000);
+    await saveEnquiry(enquiry);
   });
 }
 
@@ -115,11 +115,11 @@ if (modalForm) {
 const contactForm = document.getElementById('contactForm');
 const contactSuccess = document.getElementById('contactSuccess');
 if (contactForm) {
-  contactForm.addEventListener('submit', (e) => {
+  contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const data = new FormData(contactForm);
     const enquiry = {
-      id: Date.now(),
+      createdAt: new Date().toISOString(),
       date: new Date().toISOString(),
       name: data.get('name'),
       phone: data.get('phone'),
@@ -131,16 +131,18 @@ if (contactForm) {
       status: 'New',
       source: 'Contact Form'
     };
-    saveEnquiry(enquiry);
     contactForm.style.display = 'none';
     if (contactSuccess) contactSuccess.style.display = 'block';
+    await saveEnquiry(enquiry);
   });
 }
 
-function saveEnquiry(enquiry) {
-  const existing = JSON.parse(localStorage.getItem('premier_enquiries') || '[]');
-  existing.push(enquiry);
-  localStorage.setItem('premier_enquiries', JSON.stringify(existing));
+async function saveEnquiry(enquiry) {
+  try {
+    await db.collection('enquiries').add(enquiry);
+  } catch (e) {
+    console.error('Failed to save enquiry', e);
+  }
 }
 
 // ===========================

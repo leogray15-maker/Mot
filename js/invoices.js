@@ -1,25 +1,23 @@
 /* ===========================
-   Premier MOT — Invoices
+   Premier MOT — Invoices (Firebase)
    =========================== */
 
-const INVOICES_KEY = 'premier_invoices';
-const INV_COUNTER_KEY = 'premier_invoice_counter';
+window._invoicesData = [];
 
-function getInvoices() { return JSON.parse(localStorage.getItem(INVOICES_KEY) || '[]'); }
-function saveInvoices(data) { localStorage.setItem(INVOICES_KEY, JSON.stringify(data)); }
-
-function getNextInvoiceNumber() {
-  const n = parseInt(localStorage.getItem(INV_COUNTER_KEY) || '0') + 1;
-  localStorage.setItem(INV_COUNTER_KEY, String(n));
-  return 'INV-' + String(n).padStart(4, '0');
-}
-
-function loadInvoicesSection() {
+async function loadInvoicesSection() {
+  showSpinner('page-invoices');
+  try {
+    const snap = await db.collection('invoices').orderBy('createdAt','desc').get();
+    window._invoicesData = docsToArr(snap);
+  } catch (e) {
+    showToast('Failed to load invoices', 'error');
+  }
+  hideSpinner('page-invoices');
   renderInvoicesList();
 }
 
 function renderInvoicesList() {
-  const invoices = getInvoices().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const invoices = [...window._invoicesData];
   const tbody = document.getElementById('invoicesBody');
   if (!tbody) return;
   if (invoices.length === 0) {
@@ -34,52 +32,68 @@ function renderInvoicesList() {
       <td>${esc(inv.service||'—')}</td>
       <td style="font-weight:700;color:var(--white)">£${parseFloat(inv.total||0).toFixed(2)}</td>
       <td>
-        <select class="status-select" onchange="updateInvoiceStatus(${inv.id},this.value)">
+        <select class="status-select" onchange="updateInvoiceStatus('${inv.id}',this.value)">
           ${['Unpaid','Paid','Overdue'].map(s=>`<option value="${s}"${inv.paymentStatus===s?' selected':''}>${s}</option>`).join('')}
         </select>
       </td>
       <td>
         <div class="action-btns">
-          <button class="action-btn" onclick="viewInvoiceModal(${inv.id})" title="View"><i class="fas fa-eye"></i></button>
-          <button class="action-btn" onclick="printInvoice(${inv.id})" title="Print / PDF"><i class="fas fa-print"></i></button>
-          <button class="action-btn success" onclick="sendInvoiceWA(${inv.id})" title="Send via WhatsApp"><i class="fab fa-whatsapp"></i></button>
-          <button class="action-btn danger" onclick="deleteInvoice(${inv.id})" title="Delete"><i class="fas fa-trash"></i></button>
+          <button class="action-btn" onclick="viewInvoiceModal('${inv.id}')" title="View"><i class="fas fa-eye"></i></button>
+          <button class="action-btn" onclick="printInvoice('${inv.id}')" title="Print / PDF"><i class="fas fa-print"></i></button>
+          <button class="action-btn success" onclick="sendInvoiceWA('${inv.id}')" title="Send via WhatsApp"><i class="fab fa-whatsapp"></i></button>
+          <button class="action-btn danger" onclick="deleteInvoice('${inv.id}')" title="Delete"><i class="fas fa-trash"></i></button>
         </div>
       </td>
     </tr>`).join('');
 }
 
-function createInvoiceFromJob(jobId) {
-  const jobs = getJobs ? getJobs() : JSON.parse(localStorage.getItem('premier_jobs') || '[]');
-  const j = jobs.find(x => x.id === jobId);
+async function getNextInvoiceNumber() {
+  const ref = db.collection('settings').doc('config');
+  const num = await db.runTransaction(async t => {
+    const doc = await t.get(ref);
+    const n = (doc.exists ? (doc.data().invoiceCounter || 0) : 0) + 1;
+    t.update(ref, { invoiceCounter: n });
+    return n;
+  });
+  return 'INV-' + String(num).padStart(4, '0');
+}
+
+async function createInvoiceFromJob(jobId) {
+  const j = (window._jobsData || []).find(x => x.id === jobId)
+    || await db.collection('jobs').doc(jobId).get().then(d => d.exists ? { id: d.id, ...d.data() } : null);
   if (!j) { showToast('Job not found', 'error'); return; }
 
   const s = getSettings();
-  const invoiceNum = getNextInvoiceNumber();
-  const customers = getCustomers();
-  const cust = customers.find(c => c.id === j.customerId) || {};
+  let invoiceNum;
+  try {
+    invoiceNum = await getNextInvoiceNumber();
+  } catch (e) {
+    showToast('Failed to generate invoice number', 'error');
+    return;
+  }
+
+  const cust = (window._customersData || []).find(c => c.id === j.customerId) || {};
   const vatRate = s.vatRegistered ? 0.2 : 0;
   const subtotal = parseFloat(j.jobValue || 0);
   const vatAmount = subtotal * vatRate;
   const total = subtotal + vatAmount;
 
   const invoice = {
-    id: Date.now(),
     invoiceNumber: invoiceNum,
     jobId,
-    customerId: j.customerId,
-    customerName: j.customerName,
+    customerId: j.customerId || '',
+    customerName: j.customerName || '',
     customerPhone: cust.phone || '',
     customerEmail: cust.email || '',
-    reg: j.reg,
-    service: j.serviceType,
+    reg: j.reg || '',
+    service: j.serviceType || '',
     date: j.dateIn || new Date().toISOString().split('T')[0],
     items: [
       ...(j.parts || []).map(p => ({ desc: p.name, qty: p.qty, unit: p.cost, total: p.total })),
-      { desc: `Labour (${j.labourHours}hrs @ £${j.labourRate}/hr)`, qty: 1, unit: (j.labourHours||0)*(j.labourRate||0), total: (j.labourHours||0)*(j.labourRate||0) }
+      { desc: `Labour (${j.labourHours||0}hrs @ £${j.labourRate||0}/hr)`, qty: 1, unit: (j.labourHours||0)*(j.labourRate||0), total: (j.labourHours||0)*(j.labourRate||0) }
     ],
     subtotal,
-    vatApplied: s.vatRegistered,
+    vatApplied: !!s.vatRegistered,
     vatRate: s.vatRegistered ? 20 : 0,
     vatAmount,
     total,
@@ -88,29 +102,47 @@ function createInvoiceFromJob(jobId) {
     createdAt: new Date().toISOString()
   };
 
-  const invoices = getInvoices();
-  invoices.push(invoice);
-  saveInvoices(invoices);
-  addNotification('invoice_overdue', `Invoice ${invoiceNum} created for ${j.customerName}`, 'invoices');
-  showToast(`Invoice ${invoiceNum} created`, 'success');
-  if (typeof navigate === 'function') navigate('invoices');
+  try {
+    const id = await fsAdd('invoices', invoice);
+    window._invoicesData.unshift({ id, ...invoice });
+    if (typeof addNotification === 'function') addNotification('info', `Invoice ${invoiceNum} created for ${j.customerName}`, 'invoices');
+    showToast(`Invoice ${invoiceNum} created`, 'success');
+    if (typeof navigate === 'function') navigate('invoices');
+  } catch (e) {
+    showToast('Failed to create invoice', 'error');
+  }
 }
 
-function updateInvoiceStatus(id, status) {
-  const invoices = getInvoices();
-  const idx = invoices.findIndex(i => i.id === id);
-  if (idx !== -1) { invoices[idx].paymentStatus = status; saveInvoices(invoices); showToast('Payment status updated', 'success'); }
+async function updateInvoiceStatus(id, status) {
+  const idx = window._invoicesData.findIndex(i => i.id === id);
+  if (idx !== -1) {
+    window._invoicesData[idx].paymentStatus = status;
+    if (status === 'Overdue' && typeof addNotification === 'function') {
+      addNotification('invoice_overdue', `Invoice ${window._invoicesData[idx].invoiceNumber} marked overdue`, 'invoices');
+    }
+  }
+  try {
+    await fsUpdate('invoices', id, { paymentStatus: status });
+    showToast('Payment status updated', 'success');
+  } catch (e) {
+    showToast('Failed to update status', 'error');
+  }
 }
 
-function deleteInvoice(id) {
+async function deleteInvoice(id) {
   if (!confirm('Delete this invoice?')) return;
-  saveInvoices(getInvoices().filter(i => i.id !== id));
+  window._invoicesData = window._invoicesData.filter(i => i.id !== id);
   renderInvoicesList();
-  showToast('Invoice deleted', 'info');
+  try {
+    await fsDel('invoices', id);
+    showToast('Invoice deleted', 'info');
+  } catch (e) {
+    showToast('Failed to delete invoice', 'error');
+  }
 }
 
 function viewInvoiceModal(id) {
-  const inv = getInvoices().find(x => x.id === id);
+  const inv = window._invoicesData.find(x => x.id === id);
   if (!inv) return;
   const overlay = document.getElementById('invoiceDetailModal');
   const content = document.getElementById('invoiceDetailContent');
@@ -148,24 +180,23 @@ function viewInvoiceModal(id) {
     </div>
     ${s.bankDetails?`<div style="margin-top:12px;padding:12px;background:var(--dark-3);border-radius:var(--radius);font-size:0.82rem;color:var(--text-muted)"><strong style="color:var(--text)">Bank Details:</strong> ${esc(s.bankDetails)}</div>`:''}
     <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap">
-      <button class="btn-sm btn-ghost-sm" onclick="printInvoice(${inv.id})"><i class="fas fa-print"></i> Print / PDF</button>
-      <button class="btn-sm btn-success-sm" onclick="sendInvoiceWA(${inv.id})"><i class="fab fa-whatsapp"></i> Send via WhatsApp</button>
+      <button class="btn-sm btn-ghost-sm" onclick="printInvoice('${inv.id}')"><i class="fas fa-print"></i> Print / PDF</button>
+      <button class="btn-sm btn-success-sm" onclick="sendInvoiceWA('${inv.id}')"><i class="fab fa-whatsapp"></i> Send via WhatsApp</button>
     </div>`;
   overlay.classList.add('open');
 }
 
 function sendInvoiceWA(id) {
-  const inv = getInvoices().find(x => x.id === id);
+  const inv = window._invoicesData.find(x => x.id === id);
   if (!inv) return;
-  const customers = getCustomers();
-  const cust = customers.find(c => c.id === inv.customerId) || { phone: inv.customerPhone, name: inv.customerName };
-  if (!cust.phone) { showToast('No phone number for this customer', 'error'); return; }
+  const phone = inv.customerPhone || ((window._customersData || []).find(c => c.id === inv.customerId) || {}).phone;
+  if (!phone) { showToast('No phone number for this customer', 'error'); return; }
   const msg = buildInvoiceWhatsAppMessage(inv);
-  openWhatsApp(cust.phone, msg);
+  openWhatsApp(phone, msg);
 }
 
 function printInvoice(id) {
-  const inv = getInvoices().find(x => x.id === id);
+  const inv = window._invoicesData.find(x => x.id === id);
   if (!inv) return;
   const s = getSettings();
   const itemRows = (inv.items||[]).map(i=>`<tr><td>${esc(i.desc)}</td><td>${i.qty}</td><td>£${parseFloat(i.unit).toFixed(2)}</td><td>£${parseFloat(i.total).toFixed(2)}</td></tr>`).join('');
@@ -202,9 +233,11 @@ function printInvoice(id) {
   ${inv.notes?`<div style="margin-top:12px;color:#666">Notes: ${esc(inv.notes)}</div>`:''}
   <div style="margin-top:40px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa;text-align:center">Thank you for choosing ${esc(s.garageName)}. Please retain this invoice for your records.</div>
   <button class="no-print" onclick="window.print()" style="margin-top:24px;padding:10px 20px;background:#e02020;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer">Print / Save PDF</button>
-  <script>window.onload=()=>window.print();</script></body></html>`);
+  <script>window.onload=()=>window.print();<\/script></body></html>`);
   win.document.close();
 }
+
+function esc(str) { if (!str) return ''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 document.getElementById('closeInvoiceModal')?.addEventListener('click', () => document.getElementById('invoiceDetailModal')?.classList.remove('open'));
 document.getElementById('invoiceDetailModal')?.addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
