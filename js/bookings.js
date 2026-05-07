@@ -146,18 +146,16 @@ if (document.getElementById('publicBookingPage')) {
     bookings.push(booking);
     saveBookings(bookings);
 
-    // Show ref
+    // Show ref and populate dynamic fields from settings
     const refEl = document.getElementById('bookingRefDisplay');
     if (refEl) refEl.textContent = ref;
-
-    // Open WA for owner notification
     const s = JSON.parse(localStorage.getItem('premier_settings') || '{}');
-    if (s.phone) {
-      const msg = `📅 New Booking — ${s.garageName||'Premier MOT'}\n\nRef: ${ref}\nCustomer: ${bkData.name}\nPhone: ${bkData.phone}\nService: ${bkData.service}\nDate: ${bkData.date} at ${bkData.time}\nVehicle: ${bkData.reg||'Not given'}\n\nNotes: ${bkData.notes||'None'}`;
-      const num = bkData.phone.replace(/[\s\-\(\)]/g,'').replace(/^0/,'44');
-      // Delay so page transition happens first
-      setTimeout(() => window.open(`https://wa.me/${num}?text=${encodeURIComponent('Thanks for booking with us! We\'ve confirmed your booking ' + ref + ' for ' + bkData.service + ' on ' + bkData.date + ' at ' + bkData.time + '. See you then! — ' + (s.garageName||'Premier MOT'))}`, '_blank', 'noopener'), 600);
-    }
+    const phoneEl = document.getElementById('confirmPhone');
+    if (phoneEl) phoneEl.textContent = s.phone || '01234 567890';
+
+    // Open WA for customer confirmation
+    const custNum = bkData.phone.replace(/[\s\-\(\)]/g,'').replace(/^0/,'44');
+    setTimeout(() => window.open(`https://wa.me/${custNum}?text=${encodeURIComponent('Thanks for booking with us! We\'ve received your ' + bkData.service + ' booking (Ref: ' + ref + ') for ' + bkData.date + ' at ' + bkData.time + '. We\'ll call you within 1 hour to confirm. — ' + (s.garageName||'Premier MOT'))}`, '_blank', 'noopener'), 600);
 
     goStep(5);
   });
@@ -167,8 +165,17 @@ if (document.getElementById('publicBookingPage')) {
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  // Init
+  // Init — read URL param to pre-select service
   goStep(1);
+  const urlParams = new URLSearchParams(window.location.search);
+  const preService = urlParams.get('service');
+  if (preService) {
+    const opt = document.querySelector(`.service-option[data-service="${preService}"]`);
+    if (opt) {
+      opt.click();
+      opt.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
 }
 
 // ===========================
