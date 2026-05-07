@@ -226,9 +226,13 @@ function loadBookingsSection() {
       window._bookingsData = docsToArr(snap);
       hideSpinner('page-bookings');
       updateBookingsBadge();
+      // Refresh overview stats live when a new booking arrives
+      if (window._currentSection === 'overview' && typeof window.loadOverview === 'function') {
+        window.loadOverview();
+      }
       if (dashBookingView === 'calendar') renderBookingCalendar();
       else renderBookingsList();
-    }, err => {
+    }, () => {
       hideSpinner('page-bookings');
       showToast('Failed to load bookings', 'error');
     });

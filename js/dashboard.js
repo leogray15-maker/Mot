@@ -38,6 +38,10 @@ async function initSettings() {
     window._settings.workingHours = Object.assign({}, def.workingHours, stored.workingHours || {});
     if (!Array.isArray(window._settings.reminderDays)) window._settings.reminderDays = def.reminderDays;
     if (!Array.isArray(window._settings.blockedDates))  window._settings.blockedDates = [];
+    // On first login, persist defaults so the public booking page always gets working hours
+    if (!snap.exists) {
+      db.collection('settings').doc('config').set(window._settings).catch(() => {});
+    }
   } catch (e) {
     console.error('Failed to load settings', e);
     window._settings = getDefaultSettings();
@@ -58,9 +62,6 @@ window.saveSettings = saveSettings;
 window._enquiriesData = [];
 window._customersData = [];
 window._bookingsData  = [];
-
-function getEnquiries() { return window._enquiriesData; }
-function getCustomers()  { return window._customersData; }
 
 // ——— Utilities ———
 
@@ -100,7 +101,6 @@ function showToast(message, type = 'success') {
 // ——— Sidebar Navigation ———
 let currentSection = 'overview';
 let _enquiriesUnsub = null;
-let _bookingsUnsub  = null;
 
 window.sectionLoaders = {
   overview:  () => loadOverview(),
@@ -117,6 +117,7 @@ const SECTION_LABELS = {
 
 function navigate(section) {
   currentSection = section;
+  window._currentSection = section;
   document.querySelectorAll('.section-page').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
   const page = document.getElementById(`page-${section}`);
@@ -148,7 +149,6 @@ function loadOverview() {
   const enquiries = window._enquiriesData;
   const bookings  = window._bookingsData;
   const todayStr  = today();
-  const s = getSettings();
 
   setText('stat-total',     enquiries.length);
   setText('stat-today',     enquiries.filter(e => (e.date||e.createdAt||'').startsWith(todayStr)).length);
@@ -307,7 +307,7 @@ async function updateEnquiryStatus(id, status) {
         if (cust && typeof promptReviewRequest === 'function') setTimeout(() => promptReviewRequest(cust.id), 300);
       }
     }
-  } catch (err) {
+  } catch {
     showToast('Failed to update status', 'error');
   }
 }
@@ -675,7 +675,7 @@ function showAppLoader(visible) {
 Object.assign(window, {
   navigate, showToast, formatDate, formatDateTime, esc, statusClass,
   updateEnquiryStatus, deleteEnquiry, markComplete, viewEnquiry,
-  viewCustomer, deleteCustomer, saveCustomerNotes
+  viewCustomer, deleteCustomer, saveCustomerNotes, loadOverview
 });
 
 // ——— Init (Firebase Auth Guard) ———
@@ -708,5 +708,10 @@ if (document.getElementById('dashboardApp')) {
     });
 
     navigate('overview');
+
+    // Eagerly start real-time listeners so overview stats are populated on first load,
+    // and new bookings/enquiries appear immediately without navigating to each section first
+    loadEnquiries();
+    window.sectionLoaders['bookings']?.();
   });
 }
