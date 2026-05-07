@@ -204,6 +204,22 @@ ul { list-style: none; }
   margin-left: 8px;
 }
 
+.nav-book-link {
+  background: rgba(224,32,32,0.1) !important;
+  border: 1px solid rgba(224,32,32,0.3) !important;
+  color: var(--red-light) !important;
+  font-weight: 600 !important;
+  gap: 6px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.nav-book-link:hover {
+  background: var(--red) !important;
+  color: var(--white) !important;
+  border-color: var(--red) !important;
+}
+
 .nav-hamburger {
   display: none;
   flex-direction: column;

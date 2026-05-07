@@ -1,64 +1,80 @@
 /* ===========================
-   Premier MOT — Dashboard CRM
+   Premier MOT — Dashboard CRM (v2)
    =========================== */
 
 // ===========================
 // DATA HELPERS
 // ===========================
-
 const ENQUIRIES_KEY = 'premier_enquiries';
 const CUSTOMERS_KEY = 'premier_customers';
-const SETTINGS_KEY = 'premier_settings';
+const SETTINGS_KEY  = 'premier_settings';
 const CREDENTIALS_KEY = 'premier_admin_credentials';
 
 function getEnquiries() { return JSON.parse(localStorage.getItem(ENQUIRIES_KEY) || '[]'); }
-function saveEnquiries(data) { localStorage.setItem(ENQUIRIES_KEY, JSON.stringify(data)); }
+function saveEnquiries(d) { localStorage.setItem(ENQUIRIES_KEY, JSON.stringify(d)); }
 function getCustomers() { return JSON.parse(localStorage.getItem(CUSTOMERS_KEY) || '[]'); }
-function saveCustomers(data) { localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(data)); }
+function saveCustomers(d) { localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(d)); }
+
 function getSettings() {
-  return JSON.parse(localStorage.getItem(SETTINGS_KEY) || JSON.stringify({
-    garageName: 'Premier MOT & Service',
-    phone: '01234 567890',
-    email: 'info@premiermot.co.uk',
-    address: '14 Industrial Way, Chelmsford, Essex, CM1 2AB'
-  }));
+  const defaults = {
+    garageName:'Premier MOT & Service', phone:'01234 567890',
+    email:'info@premiermot.co.uk', address:'14 Industrial Way, Chelmsford, Essex, CM1 2AB',
+    googleReviewLink:'', siteURL:'https://mot-ruby.vercel.app',
+    whatsappTemplate:'Hi [FirstName], just a reminder that your MOT is due on [MOTDueDate] for your [Year] [Make] [Model] ([Reg]). You can book online at [SiteURL] or call us on [PhoneNumber]. See you soon — [GarageName]',
+    reviewTemplate:'Hi [FirstName], thanks for visiting [GarageName] today! If you\'re happy with the service, we\'d really appreciate a Google review — it takes just 30 seconds: [GoogleReviewLink]\nThanks again — [GarageName]',
+    bankDetails:'', vatRegistered:false, vatNumber:'', labourRate:65,
+    reminderDays:[7,14,30], maxBookingsPerSlot:2, blockedDates:[],
+    workingHours:{
+      monday:{open:true,start:'08:00',end:'18:00'}, tuesday:{open:true,start:'08:00',end:'18:00'},
+      wednesday:{open:true,start:'08:00',end:'18:00'}, thursday:{open:true,start:'08:00',end:'18:00'},
+      friday:{open:true,start:'08:00',end:'18:00'}, saturday:{open:true,start:'08:00',end:'17:00'},
+      sunday:{open:false,start:'09:00',end:'13:00'}
+    }
+  };
+  const stored = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+  const merged = Object.assign({}, defaults, stored);
+  merged.workingHours = Object.assign({}, defaults.workingHours, stored.workingHours || {});
+  if (!Array.isArray(merged.reminderDays)) merged.reminderDays = defaults.reminderDays;
+  if (!Array.isArray(merged.blockedDates)) merged.blockedDates = [];
+  return merged;
 }
-function saveSettings(data) { localStorage.setItem(SETTINGS_KEY, JSON.stringify(data)); }
+function saveSettings(d) { localStorage.setItem(SETTINGS_KEY, JSON.stringify(d)); }
 
 function getCredentials() {
-  return JSON.parse(localStorage.getItem(CREDENTIALS_KEY) || JSON.stringify({ username: 'admin', password: 'premier2024' }));
+  return JSON.parse(localStorage.getItem(CREDENTIALS_KEY) || JSON.stringify({username:'admin',password:'premier2024'}));
 }
-function saveCredentials(data) { localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(data)); }
+function saveCredentials(d) { localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(d)); }
 
 function formatDate(iso) {
   if (!iso) return '—';
-  const d = new Date(iso);
-  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  const d = new Date(iso.includes('T') ? iso : iso + 'T12:00:00');
+  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
 }
-
 function formatDateTime(iso) {
   if (!iso) return '—';
   const d = new Date(iso);
-  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' +
-    d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) + ' ' +
+    d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
 }
-
 function today() { return new Date().toISOString().split('T')[0]; }
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
 // ===========================
 // TOAST NOTIFICATIONS
 // ===========================
-
-function showToast(message, type = 'success') {
+function showToast(message, type='success') {
   const container = document.getElementById('toastContainer');
   if (!container) return;
-  const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle' };
+  const icons = {success:'fa-check-circle',error:'fa-times-circle',info:'fa-info-circle'};
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
-  toast.innerHTML = `<i class="fas ${icons[type] || icons.info} ${type}"></i><span>${message}</span>`;
+  toast.innerHTML = `<i class="fas ${icons[type]||icons.info} ${type}"></i><span>${message}</span>`;
   container.appendChild(toast);
   setTimeout(() => {
-    toast.style.animation = 'slideInRight 0.3s ease reverse forwards';
+    toast.style.animation='slideInRight 0.3s ease reverse forwards';
     setTimeout(() => toast.remove(), 300);
   }, 3500);
 }
@@ -66,37 +82,34 @@ function showToast(message, type = 'success') {
 // ===========================
 // SIDEBAR NAVIGATION
 // ===========================
-
 let currentSection = 'overview';
+
+// Section loaders registry — other JS files add to this
+window.sectionLoaders = {
+  overview: () => loadOverview(),
+  enquiries: () => loadEnquiries(),
+  customers: () => loadCustomers(),
+  mot: () => loadMOTTracker(),
+  settings: () => loadSettings()
+};
+
+const SECTION_LABELS = {
+  overview:'Overview', enquiries:'Enquiries', customers:'Customers', mot:'MOT Tracker',
+  settings:'Settings', bookings:'Bookings', jobs:'Job Cards', invoices:'Invoices', revenue:'Revenue'
+};
 
 function navigate(section) {
   currentSection = section;
   document.querySelectorAll('.section-page').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
-
   const page = document.getElementById(`page-${section}`);
   if (page) page.classList.add('active');
-
   const link = document.querySelector(`.sidebar-link[data-section="${section}"]`);
   if (link) link.classList.add('active');
-
-  const breadcrumb = document.querySelector('.topbar-breadcrumb');
-  if (breadcrumb) {
-    const labels = { overview: 'Overview', enquiries: 'Enquiries', customers: 'Customers', mot: 'MOT Tracker', settings: 'Settings' };
-    breadcrumb.innerHTML = `<span>${labels[section] || section}</span>`;
-  }
-
-  // Load section data
-  const loaders = {
-    overview: loadOverview,
-    enquiries: loadEnquiries,
-    customers: loadCustomers,
-    mot: loadMOTTracker,
-    settings: loadSettings
-  };
-  if (loaders[section]) loaders[section]();
-
-  // Close mobile sidebar
+  const bc = document.querySelector('.topbar-breadcrumb');
+  if (bc) bc.innerHTML = `<span>${SECTION_LABELS[section] || section}</span>`;
+  const loader = window.sectionLoaders[section];
+  if (loader) loader();
   document.querySelector('.sidebar')?.classList.remove('open');
 }
 
@@ -104,41 +117,80 @@ document.querySelectorAll('.sidebar-link[data-section]').forEach(link => {
   link.addEventListener('click', () => navigate(link.dataset.section));
 });
 
-// Mobile sidebar toggle
 const sidebarToggle = document.getElementById('sidebarToggle');
 const sidebar = document.querySelector('.sidebar');
 if (sidebarToggle && sidebar) {
   sidebarToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
-  document.addEventListener('click', (e) => {
-    if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
-      sidebar.classList.remove('open');
-    }
+  document.addEventListener('click', e => {
+    if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) sidebar.classList.remove('open');
   });
 }
 
 // ===========================
 // OVERVIEW
 // ===========================
-
 function loadOverview() {
   const enquiries = getEnquiries();
+  const bookings = JSON.parse(localStorage.getItem('premier_bookings') || '[]');
   const todayStr = today();
+  const s = getSettings();
 
-  const totalEl = document.getElementById('stat-total');
-  const todayEl = document.getElementById('stat-today');
-  const awaitingEl = document.getElementById('stat-awaiting');
-  const completedEl = document.getElementById('stat-completed');
+  setText('stat-total', enquiries.length);
+  setText('stat-today', enquiries.filter(e => e.date && e.date.startsWith(todayStr)).length);
+  setText('stat-awaiting', enquiries.filter(e => e.status === 'New' || e.status === 'Contacted').length);
+  setText('stat-completed', enquiries.filter(e => e.status === 'Completed').length);
 
-  if (totalEl) totalEl.textContent = enquiries.length;
-  if (todayEl) todayEl.textContent = enquiries.filter(e => e.date && e.date.startsWith(todayStr)).length;
-  if (awaitingEl) awaitingEl.textContent = enquiries.filter(e => e.status === 'New' || e.status === 'Contacted').length;
-  if (completedEl) completedEl.textContent = enquiries.filter(e => e.status === 'Completed').length;
+  // Greeting
+  const hr = new Date().getHours();
+  const greeting = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+  const greetEl = document.getElementById('overviewGreeting');
+  if (greetEl) greetEl.textContent = `${greeting}, Admin`;
 
+  // Daily summary
+  const todayBookings = bookings.filter(b => b.date === todayStr && b.status !== 'Cancelled').length;
+  const motDue = typeof getMOTDueForReminder === 'function' ? getMOTDueForReminder().length : 0;
+  const newEnquiries = enquiries.filter(e => e.status === 'New').length;
+  const unpaidInvoices = JSON.parse(localStorage.getItem('premier_invoices') || '[]').filter(i => i.paymentStatus === 'Unpaid').length;
+  const summaryEl = document.getElementById('dailySummaryBody');
+  if (summaryEl) {
+    summaryEl.innerHTML = `
+      <div class="summary-line${todayBookings > 0 ? ' highlight' : ''}"><i class="fas fa-calendar-check"></i><span>Bookings today: <strong>${todayBookings}</strong></span>${todayBookings>0?`<button class="btn-sm btn-ghost-sm" onclick="navigate('bookings')">View</button>`:''}</div>
+      <div class="summary-line${motDue > 0 ? ' highlight-amber' : ''}"><i class="fas fa-car"></i><span>MOT reminders to send: <strong>${motDue}</strong></span>${motDue>0?`<button class="btn-sm btn-ghost-sm" onclick="navigate('mot')">View</button>`:''}</div>
+      <div class="summary-line${newEnquiries > 0 ? ' highlight' : ''}"><i class="fas fa-inbox"></i><span>New enquiries: <strong>${newEnquiries}</strong></span>${newEnquiries>0?`<button class="btn-sm btn-ghost-sm" onclick="navigate('enquiries')">View</button>`:''}</div>
+      <div class="summary-line${unpaidInvoices > 0 ? ' highlight-amber' : ''}"><i class="fas fa-file-invoice-pound"></i><span>Unpaid invoices: <strong>${unpaidInvoices}</strong></span>${unpaidInvoices>0?`<button class="btn-sm btn-ghost-sm" onclick="navigate('invoices')">View</button>`:''}</div>`;
+  }
+
+  // MOT reminder widget
+  if (typeof getMOTDueForReminder === 'function') {
+    const motReminders = getMOTDueForReminder();
+    const reminderWidget = document.getElementById('motReminderWidget');
+    if (reminderWidget) {
+      if (motReminders.length === 0) {
+        reminderWidget.innerHTML = `<div class="reminder-empty"><i class="fas fa-check-circle" style="color:var(--green)"></i> No MOT reminders to send today.</div>`;
+      } else {
+        reminderWidget.innerHTML = motReminders.map(c => `
+          <div class="reminder-row${c.reminderSentToday ? ' sent' : ''}">
+            <div class="reminder-info">
+              <strong>${esc(c.name)}</strong>
+              <span>${esc(c.make||'')} ${esc(c.model||'')} ${esc(c.reg||'')} — due in ${c.daysLeft} day${c.daysLeft!==1?'s':''}</span>
+            </div>
+            <div class="reminder-actions">
+              ${c.reminderSentToday
+                ? '<span class="badge badge-completed"><i class="fas fa-check"></i> Sent today</span>'
+                : `<button class="btn-sm btn-success-sm" onclick="sendMOTReminderWA(${c.id})"><i class="fab fa-whatsapp"></i> Send</button>`
+              }
+            </div>
+          </div>`).join('');
+      }
+    }
+  }
+
+  // Recent enquiries table
   const tbody = document.getElementById('recentEnquiriesBody');
   if (tbody) {
     const recent = [...enquiries].reverse().slice(0, 5);
     if (recent.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" class="table-empty"><i class="fas fa-inbox"></i>No enquiries yet. They'll appear here when customers submit the contact form.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="table-empty"><i class="fas fa-inbox"></i>No enquiries yet.</td></tr>`;
     } else {
       tbody.innerHTML = recent.map(e => `
         <tr>
@@ -147,98 +199,68 @@ function loadOverview() {
           <td>${esc(e.phone)}</td>
           <td>${esc(e.service)}</td>
           <td><span class="badge ${statusClass(e.status)}">${esc(e.status)}</span></td>
-          <td>
-            <div class="action-btns">
-              <button class="action-btn" onclick="viewEnquiry(${e.id})" title="View details"><i class="fas fa-eye"></i></button>
-              <button class="action-btn success" onclick="markComplete(${e.id})" title="Mark complete"><i class="fas fa-check"></i></button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
+          <td><div class="action-btns">
+            <button class="action-btn" onclick="viewEnquiry(${e.id})" title="View"><i class="fas fa-eye"></i></button>
+            <button class="action-btn success" onclick="markComplete(${e.id})" title="Mark complete"><i class="fas fa-check"></i></button>
+          </div></td>
+        </tr>`).join('');
     }
   }
 
-  // Update enquiry badge count
+  // Sidebar enquiry badge
   const badge = document.querySelector('.sidebar-link[data-section="enquiries"] .badge');
   if (badge) {
-    const newCount = enquiries.filter(e => e.status === 'New').length;
-    badge.textContent = newCount;
-    badge.style.display = newCount > 0 ? '' : 'none';
+    const n = enquiries.filter(e => e.status === 'New').length;
+    badge.textContent = n; badge.style.display = n > 0 ? '' : 'none';
   }
 }
+
+function setText(id, val) { const el = document.getElementById(id); if(el) el.textContent = val; }
 
 // ===========================
 // ENQUIRIES
 // ===========================
+let enquiryFilter = 'all', enquirySearch = '';
 
-let enquiryFilter = 'all';
-let enquirySearch = '';
-
-function loadEnquiries() {
-  renderEnquiriesTable();
-}
+function loadEnquiries() { renderEnquiriesTable(); }
 
 function renderEnquiriesTable() {
   const enquiries = getEnquiries();
   let filtered = enquiries.filter(e => {
     const matchStatus = enquiryFilter === 'all' || e.status === enquiryFilter;
     const q = enquirySearch.toLowerCase();
-    const matchSearch = !q ||
-      (e.name && e.name.toLowerCase().includes(q)) ||
-      (e.email && e.email.toLowerCase().includes(q)) ||
-      (e.reg && e.reg.toLowerCase().includes(q)) ||
-      (e.phone && e.phone.includes(q));
+    const matchSearch = !q || (e.name||'').toLowerCase().includes(q) || (e.email||'').toLowerCase().includes(q) || (e.reg||'').toLowerCase().includes(q) || (e.phone||'').includes(q);
     return matchStatus && matchSearch;
   }).reverse();
 
   const tbody = document.getElementById('enquiriesBody');
   if (!tbody) return;
-
   if (filtered.length === 0) {
     tbody.innerHTML = `<tr><td colspan="8" class="table-empty"><i class="fas fa-search"></i>No enquiries match your search.</td></tr>`;
     return;
   }
-
   tbody.innerHTML = filtered.map(e => `
     <tr>
       <td class="td-muted">${formatDate(e.date)}</td>
       <td class="td-name">${esc(e.name)}</td>
       <td>${esc(e.phone)}</td>
       <td class="td-muted">${esc(e.email)}</td>
-      <td class="td-mono">${esc(e.reg || '—')}</td>
+      <td class="td-mono">${esc(e.reg||'—')}</td>
       <td>${esc(e.service)}</td>
       <td>
-        <select class="status-select" onchange="updateEnquiryStatus(${e.id}, this.value)">
-          ${['New','Contacted','Booked In','Completed','Cancelled'].map(s =>
-            `<option value="${s}" ${e.status === s ? 'selected' : ''}>${s}</option>`
-          ).join('')}
+        <select class="status-select" onchange="updateEnquiryStatus(${e.id},this.value)">
+          ${['New','Contacted','Booked In','Completed','Cancelled'].map(s=>`<option value="${s}"${e.status===s?' selected':''}>${s}</option>`).join('')}
         </select>
       </td>
-      <td>
-        <div class="action-btns">
-          <button class="action-btn" onclick="viewEnquiry(${e.id})" title="View"><i class="fas fa-eye"></i></button>
-          <button class="action-btn danger" onclick="deleteEnquiry(${e.id})" title="Delete"><i class="fas fa-trash"></i></button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
+      <td><div class="action-btns">
+        <button class="action-btn" onclick="viewEnquiry(${e.id})" title="View"><i class="fas fa-eye"></i></button>
+        <button class="action-btn danger" onclick="deleteEnquiry(${e.id})" title="Delete"><i class="fas fa-trash"></i></button>
+      </div></td>
+    </tr>`).join('');
 }
 
-const enquirySearchInput = document.getElementById('enquirySearch');
-if (enquirySearchInput) {
-  enquirySearchInput.addEventListener('input', (e) => {
-    enquirySearch = e.target.value;
-    renderEnquiriesTable();
-  });
-}
-
-const enquiryFilterSelect = document.getElementById('enquiryFilter');
-if (enquiryFilterSelect) {
-  enquiryFilterSelect.addEventListener('change', (e) => {
-    enquiryFilter = e.target.value;
-    renderEnquiriesTable();
-  });
-}
+document.getElementById('enquirySearch')?.addEventListener('input', e => { enquirySearch=e.target.value; renderEnquiriesTable(); });
+document.getElementById('enquiryFilter')?.addEventListener('change', e => { enquiryFilter=e.target.value; renderEnquiriesTable(); });
 
 function updateEnquiryStatus(id, status) {
   const enquiries = getEnquiries();
@@ -247,15 +269,18 @@ function updateEnquiryStatus(id, status) {
     enquiries[idx].status = status;
     saveEnquiries(enquiries);
     showToast(`Status updated to "${status}"`, 'success');
+    if (status === 'Completed' && enquiries[idx].phone) {
+      const cust = getCustomers().find(c => c.phone === enquiries[idx].phone || c.email === enquiries[idx].email);
+      if (cust && typeof promptReviewRequest === 'function') setTimeout(() => promptReviewRequest(cust.id), 300);
+    }
   }
 }
 
 function deleteEnquiry(id) {
-  if (!confirm('Delete this enquiry? This cannot be undone.')) return;
-  const enquiries = getEnquiries().filter(e => e.id !== id);
-  saveEnquiries(enquiries);
+  if (!confirm('Delete this enquiry?')) return;
+  saveEnquiries(getEnquiries().filter(e => e.id !== id));
   renderEnquiriesTable();
-  showToast('Enquiry deleted', 'info');
+  showToast('Enquiry deleted','info');
 }
 
 function markComplete(id) {
@@ -264,179 +289,148 @@ function markComplete(id) {
   if (idx !== -1) {
     enquiries[idx].status = 'Completed';
     saveEnquiries(enquiries);
-    showToast('Marked as Completed', 'success');
+    showToast('Marked as Completed','success');
     loadOverview();
+    if (enquiries[idx].phone && typeof promptReviewRequest === 'function') {
+      const cust = getCustomers().find(c => c.phone === enquiries[idx].phone);
+      if (cust) setTimeout(() => promptReviewRequest(cust.id), 300);
+    }
   }
 }
 
 function viewEnquiry(id) {
-  const enquiries = getEnquiries();
-  const e = enquiries.find(x => x.id === id);
+  const e = getEnquiries().find(x => x.id === id);
   if (!e) return;
-
   const overlay = document.getElementById('enquiryDetailModal');
   const content = document.getElementById('enquiryDetailContent');
   if (!overlay || !content) return;
-
   content.innerHTML = `
     <div class="detail-grid">
       <div class="detail-item"><label>Name</label><p>${esc(e.name)}</p></div>
       <div class="detail-item"><label>Phone</label><p>${esc(e.phone)}</p></div>
       <div class="detail-item"><label>Email</label><p>${esc(e.email)}</p></div>
-      <div class="detail-item"><label>Vehicle Reg</label><p class="mono">${esc(e.reg || '—')}</p></div>
+      <div class="detail-item"><label>Vehicle Reg</label><p class="mono">${esc(e.reg||'—')}</p></div>
       <div class="detail-item"><label>Service</label><p>${esc(e.service)}</p></div>
-      <div class="detail-item"><label>Preferred Date</label><p>${esc(e.preferredDate || '—')}</p></div>
+      <div class="detail-item"><label>Preferred Date</label><p>${esc(e.preferredDate||'—')}</p></div>
       <div class="detail-item"><label>Submitted</label><p>${formatDateTime(e.date)}</p></div>
-      <div class="detail-item"><label>Source</label><p>${esc(e.source || 'Website')}</p></div>
+      <div class="detail-item"><label>Source</label><p>${esc(e.source||'Website')}</p></div>
       <div class="detail-item"><label>Status</label><p><span class="badge ${statusClass(e.status)}">${esc(e.status)}</span></p></div>
     </div>
-    ${e.message ? `<div class="detail-item"><label>Message</label><p style="margin-top:8px;color:var(--text-muted);font-size:0.9rem;line-height:1.6">${esc(e.message)}</p></div>` : ''}
-  `;
-
+    ${e.message ? `<div class="detail-item" style="margin-top:12px"><label style="display:block;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-dim);margin-bottom:6px">Message</label><p style="font-size:0.9rem;color:var(--text-muted);line-height:1.6">${esc(e.message)}</p></div>` : ''}`;
   overlay.classList.add('open');
 }
 
-document.getElementById('closeEnquiryModal')?.addEventListener('click', () => {
-  document.getElementById('enquiryDetailModal')?.classList.remove('open');
-});
-document.getElementById('enquiryDetailModal')?.addEventListener('click', (e) => {
-  if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
-});
+document.getElementById('closeEnquiryModal')?.addEventListener('click', () => document.getElementById('enquiryDetailModal')?.classList.remove('open'));
+document.getElementById('enquiryDetailModal')?.addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
 
 // ===========================
 // CUSTOMERS
 // ===========================
+let customerSearch = '', selectedCustomerId = null;
 
-let customerSearch = '';
-let selectedCustomerId = null;
-
-function loadCustomers() {
-  renderCustomersList();
-}
+function loadCustomers() { renderCustomersList(); }
 
 function renderCustomersList() {
   const customers = getCustomers();
   const q = customerSearch.toLowerCase();
   const filtered = customers.filter(c =>
-    !q ||
-    c.name.toLowerCase().includes(q) ||
-    (c.email && c.email.toLowerCase().includes(q)) ||
-    (c.reg && c.reg.toLowerCase().includes(q)) ||
-    (c.phone && c.phone.includes(q))
+    !q || c.name.toLowerCase().includes(q) || (c.email||'').toLowerCase().includes(q) || (c.reg||'').toLowerCase().includes(q) || (c.phone||'').includes(q)
   );
-
   const tbody = document.getElementById('customersBody');
   if (!tbody) return;
-
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="table-empty"><i class="fas fa-users"></i>No customers found. Add your first customer above.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" class="table-empty"><i class="fas fa-users"></i>No customers found.</td></tr>`;
     return;
   }
-
   tbody.innerHTML = filtered.map(c => `
     <tr style="cursor:pointer" onclick="viewCustomer(${c.id})">
       <td class="td-name">${esc(c.name)}</td>
       <td>${esc(c.phone)}</td>
-      <td class="td-muted">${esc(c.email || '—')}</td>
-      <td class="td-mono">${esc(c.reg || '—')}</td>
-      <td class="td-muted">${esc(c.make || '')} ${esc(c.model || '')}</td>
-      <td class="td-muted">${esc(c.year || '—')}</td>
-      <td>
-        <div class="action-btns">
-          <button class="action-btn" onclick="event.stopPropagation();viewCustomer(${c.id})" title="View profile"><i class="fas fa-eye"></i></button>
-          <button class="action-btn danger" onclick="event.stopPropagation();deleteCustomer(${c.id})" title="Delete"><i class="fas fa-trash"></i></button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
+      <td class="td-muted">${esc(c.email||'—')}</td>
+      <td class="td-mono">${esc(c.reg||'—')}</td>
+      <td class="td-muted">${esc(c.make||'')} ${esc(c.model||'')}</td>
+      <td class="td-muted">${esc(c.year||'—')}</td>
+      <td><div class="action-btns">
+        <button class="action-btn" onclick="event.stopPropagation();viewCustomer(${c.id})" title="View"><i class="fas fa-eye"></i></button>
+        <button class="action-btn danger" onclick="event.stopPropagation();deleteCustomer(${c.id})" title="Delete"><i class="fas fa-trash"></i></button>
+      </div></td>
+    </tr>`).join('');
 }
 
-const customerSearchInput = document.getElementById('customerSearch');
-if (customerSearchInput) {
-  customerSearchInput.addEventListener('input', (e) => {
-    customerSearch = e.target.value;
-    renderCustomersList();
-  });
-}
+document.getElementById('customerSearch')?.addEventListener('input', e => { customerSearch=e.target.value; renderCustomersList(); });
 
-// Add customer form
 const addCustomerForm = document.getElementById('addCustomerForm');
 if (addCustomerForm) {
-  addCustomerForm.addEventListener('submit', (e) => {
+  addCustomerForm.addEventListener('submit', e => {
     e.preventDefault();
     const data = new FormData(addCustomerForm);
     const customer = {
-      id: Date.now(),
-      name: data.get('name'),
-      phone: data.get('phone'),
-      email: data.get('email'),
-      reg: data.get('reg'),
-      make: data.get('make'),
-      model: data.get('model'),
-      year: data.get('year'),
-      motDue: data.get('motDue'),
-      notes: '',
-      jobs: []
+      id: Date.now(), name: data.get('name'), phone: data.get('phone'),
+      email: data.get('email'), reg: data.get('reg'), make: data.get('make'),
+      model: data.get('model'), year: data.get('year'), motDue: data.get('motDue'),
+      notes: '', jobs: [], reminderLog: []
     };
     const customers = getCustomers();
     customers.push(customer);
     saveCustomers(customers);
     addCustomerForm.reset();
     renderCustomersList();
-    showToast('Customer added successfully', 'success');
-    navigate('customers');
+    addNotification('info', `Customer added: ${customer.name}`, 'customers');
+    showToast('Customer added','success');
   });
 }
 
 function deleteCustomer(id) {
-  if (!confirm('Delete this customer? This cannot be undone.')) return;
-  const customers = getCustomers().filter(c => c.id !== id);
-  saveCustomers(customers);
+  if (!confirm('Delete this customer?')) return;
+  saveCustomers(getCustomers().filter(c => c.id !== id));
   renderCustomersList();
-  showToast('Customer deleted', 'info');
+  showToast('Customer deleted','info');
 }
 
 function viewCustomer(id) {
-  const customers = getCustomers();
-  const c = customers.find(x => x.id === id);
+  const c = getCustomers().find(x => x.id === id);
   if (!c) return;
   selectedCustomerId = id;
-
   const overlay = document.getElementById('customerProfileModal');
   const content = document.getElementById('customerProfileContent');
   if (!overlay || !content) return;
-
-  const initials = c.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  const initials = c.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const reminderHistory = (c.reminderLog||[]).slice(0,5).map(r =>
+    `<div style="font-size:0.8rem;color:var(--text-dim);padding:4px 0;border-bottom:1px solid var(--border)">${r.type==='mot_reminder'?'MOT Reminder':r.type==='review_request'?'Review Request':'Message'} — ${formatDateTime(r.sentAt)}</div>`
+  ).join('');
 
   content.innerHTML = `
     <div class="profile-header">
       <div class="profile-avatar">${initials}</div>
       <div class="profile-info">
         <h2>${esc(c.name)}</h2>
-        <p>${esc(c.make || '')} ${esc(c.model || '')} ${esc(c.year || '')} &bull; ${esc(c.reg || 'No reg')}</p>
+        <p>${esc(c.make||'')} ${esc(c.model||'')} ${esc(c.year||'')} &bull; ${esc(c.reg||'No reg')}</p>
       </div>
     </div>
     <div class="profile-grid">
       <div>
-        <h4 style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:16px">Contact Details</h4>
+        <h4 style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:16px">Contact</h4>
         <div class="info-item"><label>Phone</label><p>${esc(c.phone)}</p></div>
-        <div class="info-item"><label>Email</label><p>${esc(c.email || '—')}</p></div>
+        <div class="info-item"><label>Email</label><p>${esc(c.email||'—')}</p></div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <button class="btn-sm btn-success-sm" onclick="sendMOTReminderWA(${c.id})"><i class="fab fa-whatsapp"></i> MOT Reminder</button>
+          <button class="btn-sm btn-ghost-sm" onclick="promptReviewRequest(${c.id})"><i class="fas fa-star"></i> Review Request</button>
+        </div>
       </div>
       <div>
-        <h4 style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:16px">Vehicle Info</h4>
-        <div class="info-item"><label>Registration</label><p class="mono" style="font-family:monospace">${esc(c.reg || '—')}</p></div>
-        <div class="info-item"><label>Make & Model</label><p>${esc(c.make || '')} ${esc(c.model || '')}</p></div>
-        <div class="info-item"><label>Year</label><p>${esc(c.year || '—')}</p></div>
-        <div class="info-item"><label>MOT Due</label><p>${c.motDue ? formatDate(c.motDue) : '—'}</p></div>
+        <h4 style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:16px">Vehicle</h4>
+        <div class="info-item"><label>Registration</label><p style="font-family:monospace">${esc(c.reg||'—')}</p></div>
+        <div class="info-item"><label>Make & Model</label><p>${esc(c.make||'')} ${esc(c.model||'')}</p></div>
+        <div class="info-item"><label>Year</label><p>${esc(c.year||'—')}</p></div>
+        <div class="info-item"><label>MOT Due</label><p>${c.motDue?formatDate(c.motDue):'—'}</p></div>
       </div>
     </div>
-    <div style="margin-top:24px">
+    ${reminderHistory ? `<div style="margin-top:20px"><h4 style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:10px">Message History</h4>${reminderHistory}</div>` : ''}
+    <div style="margin-top:20px">
       <label style="display:block;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-dim);margin-bottom:8px">Notes</label>
-      <textarea id="customerNotes" style="width:100%;background:var(--dark-3);border:1px solid var(--border-strong);border-radius:var(--radius);padding:12px;color:var(--white);font-size:0.88rem;font-family:inherit;min-height:80px;resize:vertical" placeholder="Add notes about this customer...">${esc(c.notes || '')}</textarea>
+      <textarea id="customerNotes" style="width:100%;background:var(--dark-3);border:1px solid var(--border-strong);border-radius:var(--radius);padding:12px;color:var(--white);font-size:0.88rem;font-family:inherit;min-height:80px;resize:vertical">${esc(c.notes||'')}</textarea>
       <button class="btn-sm btn-primary-sm" style="margin-top:8px" onclick="saveCustomerNotes(${c.id})"><i class="fas fa-save"></i> Save Notes</button>
-    </div>
-  `;
-
+    </div>`;
   overlay.classList.add('open');
 }
 
@@ -444,223 +438,147 @@ function saveCustomerNotes(id) {
   const notes = document.getElementById('customerNotes')?.value || '';
   const customers = getCustomers();
   const idx = customers.findIndex(c => c.id === id);
-  if (idx !== -1) {
-    customers[idx].notes = notes;
-    saveCustomers(customers);
-    showToast('Notes saved', 'success');
-  }
+  if (idx !== -1) { customers[idx].notes = notes; saveCustomers(customers); showToast('Notes saved','success'); }
 }
 
-document.getElementById('closeCustomerModal')?.addEventListener('click', () => {
-  document.getElementById('customerProfileModal')?.classList.remove('open');
-});
-document.getElementById('customerProfileModal')?.addEventListener('click', (e) => {
-  if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
-});
+document.getElementById('closeCustomerModal')?.addEventListener('click', () => document.getElementById('customerProfileModal')?.classList.remove('open'));
+document.getElementById('customerProfileModal')?.addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
 
 // ===========================
 // MOT TRACKER
 // ===========================
-
 function loadMOTTracker() {
   const customers = getCustomers();
   const now = new Date();
-
-  let overdue = 0, soon = 0, ok = 0;
+  let overdue=0, soon=0, ok=0;
 
   const rows = customers.map(c => {
     if (!c.motDue) return null;
-    const due = new Date(c.motDue);
-    const daysLeft = Math.round((due - now) / (1000 * 60 * 60 * 24));
-    let statusClass, statusLabel, summaryKey;
+    const due = new Date(c.motDue + 'T12:00:00');
+    const daysLeft = Math.round((due - now) / 86400000);
+    let sc, label;
+    if (daysLeft < 0)       { sc='mot-overdue'; label=`${Math.abs(daysLeft)} days overdue`; overdue++; }
+    else if (daysLeft <= 30){ sc='mot-soon';    label=`Due in ${daysLeft} days`; soon++; }
+    else                    { sc='mot-ok';      label=`Due in ${daysLeft} days`; ok++; }
 
-    if (daysLeft < 0) {
-      statusClass = 'mot-overdue'; statusLabel = `${Math.abs(daysLeft)} days overdue`; overdue++;
-    } else if (daysLeft <= 30) {
-      statusClass = 'mot-soon'; statusLabel = `Due in ${daysLeft} days`; soon++;
-    } else {
-      statusClass = 'mot-ok'; statusLabel = `Due in ${daysLeft} days`; ok++;
-    }
-
-    const msg = encodeURIComponent(`Hi ${c.name}, just a reminder your MOT is due on ${formatDate(c.motDue)} for your ${c.make || ''} ${c.model || ''}. Give us a call on 01234 567890 to book in — Premier MOT & Service`);
-
-    return `
-      <tr>
-        <td class="td-name">${esc(c.name)}</td>
-        <td class="td-mono">${esc(c.reg || '—')}</td>
-        <td class="td-muted">${esc(c.make || '')} ${esc(c.model || '')}</td>
-        <td>${formatDate(c.motDue)}</td>
-        <td><span class="badge ${statusClass}">${statusLabel}</span></td>
-        <td>
-          <button class="btn-sm btn-success-sm" onclick="sendMotReminder(${c.id})" title="Copy WhatsApp reminder">
-            <i class="fab fa-whatsapp"></i> Send Reminder
-          </button>
-        </td>
-      </tr>
-    `;
+    return `<tr>
+      <td class="td-name">${esc(c.name)}</td>
+      <td class="td-mono">${esc(c.reg||'—')}</td>
+      <td class="td-muted">${esc(c.make||'')} ${esc(c.model||'')}</td>
+      <td>${formatDate(c.motDue)}</td>
+      <td><span class="badge ${sc}">${label}</span></td>
+      <td>
+        <button class="btn-sm btn-success-sm" onclick="sendMOTReminderWA(${c.id})">
+          <i class="fab fa-whatsapp"></i> Send Reminder
+        </button>
+      </td>
+    </tr>`;
   }).filter(Boolean);
 
   const tbody = document.getElementById('motBody');
-  if (tbody) {
-    if (rows.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" class="table-empty"><i class="fas fa-car"></i>No customers with MOT dates. Add MOT due dates when adding customers.</td></tr>`;
-    } else {
-      tbody.innerHTML = rows.join('');
-    }
-  }
+  if (tbody) tbody.innerHTML = rows.length === 0
+    ? `<tr><td colspan="6" class="table-empty"><i class="fas fa-car"></i>No customers with MOT dates.</td></tr>`
+    : rows.join('');
 
-  const overdueEl = document.getElementById('mot-overdue');
-  const soonEl = document.getElementById('mot-soon');
-  const okEl = document.getElementById('mot-ok');
-  if (overdueEl) overdueEl.textContent = overdue;
-  if (soonEl) soonEl.textContent = soon;
-  if (okEl) okEl.textContent = ok;
-}
+  setText('mot-overdue', overdue);
+  setText('mot-soon', soon);
+  setText('mot-ok', ok);
 
-function sendMotReminder(id) {
-  const customers = getCustomers();
-  const c = customers.find(x => x.id === id);
-  if (!c) return;
-
-  const msg = `Hi ${c.name}, just a reminder your MOT is due on ${formatDate(c.motDue)} for your ${c.make || ''} ${c.model || ''}. Give us a call on 01234 567890 to book in — Premier MOT & Service`;
-
-  navigator.clipboard.writeText(msg).then(() => {
-    showToast('WhatsApp message copied to clipboard!', 'success');
-  }).catch(() => {
-    // Fallback
-    const ta = document.createElement('textarea');
-    ta.value = msg;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    showToast('Message copied to clipboard!', 'success');
-  });
+  // Update MOT template preview
+  const preview = document.getElementById('motTemplatePreview');
+  if (preview) preview.textContent = getSettings().whatsappTemplate || '';
 }
 
 // ===========================
 // SETTINGS
 // ===========================
-
 function loadSettings() {
-  const settings = getSettings();
+  const s = getSettings();
   const creds = getCredentials();
-
-  const fields = ['settingGarageName', 'settingPhone', 'settingEmail', 'settingAddress'];
-  const keys = ['garageName', 'phone', 'email', 'address'];
-  fields.forEach((id, i) => {
-    const el = document.getElementById(id);
-    if (el) el.value = settings[keys[i]] || '';
-  });
-
+  const fieldMap = { settingGarageName:'garageName', settingPhone:'phone', settingEmail:'email', settingAddress:'address' };
+  Object.entries(fieldMap).forEach(([id, key]) => { const el=document.getElementById(id); if(el) el.value=s[key]||''; });
   const usernameEl = document.getElementById('settingUsername');
   if (usernameEl) usernameEl.value = creds.username || 'admin';
 }
 
-const settingsForm = document.getElementById('settingsGarageForm');
-if (settingsForm) {
-  settingsForm.addEventListener('submit', (e) => {
+const settingsGarageForm = document.getElementById('settingsGarageForm');
+if (settingsGarageForm) {
+  settingsGarageForm.addEventListener('submit', e => {
     e.preventDefault();
-    const settings = {
-      garageName: document.getElementById('settingGarageName')?.value || '',
-      phone: document.getElementById('settingPhone')?.value || '',
-      email: document.getElementById('settingEmail')?.value || '',
-      address: document.getElementById('settingAddress')?.value || ''
-    };
-    saveSettings(settings);
-
-    // Update sidebar brand name
-    const brandStrong = document.querySelector('.sidebar-brand-text strong');
-    if (brandStrong) brandStrong.textContent = settings.garageName;
-
-    showToast('Garage details saved', 'success');
+    const s = getSettings();
+    s.garageName = document.getElementById('settingGarageName')?.value || '';
+    s.phone      = document.getElementById('settingPhone')?.value || '';
+    s.email      = document.getElementById('settingEmail')?.value || '';
+    s.address    = document.getElementById('settingAddress')?.value || '';
+    saveSettings(s);
+    const brand = document.querySelector('.sidebar-brand-text strong');
+    if (brand) brand.textContent = s.garageName;
+    showToast('Garage details saved','success');
   });
 }
 
 const passwordForm = document.getElementById('settingsPasswordForm');
 if (passwordForm) {
-  passwordForm.addEventListener('submit', (e) => {
+  passwordForm.addEventListener('submit', e => {
     e.preventDefault();
-    const currentEl = document.getElementById('currentPassword');
-    const newEl = document.getElementById('newPassword');
-    const confirmEl = document.getElementById('confirmPassword');
-    if (!currentEl || !newEl || !confirmEl) return;
-
+    const cur = document.getElementById('currentPassword');
+    const nw  = document.getElementById('newPassword');
+    const cnf = document.getElementById('confirmPassword');
+    if (!cur||!nw||!cnf) return;
     const creds = getCredentials();
-    if (currentEl.value !== creds.password) {
-      showToast('Current password is incorrect', 'error');
-      currentEl.value = '';
-      return;
-    }
-    if (newEl.value !== confirmEl.value) {
-      showToast('New passwords do not match', 'error');
-      newEl.value = ''; confirmEl.value = '';
-      return;
-    }
-    if (newEl.value.length < 6) {
-      showToast('Password must be at least 6 characters', 'error');
-      return;
-    }
-    saveCredentials({ username: creds.username, password: newEl.value });
+    if (cur.value !== creds.password) { showToast('Current password incorrect','error'); cur.value=''; return; }
+    if (nw.value !== cnf.value) { showToast('Passwords do not match','error'); nw.value=''; cnf.value=''; return; }
+    if (nw.value.length < 6) { showToast('Password must be 6+ characters','error'); return; }
+    saveCredentials({ username: creds.username, password: nw.value });
     passwordForm.reset();
-    showToast('Password updated successfully', 'success');
+    showToast('Password updated','success');
   });
 }
 
 // ===========================
 // UTILITIES
 // ===========================
-
 function statusClass(status) {
-  const map = { 'New': 'badge-new', 'Contacted': 'badge-contacted', 'Booked In': 'badge-booked', 'Completed': 'badge-completed', 'Cancelled': 'badge-cancelled' };
-  return map[status] || 'badge-new';
+  return { 'New':'badge-new','Contacted':'badge-contacted','Booked In':'badge-booked','Completed':'badge-completed','Cancelled':'badge-cancelled' }[status] || 'badge-new';
 }
 
-function esc(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-// Quick action buttons
 document.getElementById('quickAddCustomer')?.addEventListener('click', () => navigate('customers'));
 document.getElementById('quickViewEnquiries')?.addEventListener('click', () => navigate('enquiries'));
 
 // ===========================
 // SEED DEMO DATA
 // ===========================
-
 function seedDemoData() {
-  const existingEnquiries = getEnquiries();
-  const existingCustomers = getCustomers();
-
-  if (existingEnquiries.length === 0) {
-    const demoEnquiries = [
-      { id: 1700000001, date: new Date(Date.now() - 86400000 * 2).toISOString(), name: 'James Hargreaves', phone: '07712 345678', email: 'james.h@email.com', reg: 'AB21 XYZ', service: 'MOT', preferredDate: '2026-05-10', message: 'My MOT is due next month, can I get booked in?', status: 'New', source: 'Modal' },
-      { id: 1700000002, date: new Date(Date.now() - 86400000 * 5).toISOString(), name: 'Sarah Connelly', phone: '07891 234567', email: 'sconnelly@gmail.com', reg: 'DF18 HJK', service: 'Full Service', preferredDate: '2026-05-08', message: 'Need a full service, car has been making a noise.', status: 'Contacted', source: 'Contact Form' },
-      { id: 1700000003, date: new Date(Date.now() - 86400000 * 10).toISOString(), name: 'Michael Porter', phone: '07654 321098', email: 'm.porter@work.co.uk', reg: 'LM65 PQR', service: 'Brakes', preferredDate: '2026-05-07', message: 'Brakes squealing badly, urgent.', status: 'Completed', source: 'Contact Form' },
-      { id: 1700000004, date: new Date().toISOString(), name: 'Emma Whitfield', phone: '07723 456789', email: 'emma.w@hotmail.com', reg: 'EF70 TUV', service: 'MOT', preferredDate: '2026-05-12', message: '', status: 'New', source: 'Modal' },
-      { id: 1700000005, date: new Date(Date.now() - 86400000 * 1).toISOString(), name: 'Daniel Ashworth', phone: '07834 567890', email: 'd.ashworth@email.com', reg: 'GH19 WXY', service: 'Tyres', preferredDate: '2026-05-09', message: 'Need two new front tyres', status: 'Booked In', source: 'Modal' }
-    ];
-    saveEnquiries(demoEnquiries);
+  if (getEnquiries().length === 0) {
+    saveEnquiries([
+      { id:1700000001, date:new Date(Date.now()-86400000*2).toISOString(), name:'James Hargreaves', phone:'07712 345678', email:'james.h@email.com', reg:'AB21 XYZ', service:'MOT', preferredDate:'2026-05-10', message:'My MOT is due next month, can I get booked in?', status:'New', source:'Modal' },
+      { id:1700000002, date:new Date(Date.now()-86400000*5).toISOString(), name:'Sarah Connelly', phone:'07891 234567', email:'sconnelly@gmail.com', reg:'DF18 HJK', service:'Full Service', preferredDate:'2026-05-08', message:'Need a full service, car has been making a noise.', status:'Contacted', source:'Contact Form' },
+      { id:1700000003, date:new Date(Date.now()-86400000*10).toISOString(), name:'Michael Porter', phone:'07654 321098', email:'m.porter@work.co.uk', reg:'LM65 PQR', service:'Brakes', preferredDate:'2026-05-07', message:'Brakes squealing badly, urgent.', status:'Completed', source:'Contact Form' },
+      { id:1700000004, date:new Date().toISOString(), name:'Emma Whitfield', phone:'07723 456789', email:'emma.w@hotmail.com', reg:'EF70 TUV', service:'MOT', preferredDate:'2026-05-12', message:'', status:'New', source:'Modal' },
+      { id:1700000005, date:new Date(Date.now()-86400000).toISOString(), name:'Daniel Ashworth', phone:'07834 567890', email:'d.ashworth@email.com', reg:'GH19 WXY', service:'Tyres', preferredDate:'2026-05-09', message:'Need two new front tyres', status:'Booked In', source:'Modal' }
+    ]);
   }
-
-  if (existingCustomers.length === 0) {
-    const soon = new Date(Date.now() + 86400000 * 20).toISOString().split('T')[0];
-    const overdue = new Date(Date.now() - 86400000 * 15).toISOString().split('T')[0];
-    const fine = new Date(Date.now() + 86400000 * 90).toISOString().split('T')[0];
-
-    const demoCustomers = [
-      { id: 2000000001, name: 'James Hargreaves', phone: '07712 345678', email: 'james.h@email.com', reg: 'AB21 XYZ', make: 'Ford', model: 'Focus', year: '2021', motDue: soon, notes: 'Regular customer. Prefers morning appointments.', jobs: [] },
-      { id: 2000000002, name: 'Sarah Connelly', phone: '07891 234567', email: 'sconnelly@gmail.com', reg: 'DF18 HJK', make: 'Vauxhall', model: 'Astra', year: '2018', motDue: overdue, notes: 'Called regarding service noise — booked in.', jobs: [] },
-      { id: 2000000003, name: 'Michael Porter', phone: '07654 321098', email: 'm.porter@work.co.uk', reg: 'LM65 PQR', make: 'Toyota', model: 'Corolla', year: '2015', motDue: fine, notes: 'Replaced both front brake pads. Job completed.', jobs: [] }
+  if (getCustomers().length === 0) {
+    const soon  = new Date(Date.now()+86400000*20).toISOString().split('T')[0];
+    const overdue = new Date(Date.now()-86400000*15).toISOString().split('T')[0];
+    const fine  = new Date(Date.now()+86400000*90).toISOString().split('T')[0];
+    saveCustomers([
+      { id:2000000001, name:'James Hargreaves', phone:'07712 345678', email:'james.h@email.com', reg:'AB21 XYZ', make:'Ford', model:'Focus', year:'2021', motDue:soon, notes:'Regular customer. Prefers morning appointments.', jobs:[], reminderLog:[] },
+      { id:2000000002, name:'Sarah Connelly', phone:'07891 234567', email:'sconnelly@gmail.com', reg:'DF18 HJK', make:'Vauxhall', model:'Astra', year:'2018', motDue:overdue, notes:'Called regarding service noise — booked in.', jobs:[], reminderLog:[] },
+      { id:2000000003, name:'Michael Porter', phone:'07654 321098', email:'m.porter@work.co.uk', reg:'LM65 PQR', make:'Toyota', model:'Corolla', year:'2015', motDue:fine, notes:'Replaced both front brake pads. Job completed.', jobs:[], reminderLog:[] }
+    ]);
+  }
+  if (JSON.parse(localStorage.getItem('premier_jobs')||'[]').length === 0) {
+    const demoJobs = [
+      { id:3000000001, customerId:2000000003, customerName:'Michael Porter', reg:'LM65 PQR', serviceType:'Brakes', dateIn:new Date(Date.now()-86400000*10).toISOString().split('T')[0], dateOut:new Date(Date.now()-86400000*10).toISOString().split('T')[0], workRequired:'Replace front brake pads and discs. Caliper seized on offside.', parts:[{name:'Front brake pads',qty:1,cost:38.00,total:38.00},{name:'Front brake discs (pair)',qty:1,cost:72.00,total:72.00}], labourHours:2, labourRate:65, notes:'Torqued to spec. Test driven — all good.', status:'Complete', jobValue:240.00, createdAt:new Date(Date.now()-86400000*10).toISOString() },
+      { id:3000000002, customerId:2000000001, customerName:'James Hargreaves', reg:'AB21 XYZ', serviceType:'MOT', dateIn:today(), dateOut:today(), workRequired:'MOT test and advisory check', parts:[], labourHours:1, labourRate:65, notes:'', status:'In Progress', jobValue:0, createdAt:new Date().toISOString() }
     ];
-    saveCustomers(demoCustomers);
+    localStorage.setItem('premier_jobs', JSON.stringify(demoJobs));
   }
 }
 
 // ===========================
 // INIT
 // ===========================
-
 seedDemoData();
 navigate('overview');
