@@ -47,7 +47,6 @@ function getAvailableSlots(dateStr) {
 // PUBLIC BOOKING PAGE
 // ===========================
 if (document.getElementById('publicBookingPage')) {
-  let bkStep = 1;
   let bkData = { service: '', date: '', time: '', name: '', phone: '', email: '', reg: '', make: '', model: '', year: '', notes: '' };
 
   function esc(s) { return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
@@ -82,7 +81,6 @@ if (document.getElementById('publicBookingPage')) {
   }
 
   function goStep(n) {
-    bkStep = n;
     document.querySelectorAll('.booking-panel').forEach((p, i) => p.classList.toggle('active', i + 1 === n));
     document.querySelectorAll('.booking-step').forEach((s, i) => {
       s.classList.toggle('active', i + 1 === n);
@@ -214,27 +212,49 @@ let _bookingsUnsub    = null;
 function loadBookingsSection() {
   updateBookingsBadge();
   if (_bookingsUnsub) {
-    // Listener already running — just re-render
+    // Listener already running — just re-render with current data
     if (dashBookingView === 'calendar') renderBookingCalendar();
     else renderBookingsList();
     return;
   }
   showSpinner('page-bookings');
+
+  // Immediately show whatever data we already have (e.g. from a previous load)
+  // so the section never appears blank while waiting for the live stream
+  if (window._bookingsData.length > 0) {
+    hideSpinner('page-bookings');
+    if (dashBookingView === 'calendar') renderBookingCalendar();
+    else renderBookingsList();
+  }
+
   _bookingsUnsub = db.collection('bookings')
     .orderBy('createdAt', 'desc')
     .onSnapshot(snap => {
       window._bookingsData = docsToArr(snap);
       hideSpinner('page-bookings');
       updateBookingsBadge();
-      // Refresh overview stats live when a new booking arrives
       if (window._currentSection === 'overview' && typeof window.loadOverview === 'function') {
         window.loadOverview();
       }
-      if (dashBookingView === 'calendar') renderBookingCalendar();
-      else renderBookingsList();
-    }, () => {
+      if (window._currentSection === 'bookings') {
+        if (dashBookingView === 'calendar') renderBookingCalendar();
+        else renderBookingsList();
+      }
+    }, async () => {
+      // Listener errored (network drop, 400, etc.) — reset so next navigate retries
+      _bookingsUnsub = null;
       hideSpinner('page-bookings');
-      showToast('Failed to load bookings', 'error');
+      // Fall back to a one-time read so the section still shows data
+      try {
+        const snap = await db.collection('bookings').orderBy('createdAt', 'desc').get();
+        window._bookingsData = docsToArr(snap);
+        updateBookingsBadge();
+        if (dashBookingView === 'calendar') renderBookingCalendar();
+        else renderBookingsList();
+      } catch {
+        showToast('Could not load bookings — check your connection', 'error');
+        renderBookingsList();
+      }
     });
 }
 
