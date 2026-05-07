@@ -2,6 +2,7 @@
    Premier MOT — Dashboard CRM (Firebase)
    =========================== */
 
+import firebase, { db, auth, docsToArr, fsAdd, fsUpdate, fsDel, showSpinner, hideSpinner } from './firebase.js';
 // ——— Settings ———
 
 function getDefaultSettings() {
@@ -669,6 +670,13 @@ function showAppLoader(visible) {
   const el = document.getElementById('appLoader');
   if (el) el.style.display = visible ? 'flex' : 'none';
 }
+
+// ——— Expose globals for cross-module access and onclick handlers ———
+Object.assign(window, {
+  navigate, showToast, formatDate, formatDateTime, esc, statusClass,
+  updateEnquiryStatus, deleteEnquiry, markComplete, viewEnquiry,
+  viewCustomer, deleteCustomer
+});
 
 // ——— Init (Firebase Auth Guard) ———
 if (document.getElementById('dashboardApp')) {

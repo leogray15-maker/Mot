@@ -305,3 +305,7 @@ document.getElementById('jobDetailModal')?.addEventListener('click', e => { if (
 
 window.sectionLoaders = window.sectionLoaders || {};
 window.sectionLoaders['jobs'] = loadJobsSection;
+
+Object.assign(window, {
+  viewJobModal, updateJobStatus, deleteJob, createInvoiceFromJob, printJobCard
+});

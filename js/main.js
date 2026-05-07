@@ -2,6 +2,9 @@
    Premier MOT — Public Site JS
    =========================== */
 
+import { db } from './firebase.js';
+import { showToast, formatDate, esc } from './utils.js';
+Object.assign(window, { showToast, formatDate, esc });
 // Nav scroll behaviour
 const nav = document.querySelector('.nav');
 if (nav) {

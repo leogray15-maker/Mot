@@ -192,3 +192,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') { e.preventDefault(); addBlockedDate(); }
   });
 });
+
+Object.assign(window, {
+  addBlockedDate, removeBlockedDate, toggleVATNumber,
+  updateDayRowState, renderBlockedDates, saveExtendedSettings
+});

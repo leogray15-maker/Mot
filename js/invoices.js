@@ -2,6 +2,7 @@
    Premier MOT — Invoices (Firebase)
    =========================== */
 
+import { db, docsToArr, fsAdd, fsUpdate, fsDel, showSpinner, hideSpinner } from './firebase.js';
 window._invoicesData = [];
 
 async function loadInvoicesSection() {
@@ -244,3 +245,8 @@ document.getElementById('invoiceDetailModal')?.addEventListener('click', e => { 
 
 window.sectionLoaders = window.sectionLoaders || {};
 window.sectionLoaders['invoices'] = loadInvoicesSection;
+
+Object.assign(window, {
+  createInvoiceFromJob, updateInvoiceStatus, deleteInvoice,
+  viewInvoiceModal, sendInvoiceWA, printInvoice
+});

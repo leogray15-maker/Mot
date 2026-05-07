@@ -2,6 +2,7 @@
    Premier MOT — Auth (Firebase)
    =========================== */
 
+import { auth } from './firebase.js';
 // ——— Login page ———
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {

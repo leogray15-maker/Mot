@@ -2,6 +2,7 @@
    Premier MOT — Bookings (Firebase)
    =========================== */
 
+import { db, docsToArr, fsAdd, fsUpdate, fsDel, showSpinner, hideSpinner } from './firebase.js';
 window._bookingsData = window._bookingsData || [];
 
 function genBookingRef() {
@@ -422,3 +423,8 @@ document.getElementById('bookingDetailModal')?.addEventListener('click', e => { 
 
 window.sectionLoaders = window.sectionLoaders || {};
 window.sectionLoaders['bookings'] = loadBookingsSection;
+
+Object.assign(window, {
+  viewBookingModal, updateBookingStatus, deleteBooking,
+  convertBookingToCustomer, sendBookingReminderWA, renderBookingCalendar
+});

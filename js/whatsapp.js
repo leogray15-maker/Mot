@@ -2,6 +2,8 @@
    Premier MOT — WhatsApp System
    =========================== */
 
+import { db, fsUpdate } from './firebase.js';
+
 function buildWAPhone(phone) {
   if (!phone) return '';
   const clean = phone.replace(/[\s\-\(\)\+]/g, '');
@@ -105,3 +107,8 @@ function getMOTDueForReminder() {
     return { ...c, daysLeft: days, reminderSentToday: reminderToday };
   }).sort((a, b) => a.daysLeft - b.daysLeft);
 }
+
+Object.assign(window, {
+  openWhatsApp, sendMOTReminderWA, promptReviewRequest, getMOTDueForReminder,
+  buildMOTReminderMessage, buildReviewRequestMessage, buildInvoiceWhatsAppMessage
+});

@@ -2,6 +2,8 @@
    Premier MOT — Revenue Dashboard (Firebase)
    =========================== */
 
+import { db, showSpinner, hideSpinner } from './firebase.js';
+
 let revenueCharts = {};
 
 async function loadRevenue() {

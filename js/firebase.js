@@ -1,52 +1,54 @@
 /* ===========================
-   Premier MOT — Firebase Init
+   Premier MOT — Firebase (npm)
    =========================== */
 
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
+import 'firebase/compat/auth';
+
 const firebaseConfig = {
-  apiKey: "AIzaSyCarVPgFNyx45yp4aUAjGrHkMvHhVj5So4",
-  authDomain: "prem-mot.firebaseapp.com",
-  projectId: "prem-mot",
-  storageBucket: "prem-mot.firebasestorage.app",
-  messagingSenderId: "294550370130",
-  appId: "1:294550370130:web:f20c14f01325da3856ec8b"
+  apiKey:            'AIzaSyCarVPgFNyx45yp4aUAjGrHkMvHhVj5So4',
+  authDomain:        'prem-mot.firebaseapp.com',
+  projectId:         'prem-mot',
+  storageBucket:     'prem-mot.firebasestorage.app',
+  messagingSenderId: '294550370130',
+  appId:             '1:294550370130:web:f20c14f01325da3856ec8b'
 };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth();
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+export const db   = firebase.firestore();
+export const auth = firebase.auth();
+export default firebase;
 
 // ——— Firestore helpers ———
 
-function docsToArr(snapshot) {
+export function docsToArr(snapshot) {
   return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
-async function fsAll(col, ...constraints) {
-  let ref = db.collection(col);
-  const snap = await ref.get();
-  return docsToArr(snap);
-}
-
-async function fsAdd(col, data) {
+export async function fsAdd(col, data) {
   const ref = await db.collection(col).add(data);
   return ref.id;
 }
 
-async function fsSet(col, id, data) {
+export async function fsSet(col, id, data) {
   return db.collection(col).doc(id).set(data);
 }
 
-async function fsUpdate(col, id, data) {
+export async function fsUpdate(col, id, data) {
   return db.collection(col).doc(id).update(data);
 }
 
-async function fsDel(col, id) {
+export async function fsDel(col, id) {
   return db.collection(col).doc(id).delete();
 }
 
-// ——— Loading spinner ———
+// ——— Spinner ———
 
-function showSpinner(containerId) {
+export function showSpinner(containerId) {
   const el = document.getElementById(containerId);
   if (!el || el.querySelector('.fs-spinner')) return;
   const s = document.createElement('div');
@@ -55,6 +57,6 @@ function showSpinner(containerId) {
   el.prepend(s);
 }
 
-function hideSpinner(containerId) {
+export function hideSpinner(containerId) {
   document.getElementById(containerId)?.querySelector('.fs-spinner')?.remove();
 }

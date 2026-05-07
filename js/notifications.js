@@ -2,6 +2,8 @@
    Premier MOT — Notifications (Firebase)
    =========================== */
 
+import { db } from './firebase.js';
+
 window._notifData = [];
 
 async function loadNotifications() {
@@ -128,4 +130,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('clearNotifs')?.addEventListener('click', clearAllNotifs);
   // Load notifications on init (after auth is ready, via a slight delay)
   setTimeout(loadNotifications, 1000);
+});
+
+Object.assign(window, {
+  clickNotif, markAllRead, clearAllNotifs, addNotification,
+  renderNotifDropdown, updateNotifBadge, loadNotifications
 });
