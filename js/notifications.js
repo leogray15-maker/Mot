@@ -2,7 +2,7 @@
    Premier MOT — Notifications (Firebase)
    =========================== */
 
-import { db } from './firebase.js';
+import { db, docsToArr } from './firebase.js';
 
 window._notifData = [];
 
