@@ -54,18 +54,29 @@ if (document.getElementById('publicBookingPage')) {
 
   // Load settings + existing bookings for slot availability
   async function initPublicBooking() {
+    const defaultWH = {
+      monday:    { open: true,  start: '08:00', end: '18:00' },
+      tuesday:   { open: true,  start: '08:00', end: '18:00' },
+      wednesday: { open: true,  start: '08:00', end: '18:00' },
+      thursday:  { open: true,  start: '08:00', end: '18:00' },
+      friday:    { open: true,  start: '08:00', end: '18:00' },
+      saturday:  { open: true,  start: '08:00', end: '17:00' },
+      sunday:    { open: false, start: '09:00', end: '13:00' }
+    };
     try {
       const [settingsSnap, bookingsSnap] = await Promise.all([
         db.collection('settings').doc('config').get(),
         db.collection('bookings').get()
       ]);
-      window._settings = settingsSnap.exists ? Object.assign({ workingHours:{}, blockedDates:[], maxBookingsPerSlot:2 }, settingsSnap.data()) : { workingHours:{}, blockedDates:[], maxBookingsPerSlot:2 };
+      const stored = settingsSnap.exists ? settingsSnap.data() : {};
+      // Deep-merge so missing/empty workingHours always falls back to sensible defaults
+      window._settings = Object.assign({ blockedDates: [], maxBookingsPerSlot: 2 }, stored);
+      window._settings.workingHours = Object.assign({}, defaultWH, stored.workingHours || {});
       window._bookingsData = bookingsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-      // Update confirmation phone
       const phoneEl = document.getElementById('confirmPhone');
       if (phoneEl && window._settings.phone) phoneEl.textContent = window._settings.phone;
     } catch (e) {
-      window._settings = window._settings || {};
+      window._settings = { workingHours: defaultWH, blockedDates: [], maxBookingsPerSlot: 2 };
       window._bookingsData = [];
     }
   }
