@@ -53,7 +53,8 @@ async function getNextInvoiceNumber() {
   const num = await db.runTransaction(async t => {
     const doc = await t.get(ref);
     const n = (doc.exists ? (doc.data().invoiceCounter || 0) : 0) + 1;
-    t.update(ref, { invoiceCounter: n });
+    // Use set+merge so the transaction works even if the settings doc doesn't exist yet
+    t.set(ref, { invoiceCounter: n }, { merge: true });
     return n;
   });
   return 'INV-' + String(num).padStart(4, '0');

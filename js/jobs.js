@@ -309,5 +309,5 @@ window.sectionLoaders = window.sectionLoaders || {};
 window.sectionLoaders['jobs'] = loadJobsSection;
 
 Object.assign(window, {
-  viewJobModal, updateJobStatus, deleteJob, createInvoiceFromJob, printJobCard
+  viewJobModal, updateJobStatus, deleteJob, printJobCard, addPartRow, updateJobLabourTotal
 });

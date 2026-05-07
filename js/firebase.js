@@ -23,6 +23,9 @@ export const db   = firebase.firestore();
 export const auth = firebase.auth();
 export default firebase;
 
+// Expose db on window so non-module inline scripts (e.g. clearAllData) can use it
+window.db = db;
+
 // ——— Firestore helpers ———
 
 export function docsToArr(snapshot) {

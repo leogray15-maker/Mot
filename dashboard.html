@@ -468,15 +468,62 @@
             <div class="panel-body">
               <form id="settingsHoursForm" class="dash-form">
                 <div style="display:grid;gap:8px;margin-bottom:20px">
-                  ${['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].map(day => `
-                    <div class="wh-row" id="wh-row-${day}">
-                      <div class="wh-day-name">${day.charAt(0).toUpperCase()+day.slice(1)}</div>
-                      <input type="checkbox" id="wh_open_${day}" class="wh-open-cb">
-                      <label for="wh_open_${day}" class="wh-open-label">Open</label>
-                      <input type="time" id="wh_start_${day}" class="wh-time-input">
-                      <span class="wh-to">to</span>
-                      <input type="time" id="wh_end_${day}" class="wh-time-input">
-                    </div>`).join('')}
+                  <div class="wh-row" id="wh-row-monday">
+                    <div class="wh-day-name">Monday</div>
+                    <input type="checkbox" id="wh_open_monday" class="wh-open-cb">
+                    <label for="wh_open_monday" class="wh-open-label">Open</label>
+                    <input type="time" id="wh_start_monday" class="wh-time-input">
+                    <span class="wh-to">to</span>
+                    <input type="time" id="wh_end_monday" class="wh-time-input">
+                  </div>
+                  <div class="wh-row" id="wh-row-tuesday">
+                    <div class="wh-day-name">Tuesday</div>
+                    <input type="checkbox" id="wh_open_tuesday" class="wh-open-cb">
+                    <label for="wh_open_tuesday" class="wh-open-label">Open</label>
+                    <input type="time" id="wh_start_tuesday" class="wh-time-input">
+                    <span class="wh-to">to</span>
+                    <input type="time" id="wh_end_tuesday" class="wh-time-input">
+                  </div>
+                  <div class="wh-row" id="wh-row-wednesday">
+                    <div class="wh-day-name">Wednesday</div>
+                    <input type="checkbox" id="wh_open_wednesday" class="wh-open-cb">
+                    <label for="wh_open_wednesday" class="wh-open-label">Open</label>
+                    <input type="time" id="wh_start_wednesday" class="wh-time-input">
+                    <span class="wh-to">to</span>
+                    <input type="time" id="wh_end_wednesday" class="wh-time-input">
+                  </div>
+                  <div class="wh-row" id="wh-row-thursday">
+                    <div class="wh-day-name">Thursday</div>
+                    <input type="checkbox" id="wh_open_thursday" class="wh-open-cb">
+                    <label for="wh_open_thursday" class="wh-open-label">Open</label>
+                    <input type="time" id="wh_start_thursday" class="wh-time-input">
+                    <span class="wh-to">to</span>
+                    <input type="time" id="wh_end_thursday" class="wh-time-input">
+                  </div>
+                  <div class="wh-row" id="wh-row-friday">
+                    <div class="wh-day-name">Friday</div>
+                    <input type="checkbox" id="wh_open_friday" class="wh-open-cb">
+                    <label for="wh_open_friday" class="wh-open-label">Open</label>
+                    <input type="time" id="wh_start_friday" class="wh-time-input">
+                    <span class="wh-to">to</span>
+                    <input type="time" id="wh_end_friday" class="wh-time-input">
+                  </div>
+                  <div class="wh-row" id="wh-row-saturday">
+                    <div class="wh-day-name">Saturday</div>
+                    <input type="checkbox" id="wh_open_saturday" class="wh-open-cb">
+                    <label for="wh_open_saturday" class="wh-open-label">Open</label>
+                    <input type="time" id="wh_start_saturday" class="wh-time-input">
+                    <span class="wh-to">to</span>
+                    <input type="time" id="wh_end_saturday" class="wh-time-input">
+                  </div>
+                  <div class="wh-row" id="wh-row-sunday">
+                    <div class="wh-day-name">Sunday</div>
+                    <input type="checkbox" id="wh_open_sunday" class="wh-open-cb">
+                    <label for="wh_open_sunday" class="wh-open-label">Open</label>
+                    <input type="time" id="wh_start_sunday" class="wh-time-input">
+                    <span class="wh-to">to</span>
+                    <input type="time" id="wh_end_sunday" class="wh-time-input">
+                  </div>
                 </div>
                 <div class="form-row" style="max-width:400px">
                   <div class="form-group"><label>Max Bookings Per Hour Slot</label><input type="number" id="settingMaxSlots" placeholder="2" min="1" max="10"></div>
@@ -514,7 +561,7 @@
           <div class="panel">
             <div class="panel-header"><div class="panel-title"><i class="fas fa-database"></i> Data Management</div></div>
             <div class="panel-body">
-              <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px">All data is stored in your browser's localStorage.</p>
+              <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px">All data is stored securely in Firebase Firestore.</p>
               <div style="display:flex;gap:10px;flex-wrap:wrap">
                 <button class="btn-sm btn-ghost-sm" onclick="exportData()"><i class="fas fa-download"></i> Export JSON</button>
                 <button class="btn-sm btn-danger" onclick="clearAllData()"><i class="fas fa-trash"></i> Clear All Data</button>

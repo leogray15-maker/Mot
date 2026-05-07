@@ -675,7 +675,7 @@ function showAppLoader(visible) {
 Object.assign(window, {
   navigate, showToast, formatDate, formatDateTime, esc, statusClass,
   updateEnquiryStatus, deleteEnquiry, markComplete, viewEnquiry,
-  viewCustomer, deleteCustomer
+  viewCustomer, deleteCustomer, saveCustomerNotes
 });
 
 // ——— Init (Firebase Auth Guard) ———
