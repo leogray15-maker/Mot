@@ -34,7 +34,7 @@ window.auth = auth;
  * Placeholder UID for the platform super-admin.
  * Replace '[SUPER_ADMIN_UID]' with the real Firebase UID before deploying.
  */
-export const SUPER_ADMIN_UID = '[SUPER_ADMIN_UID]';
+export const SUPER_ADMIN_UID = 'q8Zob2UIzUSRosbkg1fZz7zHWwk1';
 
 /**
  * Pages that are allowed to load without a garageId in sessionStorage.
