@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GarageOS Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- APP LOADER -->
+<div id="appLoader">
+  <i class="fas fa-shield-halved loader-icon"></i>
+  <div class="loader-title">GarageOS Admin</div>
+  <div class="loader-sub">Verifying access…</div>
+</div>
+
+<!-- TOP NAV -->
+<nav class="admin-topnav" id="adminTopnav" style="display:none">
+  <div class="topnav-logo">
+    <div class="topnav-logo-icon"><i class="fas fa-shield-halved"></i></div>
+    GarageOS Admin
+    <span class="topnav-badge">Super Admin</span>
+  </div>
+  <div class="topnav-right">
+    <div class="topnav-user">
+      <div class="topnav-user-avatar" id="adminAvatar">S</div>
+      <span id="adminEmail" style="font-size:0.78rem;color:var(--text-muted)">Loading…</span>
+    </div>
+    <button class="btn btn-ghost btn-sm" id="adminLogoutBtn">
+      <i class="fas fa-right-from-bracket"></i> Logout
+    </button>
+  </div>
+</nav>
+
+<!-- LAYOUT -->
+<div class="admin-layout" id="adminLayout" style="display:none">
+
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar" id="adminSidebar">
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-label">Platform</div>
+      <button class="sidebar-btn active" data-page="overview">
+        <i class="fas fa-chart-line"></i> Overview
+      </button>
+      <button class="sidebar-btn" data-page="garages">
+        <i class="fas fa-warehouse"></i> Garages
+      </button>
+      <button class="sidebar-btn" data-page="crm">
+        <i class="fas fa-users-between-lines"></i> Sales CRM
+      </button>
+      <button class="sidebar-btn" data-page="revenue">
+        <i class="fas fa-sterling-sign"></i> Revenue
+      </button>
+      <button class="sidebar-btn" data-page="settings">
+        <i class="fas fa-gear"></i> Settings
+      </button>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="admin-main">
+
+    <!-- ========== OVERVIEW ========== -->
+    <div class="admin-page active" id="page-overview">
+      <div class="page-header">
+        <h1>Platform Overview</h1>
+        <p>Real-time metrics across all GarageOS tenants.</p>
+      </div>
+
+      <div class="stats-grid" id="overviewStatsGrid">
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-label">Total Garages</div>
+            <div class="stat-value" id="stat-total-garages">—</div>
+            <div class="stat-delta">All accounts</div>
+          </div>
+          <div class="stat-icon blue"><i class="fas fa-warehouse"></i></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-label">Active Trials</div>
+            <div class="stat-value" id="stat-active-trials">—</div>
+            <div class="stat-delta">Current trial users</div>
+          </div>
+          <div class="stat-icon amber"><i class="fas fa-hourglass-half"></i></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-label">Paying Customers</div>
+            <div class="stat-value" id="stat-paying">—</div>
+            <div class="stat-delta good" id="stat-paying-delta">Active subscriptions</div>
+          </div>
+          <div class="stat-icon green"><i class="fas fa-circle-check"></i></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-label">MRR</div>
+            <div class="stat-value" id="stat-mrr">—</div>
+            <div class="stat-delta">Monthly recurring</div>
+          </div>
+          <div class="stat-icon green"><i class="fas fa-sterling-sign"></i></div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-info">
+            <div class="stat-label">Trials Expiring This Week</div>
+            <div class="stat-value" id="stat-expiring">—</div>
+            <div class="stat-delta danger">Needs follow-up</div>
+          </div>
+          <div class="stat-icon red"><i class="fas fa-triangle-exclamation"></i></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-label">Revenue All Time</div>
+            <div class="stat-value" id="stat-revenue-all">—</div>
+            <div class="stat-delta">Total collected</div>
+          </div>
+          <div class="stat-icon purple"><i class="fas fa-coins"></i></div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fas fa-bolt"></i> Quick Actions</div>
+          </div>
+          <div class="panel-body">
+            <div class="quick-actions">
+              <button class="btn btn-primary" id="quickAddLeadBtn">
+                <i class="fas fa-plus"></i> Add Lead
+              </button>
+              <button class="btn btn-ghost" id="quickExportBtn">
+                <i class="fas fa-download"></i> Export Data
+              </button>
+              <button class="btn btn-ghost" onclick="navigateAdmin('garages')">
+                <i class="fas fa-warehouse"></i> View Garages
+              </button>
+              <button class="btn btn-ghost" onclick="navigateAdmin('crm')">
+                <i class="fas fa-users-between-lines"></i> CRM Pipeline
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fas fa-clock-rotate-left"></i> Recent Activity</div>
+          </div>
+          <div class="panel-body" style="padding:0">
+            <div class="activity-feed" id="activityFeed">
+              <div style="padding:20px;text-align:center;color:var(--text-dim);font-size:0.83rem">
+                <i class="fas fa-circle-notch fa-spin"></i> Loading…
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== GARAGES ========== -->
+    <div class="admin-page" id="page-garages">
+      <div class="page-header">
+        <h1>Garages</h1>
+        <p>Manage all tenant accounts, plans, and trial periods.</p>
+      </div>
+
+      <div class="panel">
+        <div class="toolbar">
+          <div class="search-wrap">
+            <i class="fas fa-search"></i>
+            <input type="text" id="garageSearch" placeholder="Search by name, email…">
+          </div>
+          <select class="filter-select" id="garageStatusFilter">
+            <option value="all">All Statuses</option>
+            <option value="trial">Trial</option>
+            <option value="active">Active</option>
+            <option value="expired">Expired</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="suspended">Suspended</option>
+          </select>
+          <select class="filter-select" id="garagePlanFilter">
+            <option value="all">All Plans</option>
+            <option value="starter">Starter</option>
+            <option value="pro">Pro</option>
+            <option value="enterprise">Enterprise</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table id="garagesTable">
+            <thead>
+              <tr>
+                <th>Garage Name</th>
+                <th>Owner</th>
+                <th>Email</th>
+                <th>Plan</th>
+                <th>Status</th>
+                <th>Trial Ends</th>
+                <th>Signed Up</th>
+                <th>Last Login</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="garagesTableBody">
+              <tr><td colspan="9" class="table-empty"><i class="fas fa-circle-notch fa-spin"></i> Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== CRM ========== -->
+    <div class="admin-page" id="page-crm">
+      <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div>
+          <h1>Sales CRM</h1>
+          <p>Leo's pipeline — track every lead from first contact to paying customer.</p>
+        </div>
+        <button class="btn btn-primary" id="addLeadBtn">
+          <i class="fas fa-plus"></i> Add Lead
+        </button>
+      </div>
+
+      <div class="kanban-board" id="kanbanBoard">
+        <div class="kanban-column" data-col="lead">
+          <div class="kanban-col-header">
+            <span class="kanban-col-title">Lead</span>
+            <span class="kanban-count" id="count-lead">0</span>
+          </div>
+          <div class="kanban-col-body" id="col-lead"></div>
+        </div>
+        <div class="kanban-column" data-col="demo">
+          <div class="kanban-col-header">
+            <span class="kanban-col-title">Demo Sent</span>
+            <span class="kanban-count" id="count-demo">0</span>
+          </div>
+          <div class="kanban-col-body" id="col-demo"></div>
+        </div>
+        <div class="kanban-column" data-col="trial">
+          <div class="kanban-col-header">
+            <span class="kanban-col-title">Trial</span>
+            <span class="kanban-count" id="count-trial">0</span>
+          </div>
+          <div class="kanban-col-body" id="col-trial"></div>
+        </div>
+        <div class="kanban-column" data-col="paying">
+          <div class="kanban-col-header">
+            <span class="kanban-col-title" style="color:var(--green)">Paying</span>
+            <span class="kanban-count" id="count-paying">0</span>
+          </div>
+          <div class="kanban-col-body" id="col-paying"></div>
+        </div>
+        <div class="kanban-column" data-col="churned">
+          <div class="kanban-col-header">
+            <span class="kanban-col-title" style="color:var(--text-dim)">Churned</span>
+            <span class="kanban-count" id="count-churned">0</span>
+          </div>
+          <div class="kanban-col-body" id="col-churned"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== REVENUE ========== -->
+    <div class="admin-page" id="page-revenue">
+      <div class="page-header">
+        <h1>Revenue</h1>
+        <p>Platform subscription revenue breakdown and trends.</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-label">MRR</div>
+            <div class="stat-value" id="rev-mrr">—</div>
+            <div class="stat-delta">Monthly recurring revenue</div>
+          </div>
+          <div class="stat-icon green"><i class="fas fa-sterling-sign"></i></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-label">ARR</div>
+            <div class="stat-value" id="rev-arr">—</div>
+            <div class="stat-delta">Annual run rate</div>
+          </div>
+          <div class="stat-icon blue"><i class="fas fa-calendar-year"></i></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-label">Total Garages</div>
+            <div class="stat-value" id="rev-total-garages">—</div>
+            <div class="stat-delta">All accounts</div>
+          </div>
+          <div class="stat-icon amber"><i class="fas fa-warehouse"></i></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-label">Trial-to-Paid Rate</div>
+            <div class="stat-value" id="rev-conversion">—</div>
+            <div class="stat-delta">Conversion %</div>
+          </div>
+          <div class="stat-icon purple"><i class="fas fa-arrow-trend-up"></i></div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-header">
+          <div class="panel-title"><i class="fas fa-chart-line"></i> Revenue Over Time</div>
+        </div>
+        <div class="panel-body">
+          <div style="height:280px;position:relative">
+            <canvas id="adminRevenueChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fas fa-layer-group"></i> MRR Breakdown by Plan</div>
+          </div>
+          <div class="panel-body">
+            <div id="mrrBreakdown">
+              <div class="revenue-plan-row">
+                <div>
+                  <div class="revenue-plan-name">Starter</div>
+                  <div class="revenue-plan-count" id="starter-count">0 garages × £49</div>
+                </div>
+                <div class="revenue-plan-value" id="starter-mrr">£0</div>
+              </div>
+              <div class="revenue-plan-row">
+                <div>
+                  <div class="revenue-plan-name">Pro</div>
+                  <div class="revenue-plan-count" id="pro-count">0 garages × £79</div>
+                </div>
+                <div class="revenue-plan-value" id="pro-mrr">£0</div>
+              </div>
+              <div class="revenue-plan-row">
+                <div>
+                  <div class="revenue-plan-name">Enterprise</div>
+                  <div class="revenue-plan-count" id="enterprise-count">0 garages × £129</div>
+                </div>
+                <div class="revenue-plan-value" id="enterprise-mrr">£0</div>
+              </div>
+              <div class="revenue-plan-row" style="border-top:2px solid var(--border-strong);padding-top:14px;margin-top:4px">
+                <div class="revenue-plan-name" style="font-weight:800">Total MRR</div>
+                <div class="revenue-plan-value" id="total-mrr-breakdown" style="font-size:1.1rem">£0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fas fa-table"></i> Monthly Summary</div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th>New Signups</th>
+                  <th>Trials</th>
+                  <th>Conversions</th>
+                  <th>MRR</th>
+                </tr>
+              </thead>
+              <tbody id="revenueSummaryBody">
+                <tr><td colspan="5" class="table-empty"><i class="fas fa-chart-bar"></i> Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== SETTINGS ========== -->
+    <div class="admin-page" id="page-settings">
+      <div class="page-header">
+        <h1>Platform Settings</h1>
+        <p>Super admin configuration and platform management.</p>
+      </div>
+
+      <div class="settings-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fas fa-fingerprint"></i> Super Admin Identity</div>
+          </div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label>Super Admin UID</label>
+              <div class="uid-display" id="superAdminUidDisplay">
+                <span id="superAdminUidText" style="flex:1">—</span>
+                <button class="uid-copy-btn" id="copyUidBtn" title="Copy UID">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Logged In As</label>
+              <div class="uid-display">
+                <span id="settingsEmailDisplay">—</span>
+              </div>
+            </div>
+            <p style="font-size:0.75rem;color:var(--text-dim);margin-top:8px">
+              <i class="fas fa-info-circle"></i>
+              This UID is hardcoded in <code style="color:var(--amber)">/js/firebase.js</code>. Only this user can access the admin panel.
+            </p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fas fa-shield-halved"></i> Platform Information</div>
+          </div>
+          <div class="panel-body">
+            <div class="detail-row"><span class="detail-key">Version</span><span class="detail-val">GarageOS v1.0</span></div>
+            <div class="detail-row"><span class="detail-key">Firebase Project</span><span class="detail-val">prem-mot</span></div>
+            <div class="detail-row"><span class="detail-key">Firestore</span><span class="detail-val">Native Mode</span></div>
+            <div class="detail-row"><span class="detail-key">Auth Provider</span><span class="detail-val">Email / Password</span></div>
+            <div class="detail-row"><span class="detail-key">Accounts Collection</span><span class="detail-val">/accounts</span></div>
+            <div class="detail-row"><span class="detail-key">CRM Collection</span><span class="detail-val">/admin_leads</span></div>
+          </div>
+        </div>
+
+        <div class="panel" style="grid-column:1/-1">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fas fa-sliders"></i> Plan Pricing Configuration</div>
+          </div>
+          <div class="panel-body">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+              <div class="form-group">
+                <label>Starter Plan (£/mo)</label>
+                <input type="number" id="pricingStarter" value="49" min="0" step="1"
+                  style="background:var(--bg);border:1px solid var(--border-strong);border-radius:var(--radius);padding:10px 12px;color:var(--text);width:100%">
+              </div>
+              <div class="form-group">
+                <label>Pro Plan (£/mo)</label>
+                <input type="number" id="pricingPro" value="79" min="0" step="1"
+                  style="background:var(--bg);border:1px solid var(--border-strong);border-radius:var(--radius);padding:10px 12px;color:var(--text);width:100%">
+              </div>
+              <div class="form-group">
+                <label>Enterprise Plan (£/mo)</label>
+                <input type="number" id="pricingEnterprise" value="129" min="0" step="1"
+                  style="background:var(--bg);border:1px solid var(--border-strong);border-radius:var(--radius);padding:10px 12px;color:var(--text);width:100%">
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm" id="savePricingBtn">
+              <i class="fas fa-save"></i> Save Pricing
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ========== GARAGE DETAIL SIDE PANEL ========== -->
+<div class="detail-panel-overlay" id="garagePanelOverlay"></div>
+<div class="detail-panel" id="garageDetailPanel">
+  <div class="detail-panel-header">
+    <div class="detail-panel-title" id="panelGarageName">Garage Details</div>
+    <button class="detail-panel-close" id="closePanelBtn"><i class="fas fa-xmark"></i></button>
+  </div>
+  <div class="detail-panel-body" id="garageDetailBody">
+    <div style="text-align:center;padding:40px;color:var(--text-dim)">
+      <i class="fas fa-circle-notch fa-spin" style="font-size:1.5rem"></i>
+    </div>
+  </div>
+  <div class="detail-panel-footer" id="garageDetailFooter"></div>
+</div>
+
+<!-- ========== LEAD MODAL ========== -->
+<div class="modal-overlay" id="leadModalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="leadModalTitle">Add Lead</div>
+      <button class="modal-close" id="closeLeadModal"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <form id="leadForm">
+        <input type="hidden" id="leadId">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Garage Name *</label>
+            <input type="text" id="leadGarageName" placeholder="e.g. Fast Fit Garage" required>
+          </div>
+          <div class="form-group">
+            <label>Owner Name *</label>
+            <input type="text" id="leadOwnerName" placeholder="e.g. John Smith" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" id="leadPhone" placeholder="07700 900000">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="leadEmail" placeholder="john@garage.co.uk">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Status</label>
+            <select id="leadStatus">
+              <option value="lead">Lead</option>
+              <option value="demo">Demo Sent</option>
+              <option value="trial">Trial</option>
+              <option value="paying">Paying</option>
+              <option value="churned">Churned</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Follow-Up Date</label>
+            <input type="date" id="leadFollowUp">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <textarea id="leadNotes" placeholder="Any relevant notes about this lead…"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="cancelLeadBtn">Cancel</button>
+      <button class="btn btn-primary" id="saveLeadBtn">
+        <i class="fas fa-save"></i> Save Lead
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== TOAST ========== -->
+<div class="toast-container" id="adminToastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script type="module" src="/js/admin.js"></script>
+</body>
+</html>

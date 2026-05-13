@@ -3,282 +3,337 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Premier MOT & Service | Essex's Most Trusted MOT Centre</title>
-  <meta name="description" content="Fast, honest and affordable MOT testing, servicing and brake inspections in Chelmsford, Essex. Same day MOTs from £45. Book online now.">
+  <title>GarageOS — The All-In-One Garage Management System</title>
+  <meta name="description" content="Bookings, job cards, invoicing, MOT reminders, VHC reports, and AI — all in one place. Built for UK independent garages.">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/landing.css">
 </head>
 <body>
 
-<!-- NAV -->
-<nav class="nav" id="mainNav">
-  <div class="nav-inner">
-    <a href="index.html" class="nav-logo">
-      <span class="logo-main">Premier MOT & Service</span>
-      <span class="logo-sub">Chelmsford, Essex</span>
-    </a>
-    <div class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="services.html">Services</a>
-      <a href="contact.html">Contact</a>
-      <a href="booking.html" class="nav-book-link"><i class="fas fa-calendar-check"></i> Book Online</a>
-    </div>
-    <button class="btn btn-primary nav-cta open-modal">Book Now</button>
-    <button class="nav-hamburger" aria-label="Menu">
+<!-- =====================
+     NAV
+     ===================== -->
+<nav class="landing-nav" id="landingNav">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-icon"><i class="fas fa-garage"></i></div>
+    GarageOS
+  </a>
+
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#how-it-works">How It Works</a>
+    <a href="login.html">Login</a>
+  </div>
+
+  <div class="nav-actions">
+    <a href="login.html" class="nav-login">Login</a>
+    <a href="signup.html" class="btn-primary">Start Free Trial</a>
+    <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
   </div>
 </nav>
 
-<div class="mobile-menu">
-  <a href="index.html">Home</a>
-  <a href="services.html">Services</a>
-  <a href="contact.html">Contact</a>
-  <a href="booking.html"><i class="fas fa-calendar-check"></i> Book Online</a>
-  <button class="btn btn-primary open-modal">Book Now</button>
+<!-- Mobile menu -->
+<div id="mobileMenu" style="position:fixed;top:68px;left:0;right:0;z-index:99;background:#0f0f0f;border-bottom:1px solid #1e1e1e;padding:1.25rem 2rem;display:flex;flex-direction:column;gap:1rem;transform:translateY(-130%);transition:transform 0.3s ease;">
+  <a href="#features" style="color:#9ca3af;font-size:0.95rem;">Features</a>
+  <a href="#pricing" style="color:#9ca3af;font-size:0.95rem;">Pricing</a>
+  <a href="#how-it-works" style="color:#9ca3af;font-size:0.95rem;">How It Works</a>
+  <a href="login.html" style="color:#9ca3af;font-size:0.95rem;">Login</a>
+  <a href="signup.html" class="btn-primary" style="text-align:center;margin-top:0.5rem;">Start Free Trial</a>
 </div>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-grid"></div>
-  <div class="hero-content">
-    <div class="hero-badge">
-      <i class="fas fa-circle-check"></i>
-      Essex's #1 Rated MOT Centre — Over 3,000 vehicles tested
-    </div>
-    <h1>Essex's Most Trusted<br><span class="accent">MOT & Service</span><br>Centre</h1>
-    <p class="hero-sub">Fast, honest, affordable — book your MOT today and join thousands of Essex drivers who trust us to keep them safe on the road.</p>
-    <div class="hero-actions">
-      <a href="booking.html" class="btn btn-primary" style="padding:16px 36px;font-size:1rem">
-        <i class="fas fa-calendar-check"></i> Book Your MOT
-      </a>
-      <a href="tel:01234567890" class="btn btn-outline">
-        <i class="fas fa-phone"></i> 01234 567890
-      </a>
-    </div>
-    <div class="hero-stats">
-      <div>
-        <div class="hero-stat-num">30<span>+</span></div>
-        <div class="hero-stat-label">Years Experience</div>
+<!-- =====================
+     HERO
+     ===================== -->
+<section class="hero" id="home">
+  <div class="hero-badge">
+    <i class="fas fa-bolt"></i> Built for UK Independent Garages
+  </div>
+
+  <h1>The <span class="highlight">All-In-One</span> Garage Management System That Replaces Everything</h1>
+
+  <p class="hero-sub">
+    Bookings, job cards, invoicing, MOT reminders, VHC reports, and AI — all in one place. Built for UK independent garages.
+  </p>
+
+  <div class="hero-ctas">
+    <a href="signup.html" class="btn-primary btn-lg">Start Free Trial <i class="fas fa-arrow-right"></i></a>
+    <a href="#how-it-works" class="btn-outline btn-lg"><i class="fas fa-play-circle"></i> Watch Demo</a>
+  </div>
+
+  <div class="hero-trust">
+    <i class="fas fa-star"></i>
+    <i class="fas fa-star"></i>
+    <i class="fas fa-star"></i>
+    <i class="fas fa-star"></i>
+    <i class="fas fa-star"></i>
+    &nbsp;Trusted by independent garages across the UK
+  </div>
+
+  <div class="hero-img">
+    <div class="hero-dashboard-mock">
+      <div class="mock-topbar">
+        <div class="mock-dot"></div>
+        <div class="mock-dot"></div>
+        <div class="mock-dot"></div>
+        <span class="mock-title">GarageOS Dashboard — Premier Auto</span>
       </div>
-      <div>
-        <div class="hero-stat-num">5<span>★</span></div>
-        <div class="hero-stat-label">Google Rating</div>
+      <div class="mock-stats">
+        <div class="mock-stat">
+          <div class="mock-stat-label">Jobs Today</div>
+          <div class="mock-stat-value red">12</div>
+        </div>
+        <div class="mock-stat">
+          <div class="mock-stat-label">Revenue MTD</div>
+          <div class="mock-stat-value gold">£8,430</div>
+        </div>
+        <div class="mock-stat">
+          <div class="mock-stat-label">MOT Reminders Sent</div>
+          <div class="mock-stat-value green">47</div>
+        </div>
+        <div class="mock-stat">
+          <div class="mock-stat-label">Open Invoices</div>
+          <div class="mock-stat-value">3</div>
+        </div>
       </div>
-      <div>
-        <div class="hero-stat-num">3k<span>+</span></div>
-        <div class="hero-stat-label">Happy Customers</div>
+      <div class="mock-bars">
+        <div class="mock-bar" style="--h:40%"></div>
+        <div class="mock-bar" style="--h:60%"></div>
+        <div class="mock-bar" style="--h:80%"></div>
+        <div class="mock-bar" style="--h:55%"></div>
+        <div class="mock-bar" style="--h:90%"></div>
+        <div class="mock-bar" style="--h:70%"></div>
+        <div class="mock-bar" style="--h:45%"></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- TRUST BAR -->
+<!-- =====================
+     TRUST BAR
+     ===================== -->
 <div class="trust-bar">
   <div class="trust-bar-inner">
-    <div class="trust-item">
-      <div class="trust-icon"><i class="fas fa-shield-halved"></i></div>
-      <div class="trust-item-text">
-        <strong>30+ Years Experience</strong>
-        <span>Family-run since 1994</span>
-      </div>
-    </div>
-    <div class="trust-item">
-      <div class="trust-icon"><i class="fas fa-bolt"></i></div>
-      <div class="trust-item-text">
-        <strong>Same Day MOTs</strong>
-        <span>Results within the hour</span>
-      </div>
-    </div>
-    <div class="trust-item">
-      <div class="trust-icon"><i class="fas fa-truck"></i></div>
-      <div class="trust-item-text">
-        <strong>Free Collection & Delivery</strong>
-        <span>Within 5 miles of Chelmsford</span>
-      </div>
-    </div>
-    <div class="trust-item">
-      <div class="trust-icon"><i class="fas fa-star"></i></div>
-      <div class="trust-item-text">
-        <strong>5-Star Rated</strong>
-        <span>200+ Google reviews</span>
-      </div>
-    </div>
+    <div class="trust-item"><i class="fas fa-check-circle"></i> No setup fee</div>
+    <div class="trust-sep"></div>
+    <div class="trust-item"><i class="fas fa-check-circle"></i> 14-day free trial</div>
+    <div class="trust-sep"></div>
+    <div class="trust-item"><i class="fas fa-check-circle"></i> Cancel anytime</div>
+    <div class="trust-sep"></div>
+    <div class="trust-item"><i class="fas fa-check-circle"></i> UK support</div>
   </div>
 </div>
 
-<!-- SERVICES PREVIEW -->
-<section class="services-preview">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-tag">What We Do</div>
-      <h2 class="section-title">Everything Your Car Needs,<br><span>Under One Roof</span></h2>
-      <p class="section-sub">From mandatory MOT testing to full servicing, brakes and tyres — our experienced team handles it all with transparent pricing and no hidden extras.</p>
+<!-- =====================
+     FEATURES
+     ===================== -->
+<section id="features">
+  <div class="section-inner">
+    <div class="text-center">
+      <span class="section-label">Features</span>
+      <h2 class="section-title">Everything your garage needs, nothing it doesn't</h2>
+      <p class="section-sub">Replace your booking software, job cards, invoicing, and CRM with a single platform built for UK garages.</p>
     </div>
-    <div class="services-grid">
-      <div class="service-card">
-        <div class="service-icon"><i class="fas fa-clipboard-check"></i></div>
-        <h3>MOT Testing</h3>
-        <p>DVSA-authorised MOT testing for Class 4 vehicles. Fast, thorough and completely transparent — we explain every check in plain English.</p>
-        <div class="service-price">From £45 <span>/ test</span></div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📅</div>
+        <h3>Smart Booking Diary</h3>
+        <p>Full calendar with ramp and bay management, drag-and-drop scheduling, 13 colour labels and anti-double-booking to keep your day running smoothly.</p>
       </div>
-      <div class="service-card">
-        <div class="service-icon"><i class="fas fa-wrench"></i></div>
-        <h3>Full Service</h3>
-        <p>Comprehensive vehicle health check covering over 60 inspection points. Includes oil, filters, fluids and a full safety inspection.</p>
-        <div class="service-price">From £120 <span>/ service</span></div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🔧</div>
+        <h3>Digital Job Cards &amp; VHC</h3>
+        <p>Create job cards instantly, run digital vehicle health checks, and send traffic-light reports directly to customers via WhatsApp or shareable link.</p>
       </div>
-      <div class="service-card">
-        <div class="service-icon"><i class="fas fa-circle-dot"></i></div>
-        <h3>Brake Inspection</h3>
-        <p>Free brake safety check on every visit. Disc, pad and caliper inspection with honest advice — we'll never recommend work you don't need.</p>
-        <div class="service-price">Free <span>/ check</span></div>
+
+      <div class="feature-card">
+        <div class="feature-icon">💰</div>
+        <h3>Invoicing &amp; Revenue</h3>
+        <p>Auto-generate invoices from completed jobs, track payments, and view profit &amp; loss reports in real time. VAT-ready for UK garages.</p>
       </div>
-      <div class="service-card">
-        <div class="service-icon"><i class="fas fa-tire"></i></div>
-        <h3>Tyres</h3>
-        <p>Supply and fit of all major tyre brands including Michelin, Pirelli and Continental. Competitive prices with same-day fitting available.</p>
-        <div class="service-price">From £60 <span>/ tyre</span></div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🚗</div>
+        <h3>MOT Reminder Automation</h3>
+        <p>Automated WhatsApp reminders at 30, 14, and 7 days before MOT expiry. Never lose an MOT customer to a competitor again.</p>
       </div>
-    </div>
-    <div style="text-align:center;margin-top:40px">
-      <a href="services.html" class="btn btn-outline">
-        View All Services & Prices <i class="fas fa-arrow-right"></i>
-      </a>
+
+      <div class="feature-card">
+        <div class="feature-icon">🤖</div>
+        <h3>AI Business Assistant</h3>
+        <p>Ask your data anything. Get morning briefings, revenue summaries, upsell opportunities, and WhatsApp message drafts in seconds.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Reports &amp; Analytics</h3>
+        <p>15 reports including VAT summary, technician performance, stock movement, and customer retention. Know your business inside and out.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- PRICING -->
-<section class="pricing">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-tag">Transparent Pricing</div>
-      <h2 class="section-title">Clear Prices,<br><span>No Hidden Extras</span></h2>
-      <p class="section-sub">We believe you deserve to know exactly what you're paying for. No surprise charges, no upselling — just honest, professional work.</p>
+<!-- =====================
+     HOW IT WORKS
+     ===================== -->
+<section class="how-section" id="how-it-works">
+  <div class="section-inner">
+    <div class="text-center">
+      <span class="section-label">How It Works</span>
+      <h2 class="section-title">Up and running in minutes</h2>
+      <p class="section-sub">No IT department needed. GarageOS is designed to be set up by the garage owner in an afternoon.</p>
     </div>
+
+    <div class="steps-row">
+      <div class="step-item">
+        <div class="step-number">1</div>
+        <h3>Sign Up</h3>
+        <p>Create your account and complete the 2-minute setup wizard. No credit card required for your free trial.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-number">2</div>
+        <h3>Set Up</h3>
+        <p>Add your garage details, team members, services, and working hours. Import your existing customers in one click.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-number">3</div>
+        <h3>Go Live</h3>
+        <p>Share your online booking link, connect WhatsApp, and start managing customers and jobs from a single screen.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================
+     PRICING
+     ===================== -->
+<section id="pricing">
+  <div class="section-inner">
+    <div class="text-center">
+      <span class="section-label">Pricing</span>
+      <h2 class="section-title">Simple, transparent pricing</h2>
+      <p class="section-sub">All plans include a 14-day free trial. No setup fee. Cancel anytime.</p>
+    </div>
+
     <div class="pricing-grid">
+      <!-- Starter -->
       <div class="pricing-card">
-        <div class="pricing-icon"><i class="fas fa-clipboard-check"></i></div>
-        <h3>MOT Test</h3>
-        <div class="pricing-amount"><sup>£</sup>45</div>
-        <div class="pricing-from">Standard Class 4 vehicle</div>
+        <div class="pricing-plan">Starter</div>
+        <div class="pricing-price">
+          <span class="currency">£</span><span class="amount">49</span><span class="period">/mo</span>
+        </div>
         <ul class="pricing-features">
-          <li><i class="fas fa-check"></i> All standard MOT checks</li>
-          <li><i class="fas fa-check"></i> Same-day results</li>
-          <li><i class="fas fa-check"></i> Free retest if we fix it</li>
-          <li><i class="fas fa-check"></i> Digital certificate</li>
+          <li><i class="fas fa-check"></i> Garage Website &amp; CRM</li>
+          <li><i class="fas fa-check"></i> Online Bookings</li>
+          <li><i class="fas fa-check"></i> Digital Job Cards</li>
+          <li><i class="fas fa-check"></i> Invoicing</li>
+          <li><i class="fas fa-check"></i> MOT Reminder Tracker</li>
+          <li><i class="fas fa-check"></i> Basic Reports</li>
+          <li><i class="fas fa-check"></i> Up to 2 users</li>
         </ul>
-        <a href="booking.html?service=MOT" class="btn btn-outline" style="width:100%;justify-content:center">Book MOT</a>
+        <a href="signup.html?plan=starter" class="pricing-cta pricing-cta-outline">Start Free Trial</a>
+        <p class="pricing-note">No setup fee. Cancel anytime.</p>
       </div>
+
+      <!-- Pro (featured) -->
       <div class="pricing-card featured">
-        <div class="pricing-icon"><i class="fas fa-wrench"></i></div>
-        <h3>Full Service + MOT</h3>
-        <div class="pricing-amount"><sup>£</sup>149</div>
-        <div class="pricing-from">Best value — save £16</div>
+        <div class="pricing-badge">Most Popular</div>
+        <div class="pricing-plan">Pro</div>
+        <div class="pricing-price">
+          <span class="currency">£</span><span class="amount">79</span><span class="period">/mo</span>
+        </div>
         <ul class="pricing-features">
-          <li><i class="fas fa-check"></i> Full MOT test included</li>
-          <li><i class="fas fa-check"></i> Oil & filter change</li>
-          <li><i class="fas fa-check"></i> All fluids topped up</li>
-          <li><i class="fas fa-check"></i> 60-point health check</li>
-          <li><i class="fas fa-check"></i> Free brake inspection</li>
+          <li><i class="fas fa-check"></i> Everything in Starter</li>
+          <li><i class="fas fa-check"></i> VHC Traffic-Light Reports</li>
+          <li><i class="fas fa-check"></i> AI Business Assistant</li>
+          <li><i class="fas fa-check"></i> Fleet Management</li>
+          <li><i class="fas fa-check"></i> Full Reports Suite (15)</li>
+          <li><i class="fas fa-check"></i> Opportunities Pipeline</li>
+          <li><i class="fas fa-check"></i> Up to 5 users</li>
         </ul>
-        <a href="booking.html?service=MOT%20%2B%20Full%20Service" class="btn btn-primary" style="width:100%;justify-content:center">Book Now</a>
+        <a href="signup.html?plan=pro" class="pricing-cta pricing-cta-primary">Start Free Trial</a>
+        <p class="pricing-note">No setup fee. Cancel anytime.</p>
       </div>
+
+      <!-- Enterprise -->
       <div class="pricing-card">
-        <div class="pricing-icon"><i class="fas fa-circle-dot"></i></div>
-        <h3>Interim Service</h3>
-        <div class="pricing-amount"><sup>£</sup>79</div>
-        <div class="pricing-from">Ideal between full services</div>
+        <div class="pricing-plan">Enterprise</div>
+        <div class="pricing-price">
+          <span class="currency">£</span><span class="amount">129</span><span class="period">/mo</span>
+        </div>
         <ul class="pricing-features">
-          <li><i class="fas fa-check"></i> Oil & filter change</li>
-          <li><i class="fas fa-check"></i> 25-point safety check</li>
-          <li><i class="fas fa-check"></i> Tyre condition check</li>
-          <li><i class="fas fa-check"></i> Battery health check</li>
+          <li><i class="fas fa-check"></i> Everything in Pro</li>
+          <li><i class="fas fa-check"></i> Unlimited users</li>
+          <li><i class="fas fa-check"></i> Custom domain</li>
+          <li><i class="fas fa-check"></i> White label branding</li>
+          <li><i class="fas fa-check"></i> Priority UK support</li>
+          <li><i class="fas fa-check"></i> Dedicated account manager</li>
+          <li><i class="fas fa-check"></i> API access</li>
         </ul>
-        <a href="booking.html?service=Interim%20Service" class="btn btn-outline" style="width:100%;justify-content:center">Book Service</a>
+        <a href="signup.html?plan=enterprise" class="pricing-cta pricing-cta-outline">Get Started</a>
+        <p class="pricing-note">No setup fee. Cancel anytime.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
-<section class="how-it-works">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-tag">How It Works</div>
-      <h2 class="section-title">Book, Drop Off,<br><span>Pick Up Fixed</span></h2>
-      <p class="section-sub">We've made the whole process as simple as possible. Three steps — that's all it takes.</p>
+<!-- =====================
+     SOCIAL PROOF
+     ===================== -->
+<section class="social-section" id="testimonials">
+  <div class="section-inner">
+    <div class="text-center">
+      <span class="section-label">Testimonials</span>
+      <h2 class="section-title">Join garages already using GarageOS</h2>
+      <p class="section-sub">Independent garages across the UK are replacing their old systems with GarageOS.</p>
     </div>
-    <div class="steps-grid">
-      <div class="step-card">
-        <div class="step-num">1</div>
-        <h3>Book Online or Call</h3>
-        <p>Choose your service and pick a time that suits you. Use our online booking form or give us a call on 01234 567890. We'll confirm within the hour.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">2</div>
-        <h3>Drop Off Your Car</h3>
-        <p>Bring your car to us in Chelmsford, or use our free collection service within 5 miles. Our team will get straight to work.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">3</div>
-        <h3>Pick It Up Fixed</h3>
-        <p>We'll call you as soon as we're done. We'll clearly explain what we found and what we did — no jargon, no surprises. Just a safe, roadworthy vehicle.</p>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- TESTIMONIALS -->
-<section class="testimonials">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-tag">Real Reviews</div>
-      <h2 class="section-title">What Our Customers<br><span>Actually Say</span></h2>
-      <p class="section-sub">Don't take our word for it. Here's what real Essex drivers say about Premier MOT & Service.</p>
-    </div>
     <div class="testimonials-grid">
       <div class="testimonial-card">
-        <div class="testimonial-stars">
-          <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+        <div class="stars">
+          <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+          <i class="fas fa-star"></i><i class="fas fa-star"></i>
         </div>
-        <p class="testimonial-text">"Been using Premier MOT for the past six years across three different cars. Never once felt like I was being oversold anything. Prices are fair, they explain everything clearly and the turnaround is always fast. Won't go anywhere else."</p>
+        <p class="testimonial-text">"We switched from paper job cards and a spreadsheet to GarageOS in a weekend. The MOT reminder system alone has brought back customers we thought we'd lost for good."</p>
         <div class="testimonial-author">
-          <div class="testimonial-avatar">JH</div>
-          <div>
-            <strong>James Hargreaves</strong>
-            <span>Chelmsford, Essex</span>
-            <div class="google-badge"><i class="fab fa-google"></i> Verified Google Review</div>
+          <div class="author-avatar avatar-red">TH</div>
+          <div class="author-info">
+            <div class="name">Tom Hargreaves</div>
+            <div class="location">Hargreaves Autos, Leeds</div>
           </div>
         </div>
       </div>
+
       <div class="testimonial-card">
-        <div class="testimonial-stars">
-          <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+        <div class="stars">
+          <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+          <i class="fas fa-star"></i><i class="fas fa-star"></i>
         </div>
-        <p class="testimonial-text">"My car failed its MOT at another garage and I was quoted nearly £400 to fix it. Got a second opinion from Premier MOT and they did the same work for £210. Honest, professional and brilliant communication throughout. Highly recommend."</p>
+        <p class="testimonial-text">"The VHC reports have been a game-changer for upselling. Customers trust the traffic-light report and we've seen a 25% increase in additional work being authorised on the day."</p>
         <div class="testimonial-author">
-          <div class="testimonial-avatar">SC</div>
-          <div>
-            <strong>Sarah Connelly</strong>
-            <span>Brentwood, Essex</span>
-            <div class="google-badge"><i class="fab fa-google"></i> Verified Google Review</div>
+          <div class="author-avatar avatar-gold">SK</div>
+          <div class="author-info">
+            <div class="name">Sarah Khan</div>
+            <div class="location">Prestige MOT Centre, Birmingham</div>
           </div>
         </div>
       </div>
+
       <div class="testimonial-card">
-        <div class="testimonial-stars">
-          <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+        <div class="stars">
+          <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+          <i class="fas fa-star"></i><i class="fas fa-star"></i>
         </div>
-        <p class="testimonial-text">"Used the collection service for the first time and was blown away. They picked my car up, did the MOT and full service, and had it back on my drive by midday. Brilliant service from start to finish — I'll never stress about my MOT again."</p>
+        <p class="testimonial-text">"I run three bays with two techs and one of me. GarageOS keeps everything in one place — I can see revenue, jobs, and reminders on my phone before I've had my morning coffee."</p>
         <div class="testimonial-author">
-          <div class="testimonial-avatar">MP</div>
-          <div>
-            <strong>Michael Porter</strong>
-            <span>Witham, Essex</span>
-            <div class="google-badge"><i class="fab fa-google"></i> Verified Google Review</div>
+          <div class="author-avatar avatar-blue">DM</div>
+          <div class="author-info">
+            <div class="name">Dave Morrison</div>
+            <div class="location">DM Autocare, Bristol</div>
           </div>
         </div>
       </div>
@@ -286,128 +341,153 @@
   </div>
 </section>
 
-<!-- FOOTER -->
-<footer class="footer">
-  <div class="footer-grid">
-    <div class="footer-brand">
-      <span class="logo-main">Premier MOT & Service</span>
-      <span class="logo-sub">Chelmsford, Essex</span>
-      <p>Essex's most trusted MOT and vehicle service centre since 1994. Family-run, DVSA-authorised, and proud of every car we work on.</p>
-      <a href="booking.html" class="btn btn-ghost"><i class="fas fa-calendar-check"></i> Book an Appointment</a>
-    </div>
-    <div class="footer-col">
-      <h4>Services</h4>
-      <ul>
-        <li><a href="services.html">MOT Testing</a></li>
-        <li><a href="services.html">Full Service</a></li>
-        <li><a href="services.html">Interim Service</a></li>
-        <li><a href="services.html">Brake Inspection</a></li>
-        <li><a href="services.html">Tyre Fitting</a></li>
-        <li><a href="services.html">Diagnostics</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Opening Hours</h4>
-      <ul class="footer-hours">
-        <li><span>Mon – Fri</span><span>8:00 – 18:00</span></li>
-        <li><span>Saturday</span><span>8:00 – 17:00</span></li>
-        <li><span>Sunday</span><span class="closed">Closed</span></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Contact Us</h4>
-      <ul class="footer-contact">
-        <li><i class="fas fa-phone"></i><a href="tel:01234567890">01234 567890</a></li>
-        <li><i class="fas fa-envelope"></i><a href="mailto:info@premiermot.co.uk">info@premiermot.co.uk</a></li>
-        <li><i class="fas fa-location-dot"></i>14 Industrial Way,<br>Chelmsford, Essex, CM1 2AB</li>
-      </ul>
+<!-- =====================
+     CTA BANNER
+     ===================== -->
+<section style="padding:80px 2rem;background:var(--bg);">
+  <div style="max-width:700px;margin:0 auto;text-align:center;">
+    <span class="section-label">Get Started Today</span>
+    <h2 class="section-title" style="margin-bottom:1rem;">Ready to take control of your garage?</h2>
+    <p style="color:var(--text-dim);font-size:1.05rem;margin-bottom:2.5rem;line-height:1.7;">
+      Join hundreds of UK independent garages running smarter with GarageOS. 14-day free trial, no credit card required.
+    </p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;">
+      <a href="signup.html" class="btn-primary btn-lg">Start Your Free Trial <i class="fas fa-arrow-right"></i></a>
+      <a href="#pricing" class="btn-outline btn-lg">View Pricing</a>
     </div>
   </div>
+</section>
 
-  <div class="footer-map">
-    <div class="map-placeholder">
-      <i class="fas fa-map-location-dot"></i>
-      <p>14 Industrial Way, Chelmsford, Essex CM1 2AB</p>
+<!-- =====================
+     FOOTER
+     ===================== -->
+<footer class="landing-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="index.html" class="nav-logo" style="margin-bottom:0.75rem;display:inline-flex;">
+        <div class="nav-logo-icon"><i class="fas fa-garage"></i></div>
+        GarageOS
+      </a>
+      <p class="footer-tagline">The all-in-one garage management platform built for UK independent garages. Replace everything, simplify everything.</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>Product</h4>
+      <ul>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="signup.html">Sign Up</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="mailto:support@garageos.co.uk">support@garageos.co.uk</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#">Documentation</a></li>
+      </ul>
     </div>
   </div>
 
   <div class="footer-bottom">
-    <p>&copy; 2026 Premier MOT & Service Ltd. All rights reserved.</p>
-    <div class="footer-bottom-links">
+    <span>© 2025 GarageOS. Built for UK independent garages.</span>
+    <div class="footer-legal">
+      <a href="#">Terms of Service</a>
       <a href="#">Privacy Policy</a>
-      <a href="#">Terms & Conditions</a>
-      <a href="login.html">Staff Login</a>
     </div>
   </div>
 </footer>
 
-<!-- ENQUIRY MODAL -->
-<div class="modal-overlay" id="enquiryModal">
-  <div class="modal" role="dialog" aria-modal="true">
-    <div class="modal-header">
-      <h2><i class="fas fa-calendar-check" style="color:var(--red);margin-right:10px"></i>Book an Appointment</h2>
-      <button class="modal-close" aria-label="Close"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="modal-body">
-      <form id="enquiryForm">
-        <div class="form-row">
-          <div class="form-group">
-            <label>Full Name *</label>
-            <input type="text" name="name" placeholder="John Smith" required>
-          </div>
-          <div class="form-group">
-            <label>Phone Number *</label>
-            <input type="tel" name="phone" placeholder="07700 900000" required>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Email Address *</label>
-            <input type="email" name="email" placeholder="john@email.com" required>
-          </div>
-          <div class="form-group">
-            <label>Vehicle Registration</label>
-            <input type="text" name="reg" placeholder="AB21 XYZ" style="text-transform:uppercase">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Service Required *</label>
-            <select name="service" required>
-              <option value="">Select a service...</option>
-              <option>MOT</option>
-              <option>Full Service</option>
-              <option>Interim Service</option>
-              <option>MOT + Full Service</option>
-              <option>Brakes</option>
-              <option>Tyres</option>
-              <option>Diagnostics</option>
-              <option>Other</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Preferred Date</label>
-            <input type="date" name="preferredDate">
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Additional Notes</label>
-          <textarea name="message" placeholder="Any other details about your vehicle or the work needed..."></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary form-submit">
-          <i class="fas fa-calendar-check"></i> Submit Booking Request
-        </button>
-        <p style="font-size:0.78rem;color:var(--text-dim);text-align:center;margin-top:12px">We'll call you back within 1 hour to confirm your booking.</p>
-      </form>
-      <div class="form-success" id="enquirySuccess">
-        <div class="success-icon"><i class="fas fa-check"></i></div>
-        <h3>Request Received!</h3>
-        <p>Thanks — we'll be in touch within 1 hour to confirm your booking.<br>If it's urgent, call us on <strong>01234 567890</strong>.</p>
-      </div>
-    </div>
-  </div>
-</div>
+<div class="toast-container" id="toastContainer"></div>
 
 <script type="module" src="/js/main.js"></script>
+
+<script>
+(function () {
+  // Nav scroll
+  const nav = document.getElementById('landingNav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 30);
+  });
+
+  // Hamburger mobile menu
+  const hamburger = document.getElementById('navHamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  let menuOpen = false;
+
+  if (hamburger && mobileMenu) {
+    hamburger.addEventListener('click', () => {
+      menuOpen = !menuOpen;
+      mobileMenu.style.transform = menuOpen ? 'translateY(0)' : 'translateY(-130%)';
+      const spans = hamburger.querySelectorAll('span');
+      if (menuOpen) {
+        spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
+        spans[1].style.opacity = '0';
+        spans[2].style.transform = 'rotate(-45deg) translate(5px, -5px)';
+      } else {
+        spans.forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (menuOpen && !hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+        menuOpen = false;
+        mobileMenu.style.transform = 'translateY(-130%)';
+        hamburger.querySelectorAll('span').forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
+      }
+    });
+
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        menuOpen = false;
+        mobileMenu.style.transform = 'translateY(-130%)';
+        hamburger.querySelectorAll('span').forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
+      });
+    });
+  }
+
+  // Scroll reveal animations
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.feature-card, .pricing-card, .step-item, .testimonial-card').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(28px)';
+    el.style.transition = 'opacity 0.55s ease, transform 0.55s ease';
+    revealObserver.observe(el);
+  });
+
+  // Pre-select plan via URL param
+  const urlParams = new URLSearchParams(window.location.search);
+  const planParam = urlParams.get('plan');
+  if (planParam) {
+    sessionStorage.setItem('selectedPlan', planParam);
+  }
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const id = link.getAttribute('href');
+      if (id === '#') return;
+      const target = document.querySelector(id);
+      if (target) {
+        e.preventDefault();
+        const top = target.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    });
+  });
+})();
+</script>
+
 </body>
 </html>

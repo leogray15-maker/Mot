@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>GarageOS — Technician</title>
+  <link rel="icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/technician.css">
+  <style>
+    /* ---- Inline tech-specific overrides ---- */
+    body { background: #0a0a0a; color: #e2e2e2; font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; min-height: 100vh; }
+
+    /* ---- Login Screen ---- */
+    #techLoginScreen {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 24px;
+    }
+    .tech-login-card {
+      background: #111; border: 1px solid #1e1e1e; border-radius: 16px;
+      padding: 40px; max-width: 400px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+    .tech-login-logo { text-align: center; margin-bottom: 32px; }
+    .tech-login-logo h1 { font-size: 28px; font-weight: 700; color: #dc2626; }
+    .tech-login-logo p { color: #888; margin-top: 4px; }
+    .tech-login-label { font-size: 13px; color: #888; margin-bottom: 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+    #techSelect {
+      width: 100%; padding: 12px 16px; background: #1a1a1a; border: 1px solid #2e2e2e;
+      border-radius: 10px; color: #e2e2e2; font-size: 16px; margin-bottom: 24px; appearance: none;
+    }
+    #techSelect:focus { outline: none; border-color: #dc2626; }
+
+    /* ---- PIN Pad ---- */
+    .pin-display-wrap { text-align: center; margin-bottom: 24px; }
+    .pin-display-label { font-size: 13px; color: #666; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+    #pinDisplay {
+      font-size: 40px; letter-spacing: 20px; min-height: 56px; color: #e2e2e2;
+      background: #1a1a1a; border: 1px solid #2e2e2e; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; padding: 0 16px;
+    }
+    .pin-pad {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;
+    }
+    .pin-btn {
+      background: #1a1a1a; border: 1px solid #2e2e2e; border-radius: 12px;
+      color: #e2e2e2; font-size: 22px; font-weight: 600; padding: 18px;
+      cursor: pointer; transition: background 0.15s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pin-btn:active { background: #dc2626; transform: scale(0.95); }
+    .pin-btn.pin-clear { background: #1e1e1e; color: #888; font-size: 14px; }
+    .pin-btn.pin-enter { background: #dc2626; color: #fff; font-size: 14px; grid-column: 2; }
+
+    #loginError {
+      background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.3);
+      color: #f87171; padding: 10px 16px; border-radius: 8px; font-size: 14px;
+      text-align: center; display: none; margin-top: 16px;
+    }
+
+    /* ---- Main Tablet UI ---- */
+    #techMain { display: none; min-height: 100vh; flex-direction: column; }
+    .tech-topbar {
+      background: #111; border-bottom: 1px solid #1e1e1e;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; height: 60px; position: sticky; top: 0; z-index: 100;
+    }
+    .tech-topbar-left { display: flex; align-items: center; gap: 12px; }
+    .tech-topbar-logo { color: #dc2626; font-size: 20px; font-weight: 700; }
+    .tech-topbar-name { font-size: 15px; font-weight: 600; color: #e2e2e2; }
+    #techClock { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; color: #f59e0b; }
+    .tech-topbar-right { display: flex; align-items: center; gap: 12px; }
+    #refreshJobsBtn {
+      background: none; border: 1px solid #2e2e2e; color: #888; border-radius: 8px;
+      padding: 8px 14px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 6px;
+    }
+    #refreshJobsBtn:hover { border-color: #dc2626; color: #dc2626; }
+    #endSessionBtn {
+      background: #1a1a1a; border: 1px solid #3e3e3e; color: #888; border-radius: 8px;
+      padding: 8px 14px; cursor: pointer; font-size: 14px;
+    }
+    #endSessionBtn:hover { border-color: #dc2626; color: #dc2626; }
+
+    /* ---- Job list ---- */
+    .tech-jobs-wrap { padding: 20px; flex: 1; }
+    .tech-jobs-heading { font-size: 16px; font-weight: 600; color: #888; margin-bottom: 16px; }
+    #techJobsList { display: flex; flex-direction: column; gap: 16px; }
+
+    .tech-job-card {
+      background: #111; border: 1px solid #1e1e1e; border-radius: 14px; padding: 18px;
+      transition: border-color 0.2s;
+    }
+    .tech-job-card:has(.status-in_progress) { border-color: rgba(59,130,246,0.4); }
+
+    .tech-job-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;
+    }
+    .uk-plate {
+      background: #f5c518; color: #111; font-weight: 800; letter-spacing: 2px;
+      padding: 4px 12px; border-radius: 6px; font-size: 18px; font-family: 'Courier New', monospace;
+    }
+    .tech-job-customer { font-size: 15px; font-weight: 600; flex: 1; }
+    .tech-job-status {
+      font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px;
+      text-transform: capitalize;
+    }
+    .status-waiting { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .status-in_progress { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .status-awaiting_parts { background: rgba(168,85,247,0.15); color: #c084fc; }
+
+    .tech-job-service { font-size: 15px; color: #ccc; margin-bottom: 8px; }
+    .tech-job-bay { font-size: 13px; color: #666; margin-bottom: 12px; }
+
+    .tech-job-buttons {
+      display: flex; gap: 10px; flex-wrap: wrap;
+    }
+    .tech-job-buttons button {
+      padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer;
+      font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px;
+      transition: opacity 0.2s, transform 0.1s; -webkit-tap-highlight-color: transparent;
+    }
+    .tech-job-buttons button:active { transform: scale(0.96); }
+    .btn-clock-on  { background: #22c55e; color: #fff; }
+    .btn-clock-off { background: #3b82f6; color: #fff; }
+    .btn-complete  { background: #dc2626; color: #fff; }
+    .btn-note      { background: #1a1a1a; color: #ccc; border: 1px solid #2e2e2e !important; }
+    .btn-vhc       { background: #f59e0b; color: #111; }
+
+    .tech-empty {
+      text-align: center; padding: 80px 24px; color: #555;
+    }
+    .tech-empty i { font-size: 48px; margin-bottom: 16px; color: #22c55e; }
+    .tech-empty p { font-size: 16px; }
+
+    /* ---- VHC Modal ---- */
+    #vhcChecklistModal {
+      display: none; position: fixed; inset: 0; background: #0a0a0a;
+      z-index: 200; overflow-y: auto;
+    }
+    .vhc-modal-header {
+      position: sticky; top: 0; background: #111; border-bottom: 1px solid #1e1e1e;
+      padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; z-index: 10;
+    }
+    .vhc-modal-header h2 { font-size: 18px; font-weight: 700; }
+    #closeVhcModal {
+      background: none; border: none; color: #888; cursor: pointer; font-size: 24px; padding: 4px;
+    }
+    .vhc-progress-wrap { padding: 16px 20px; background: #0f0f0f; border-bottom: 1px solid #1e1e1e; }
+    .vhc-progress-bar-track {
+      background: #1e1e1e; border-radius: 8px; height: 8px; overflow: hidden; margin-bottom: 6px;
+    }
+    #vhcProgressBar {
+      height: 100%; background: #22c55e; border-radius: 8px; width: 0%; transition: width 0.3s;
+    }
+    #vhcProgressLabel { font-size: 13px; color: #888; }
+
+    #vhcChecklistBody { padding: 16px 20px; }
+    .vhc-category { margin-bottom: 28px; }
+    .vhc-category h4 {
+      font-size: 14px; font-weight: 700; color: #f59e0b; text-transform: uppercase;
+      letter-spacing: 0.08em; margin-bottom: 12px; padding-bottom: 8px;
+      border-bottom: 1px solid #1e1e1e;
+    }
+    .vhc-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 0; border-bottom: 1px solid #141414; gap: 12px;
+    }
+    .vhc-item-name { font-size: 15px; flex: 1; }
+    .vhc-buttons { display: flex; gap: 8px; flex-shrink: 0; }
+    .vhc-btn {
+      padding: 8px 14px; border-radius: 8px; border: 1px solid #2e2e2e;
+      background: #1a1a1a; color: #888; cursor: pointer; font-size: 13px; font-weight: 500;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .vhc-btn.active.vhc-green  { background: rgba(34,197,94,0.2); border-color: #22c55e; color: #22c55e; }
+    .vhc-btn.active.vhc-amber  { background: rgba(245,158,11,0.2); border-color: #f59e0b; color: #f59e0b; }
+    .vhc-btn.active.vhc-red    { background: rgba(220,38,38,0.2); border-color: #dc2626; color: #f87171; }
+
+    .vhc-modal-footer {
+      position: sticky; bottom: 0; background: #111; border-top: 1px solid #1e1e1e;
+      padding: 16px 20px; display: flex; gap: 12px;
+    }
+    #submitVhcBtn {
+      flex: 1; background: #dc2626; color: #fff; border: none; border-radius: 10px;
+      padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    #submitVhcBtn:active { opacity: 0.85; }
+
+    /* Responsive: on wider screens show 2-column jobs */
+    @media (min-width: 768px) {
+      #techJobsList { display: grid; grid-template-columns: repeat(2, 1fr); }
+      .tech-jobs-wrap { padding: 28px; }
+    }
+    @media (min-width: 1200px) {
+      #techJobsList { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div id="techLoginScreen">
+  <div class="tech-login-card">
+    <div class="tech-login-logo">
+      <h1>GarageOS</h1>
+      <p>Technician Login</p>
+    </div>
+
+    <div class="tech-login-label">Select your name</div>
+    <select id="techSelect">
+      <option value="">Loading technicians…</option>
+    </select>
+
+    <div class="pin-display-wrap">
+      <div class="pin-display-label">Enter your 4-digit PIN</div>
+      <div id="pinDisplay"></div>
+    </div>
+
+    <div class="pin-pad">
+      <button class="pin-btn" data-value="1">1</button>
+      <button class="pin-btn" data-value="2">2</button>
+      <button class="pin-btn" data-value="3">3</button>
+      <button class="pin-btn" data-value="4">4</button>
+      <button class="pin-btn" data-value="5">5</button>
+      <button class="pin-btn" data-value="6">6</button>
+      <button class="pin-btn" data-value="7">7</button>
+      <button class="pin-btn" data-value="8">8</button>
+      <button class="pin-btn" data-value="9">9</button>
+      <button class="pin-btn pin-clear" data-value="clear"><i class="fas fa-delete-left"></i> Clear</button>
+      <button class="pin-btn" data-value="0">0</button>
+      <button class="pin-btn pin-enter" data-value="enter"><i class="fas fa-arrow-right"></i> Enter</button>
+    </div>
+
+    <div id="loginError"></div>
+  </div>
+</div>
+
+<!-- ===== MAIN TECHNICIAN UI ===== -->
+<div id="techMain">
+
+  <!-- Top Bar -->
+  <div class="tech-topbar">
+    <div class="tech-topbar-left">
+      <span class="tech-topbar-logo"><i class="fas fa-wrench"></i> GarageOS</span>
+      <span class="tech-topbar-name" id="techName"></span>
+    </div>
+    <span id="techClock">--:--</span>
+    <div class="tech-topbar-right">
+      <button id="refreshJobsBtn"><i class="fas fa-rotate-right"></i> Refresh</button>
+      <button id="endSessionBtn"><i class="fas fa-right-from-bracket"></i> End</button>
+    </div>
+  </div>
+
+  <!-- Jobs List -->
+  <div class="tech-jobs-wrap">
+    <p class="tech-jobs-heading"><i class="fas fa-clipboard-list"></i> Your Jobs</p>
+    <div id="techJobsList">
+      <div class="tech-empty">
+        <i class="fas fa-circle-notch fa-spin"></i>
+        <p>Loading your jobs…</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== VHC CHECKLIST MODAL ===== -->
+<div id="vhcChecklistModal">
+
+  <div class="vhc-modal-header">
+    <h2><i class="fas fa-clipboard-check" style="color:#f59e0b;margin-right:8px;"></i>Vehicle Health Check</h2>
+    <button id="closeVhcModal" title="Close"><i class="fas fa-times"></i></button>
+  </div>
+
+  <div class="vhc-progress-wrap">
+    <div class="vhc-progress-bar-track">
+      <div id="vhcProgressBar"></div>
+    </div>
+    <span id="vhcProgressLabel">0/45 items checked</span>
+  </div>
+
+  <div id="vhcChecklistBody">
+    <!-- Populated by technician.js -->
+  </div>
+
+  <div class="vhc-modal-footer">
+    <button id="submitVhcBtn">
+      <i class="fas fa-paper-plane"></i> Submit VHC Report
+    </button>
+  </div>
+
+</div>
+
+<!-- Toast container -->
+<div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;"></div>
+
+<script type="module" src="/js/technician.js"></script>
+
+<!-- Refresh button wiring (after module loads) -->
+<script>
+  document.getElementById('refreshJobsBtn')?.addEventListener('click', () => {
+    if (typeof loadTechJobs === 'function') loadTechJobs();
+  });
+</script>
+
+</body>
+</html>

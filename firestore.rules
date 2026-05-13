@@ -2,71 +2,53 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper — any authenticated user is an admin for this single-tenant app
-    function isAdmin() {
-      return request.auth != null;
+    // ——— Top-level account records (one per garage tenant) ———
+    // Readable by the garage owner or any user whose platform_users document
+    // maps to this garageId (i.e. staff members of the garage).
+    // Creatable by any authenticated user (used during onboarding / sign-up).
+    // Updatable / deletable only by the garage owner.
+    match /accounts/{garageId} {
+      allow read: if request.auth != null &&
+        (request.auth.uid == resource.data.ownerUid ||
+         getUserGarageId() == garageId);
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null &&
+        request.auth.uid == resource.data.ownerUid;
     }
 
-    // Settings — public read (booking page needs working hours / slot config),
-    //            authenticated write only
-    match /settings/{document} {
-      allow read:  if true;
-      allow write: if isAdmin();
+    // ——— Platform user profiles (one per Firebase Auth user) ———
+    // Each user can read and write only their own document.
+    // The garageId field inside this document is what binds a user to a tenant.
+    match /platform_users/{userId} {
+      allow read, write: if request.auth != null &&
+        request.auth.uid == userId;
     }
 
-    // Enquiries — public create (contact/enquiry forms),
-    //             authenticated full access
-    match /enquiries/{document} {
-      allow create: if true;
-      allow read, update, delete: if isAdmin();
+    // ——— All tenant-scoped data ———
+    // A wildcard rule covering every sub-collection and document inside
+    // a garage's namespace. Access is gated by the calling user's garageId
+    // matching the path segment — enforcing strict tenant isolation.
+    match /garages/{garageId}/{document=**} {
+      allow read, write: if request.auth != null &&
+        getUserGarageId() == garageId;
     }
 
-    // Bookings — public create (online booking wizard) + public read
-    //            (slot availability check needs existing booking count per slot).
-    //            Authenticated users get full access.
-    // Note: public read exposes booking metadata; acceptable trade-off for a
-    //       small single-garage app where slot checking is client-side.
-    match /bookings/{document} {
-      allow read, create: if true;
-      allow update, delete: if isAdmin();
+    // ——— VHC report public read override ———
+    // VHC (Vehicle Health Check) reports are readable without authentication
+    // so customers can view their report via a public portal link.
+    // Write access is still restricted to authenticated users of the garage.
+    // This rule is more specific than the wildcard above, so it takes precedence.
+    match /garages/{garageId}/vhc_reports/{vhcId} {
+      allow read: if true;
+      allow write: if request.auth != null &&
+        getUserGarageId() == garageId;
     }
 
-    // Customers — authenticated only
-    match /customers/{document} {
-      allow read, write: if isAdmin();
-    }
-
-    // Jobs — authenticated only
-    match /jobs/{document} {
-      allow read, write: if isAdmin();
-    }
-
-    // Invoices — authenticated only
-    match /invoices/{document} {
-      allow read, write: if isAdmin();
-    }
-
-    // Notifications — authenticated only
-    match /notifications/{document} {
-      allow read, write: if isAdmin();
-    }
-
-    // WhatsApp send log — authenticated only
-    match /wa_logs/{document} {
-      allow read, write: if isAdmin();
-    }
-
-    // Users collection (admin identity store) — authenticated only.
-    // The app currently uses Firebase Auth directly and does not read
-    // from this collection at runtime, but the document is retained for
-    // reference and potential future role-checks.
-    match /users/{document} {
-      allow read, write: if isAdmin();
-    }
-
-    // Deny everything else by default (explicit safety net)
-    match /{document=**} {
-      allow read, write: if false;
+    // ——— Helper function ———
+    // Reads the calling user's platform_users document to retrieve their garageId.
+    // Used throughout the rules above to enforce tenant isolation server-side.
+    function getUserGarageId() {
+      return get(/databases/$(database)/documents/platform_users/$(request.auth.uid)).data.garageId;
     }
   }
 }

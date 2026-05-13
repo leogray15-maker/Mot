@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Vehicle Health Check Report</title>
+  <meta name="description" content="Your Vehicle Health Check report — detailed inspection results for your vehicle.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/vhc-report.css">
+</head>
+<body>
+
+<!-- Loading state -->
+<div class="vhc-loading" id="vhcLoading">
+  <i class="fas fa-circle-notch fa-spin"></i>
+  <span>Loading report…</span>
+</div>
+
+<!-- Error state -->
+<div class="vhc-error" id="vhcError" style="display:none">
+  <div class="vhc-error-card">
+    <i class="fas fa-file-circle-xmark"></i>
+    <h2 id="vhcErrorTitle">Report Not Found</h2>
+    <p id="vhcErrorMsg">We couldn't find a VHC report matching this link. Please check the link or contact your garage.</p>
+  </div>
+</div>
+
+<!-- Main report — hidden until loaded -->
+<div id="vhcMain" style="display:none">
+
+  <!-- Top bar -->
+  <header class="vhc-topbar">
+    <div class="vhc-topbar-inner">
+      <div class="vhc-topbar-brand">
+        <div id="topbarLogoWrap">
+          <div class="vhc-topbar-logo-placeholder"><i class="fas fa-car-side"></i></div>
+        </div>
+        <div>
+          <div class="vhc-topbar-name" id="topbarName">Garage</div>
+          <div class="vhc-topbar-sub">Vehicle Health Check</div>
+        </div>
+      </div>
+      <a class="vhc-topbar-phone" id="topbarPhone" href="#">
+        <i class="fas fa-phone"></i>
+        <span id="topbarPhoneText"></span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Expiry notice (shown if >90 days old) -->
+  <div class="vhc-expiry-notice" id="vhcExpiryNotice" style="display:none">
+    <i class="fas fa-clock"></i>
+    This report is over 90 days old. Some items may have changed — we recommend a fresh inspection.
+  </div>
+
+  <main class="vhc-page">
+
+    <!-- Hero vehicle card -->
+    <section class="vhc-hero" id="vhcHero">
+      <div class="vhc-hero-grid">
+        <div class="vhc-plate-wrap">
+          <div class="vhc-plate"><span class="vhc-plate-text" id="heroReg">AB21 XYZ</span></div>
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);font-weight:600;text-transform:uppercase;letter-spacing:1px">UK Registered</div>
+        </div>
+        <div class="vhc-hero-meta">
+          <div class="vhc-hero-vehicle" id="heroVehicle">Vehicle</div>
+          <div class="vhc-hero-details">
+            <div class="vhc-hero-detail">
+              <span class="vhc-hero-detail-label">Year</span>
+              <span class="vhc-hero-detail-value" id="heroYear">—</span>
+            </div>
+            <div class="vhc-hero-detail">
+              <span class="vhc-hero-detail-label">Inspection Date</span>
+              <span class="vhc-hero-detail-value" id="heroDate">—</span>
+            </div>
+            <div class="vhc-hero-detail">
+              <span class="vhc-hero-detail-label">Mileage</span>
+              <span class="vhc-hero-detail-value" id="heroMileage">—</span>
+            </div>
+            <div class="vhc-hero-detail">
+              <span class="vhc-hero-detail-label">Job Ref</span>
+              <span class="vhc-hero-detail-value" id="heroJobRef">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Traffic light summary + gauge -->
+    <section class="vhc-summary" id="vhcSummary">
+      <div class="vhc-summary-title">Inspection Summary</div>
+      <div class="vhc-traffic-lights">
+        <div class="vhc-tl-item green">
+          <div class="vhc-tl-circle">
+            <span class="vhc-tl-count" id="tlGreenCount">0</span>
+            <span class="vhc-tl-word">items</span>
+          </div>
+          <div class="vhc-tl-label">Satisfactory</div>
+        </div>
+        <div class="vhc-tl-item amber">
+          <div class="vhc-tl-circle">
+            <span class="vhc-tl-count" id="tlAmberCount">0</span>
+            <span class="vhc-tl-word">items</span>
+          </div>
+          <div class="vhc-tl-label">Advisory</div>
+        </div>
+        <div class="vhc-tl-item red">
+          <div class="vhc-tl-circle">
+            <span class="vhc-tl-count" id="tlRedCount">0</span>
+            <span class="vhc-tl-word">items</span>
+          </div>
+          <div class="vhc-tl-label">Action Required</div>
+        </div>
+      </div>
+
+      <!-- Proportional gauge bar -->
+      <div class="vhc-gauge-wrap">
+        <div class="vhc-gauge-bar">
+          <div class="vhc-gauge-seg green" id="gaugeGreen" style="width:0%"></div>
+          <div class="vhc-gauge-seg amber" id="gaugeAmber" style="width:0%"></div>
+          <div class="vhc-gauge-seg red"   id="gaugeRed"   style="width:0%"></div>
+        </div>
+        <div class="vhc-gauge-legend">
+          <div class="vhc-gauge-legend-item"><div class="vhc-gauge-legend-dot green"></div> Satisfactory</div>
+          <div class="vhc-gauge-legend-item"><div class="vhc-gauge-legend-dot amber"></div> Advisory</div>
+          <div class="vhc-gauge-legend-item"><div class="vhc-gauge-legend-dot red"></div> Action Required</div>
+        </div>
+      </div>
+
+      <!-- Mechanic sign-off -->
+      <div class="vhc-signoff">
+        <div class="vhc-signoff-avatar"><i class="fas fa-user-tie"></i></div>
+        <div class="vhc-signoff-text">
+          Inspected by <span class="vhc-signoff-name" id="signoffName">Technician</span>
+          &nbsp;&bull;&nbsp;
+          <span id="signoffTimestamp"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Per-category sections -->
+    <div class="vhc-categories" id="vhcCategories"></div>
+
+    <!-- CTAs -->
+    <div class="vhc-cta-bar" id="vhcCTA">
+      <div class="vhc-cta-title">Ready to get these sorted?</div>
+      <div class="vhc-cta-sub">Book your repairs with us — fast turnaround, quality parts, trusted technicians.</div>
+      <div class="vhc-cta-buttons">
+        <a class="btn-vhc btn-vhc-primary" id="ctaBookBtn" href="#">
+          <i class="fas fa-calendar-check"></i> Book Repairs
+        </a>
+        <a class="btn-vhc btn-vhc-outline" id="ctaCallBtn" href="#">
+          <i class="fas fa-phone"></i> Call Us
+        </a>
+        <button class="btn-vhc btn-vhc-whatsapp" id="ctaWhatsappBtn">
+          <i class="fab fa-whatsapp"></i> Share Report
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="vhc-footer">
+      <p>Inspected by <strong id="footerGarage">Garage</strong> on <strong id="footerDate"></strong></p>
+      <p style="margin-top:4px">Report generated for customer reference only.</p>
+    </footer>
+  </main>
+</div>
+
+<!-- Photo lightbox -->
+<div class="vhc-lightbox" id="vhcLightbox">
+  <button class="vhc-lightbox-close" id="lightboxClose"><i class="fas fa-times"></i></button>
+  <img src="" alt="Inspection photo" id="lightboxImg">
+</div>
+
+<script type="module" src="/js/vhc.js"></script>
+</body>
+</html>
