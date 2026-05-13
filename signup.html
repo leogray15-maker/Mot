@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Start Your Free Trial | GarageOS</title>
+  <meta name="description" content="Create your GarageOS account. 14-day free trial. No credit card required.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/landing.css">
+</head>
+<body class="signup-page">
+
+<!-- NAV -->
+<nav class="signup-nav">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-icon"><i class="fas fa-garage"></i></div>
+    GarageOS
+  </a>
+  <span class="signup-nav-right">Already have an account? <a href="login.html">Login</a></span>
+</nav>
+
+<!-- BODY -->
+<div class="signup-body">
+  <div class="signup-header">
+    <h1>Start Your Free Trial</h1>
+    <p>14 days free. No credit card required. Cancel anytime.</p>
+  </div>
+
+  <!-- STEP INDICATOR -->
+  <div class="step-indicator" id="stepIndicator">
+    <div class="step-dot-wrap active" id="dotWrap1">
+      <div class="step-dot active" id="dot1">1</div>
+      <span class="step-dot-label">Your Account</span>
+    </div>
+    <div class="step-connector" id="connector1"></div>
+    <div class="step-dot-wrap" id="dotWrap2">
+      <div class="step-dot" id="dot2">2</div>
+      <span class="step-dot-label">Garage Details</span>
+    </div>
+    <div class="step-connector" id="connector2"></div>
+    <div class="step-dot-wrap" id="dotWrap3">
+      <div class="step-dot" id="dot3">3</div>
+      <span class="step-dot-label">Confirmation</span>
+    </div>
+  </div>
+
+  <!-- FORM CARD -->
+  <div class="signup-card">
+
+    <!-- ========================
+         STEP 1 — Your Account
+         ======================== -->
+    <div class="step-pane active" id="step1">
+      <h2>Your Account</h2>
+      <p>Create your GarageOS login credentials.</p>
+
+      <div class="field-group">
+        <label>Garage Name <span class="req">*</span></label>
+        <input type="text" id="garageName" class="input-field" placeholder="e.g. Premier Autos" autocomplete="organization">
+        <div class="field-error" id="err_garageName">Please enter your garage name.</div>
+      </div>
+
+      <div class="field-group">
+        <label>Your Full Name <span class="req">*</span></label>
+        <input type="text" id="ownerName" class="input-field" placeholder="e.g. John Smith" autocomplete="name">
+        <div class="field-error" id="err_ownerName">Please enter your full name.</div>
+      </div>
+
+      <div class="field-group">
+        <label>Email Address <span class="req">*</span></label>
+        <input type="email" id="signupEmail" class="input-field" placeholder="you@yourgarage.co.uk" autocomplete="email">
+        <div class="field-error" id="err_email">Please enter a valid email address.</div>
+      </div>
+
+      <div class="field-group">
+        <label>Password <span class="req">*</span></label>
+        <div class="password-wrap">
+          <input type="password" id="signupPassword" class="input-field" placeholder="Minimum 8 characters" autocomplete="new-password">
+          <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show password">
+            <i class="fas fa-eye" id="pwToggleIcon"></i>
+          </button>
+        </div>
+        <div class="pw-strength" id="pwStrength" style="display:none;">
+          <div class="pw-strength-bars">
+            <div class="pw-strength-bar" id="pwBar1"></div>
+            <div class="pw-strength-bar" id="pwBar2"></div>
+            <div class="pw-strength-bar" id="pwBar3"></div>
+            <div class="pw-strength-bar" id="pwBar4"></div>
+          </div>
+          <span class="pw-strength-label" id="pwStrengthLabel"></span>
+        </div>
+        <div class="field-error" id="err_password">Password must be at least 8 characters.</div>
+      </div>
+
+      <div class="field-group">
+        <label>Phone Number</label>
+        <input type="tel" id="ownerPhone" class="input-field" placeholder="e.g. 07700 900000" autocomplete="tel">
+      </div>
+
+      <div class="field-group">
+        <label>Choose Your Plan <span class="req">*</span></label>
+        <div class="plan-options">
+          <label class="plan-radio-card" id="planCard_starter">
+            <input type="radio" name="plan" value="starter" id="planStarter">
+            <div class="plan-radio-info">
+              <div>
+                <div class="plan-radio-name">Starter</div>
+                <div class="plan-radio-desc">Bookings, job cards, invoicing &amp; MOT tracker</div>
+              </div>
+              <div class="plan-radio-price">£49/mo</div>
+            </div>
+          </label>
+          <label class="plan-radio-card" id="planCard_pro">
+            <input type="radio" name="plan" value="pro" id="planPro" checked>
+            <div class="plan-radio-info">
+              <div>
+                <div class="plan-radio-name">Pro <span style="background:var(--red);color:#fff;font-size:0.65rem;padding:2px 7px;border-radius:99px;font-weight:700;margin-left:6px;vertical-align:middle;">Popular</span></div>
+                <div class="plan-radio-desc">Everything in Starter + VHC, AI assistant &amp; full reports</div>
+              </div>
+              <div class="plan-radio-price">£79/mo</div>
+            </div>
+          </label>
+          <label class="plan-radio-card" id="planCard_enterprise">
+            <input type="radio" name="plan" value="enterprise" id="planEnterprise">
+            <div class="plan-radio-info">
+              <div>
+                <div class="plan-radio-name">Enterprise</div>
+                <div class="plan-radio-desc">Everything in Pro + unlimited users &amp; white label</div>
+              </div>
+              <div class="plan-radio-price">£129/mo</div>
+            </div>
+          </label>
+        </div>
+        <div class="field-error" id="err_plan">Please select a plan.</div>
+      </div>
+
+      <div class="step-actions">
+        <button type="button" class="btn-next" id="next1">
+          Continue <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================
+         STEP 2 — Garage Details
+         ======================== -->
+    <div class="step-pane" id="step2">
+      <h2>Garage Details</h2>
+      <p>Tell us about your garage so we can set things up correctly.</p>
+
+      <div class="field-group">
+        <label>Address Line 1 <span class="req">*</span></label>
+        <input type="text" id="addressLine1" class="input-field" placeholder="e.g. 14 Industrial Way" autocomplete="address-line1">
+        <div class="field-error" id="err_address">Please enter your address.</div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label>Town / City <span class="req">*</span></label>
+          <input type="text" id="addressTown" class="input-field" placeholder="e.g. Chelmsford" autocomplete="address-level2">
+          <div class="field-error" id="err_town">Required.</div>
+        </div>
+        <div class="field-group">
+          <label>Postcode <span class="req">*</span></label>
+          <input type="text" id="addressPostcode" class="input-field" placeholder="e.g. CM1 2AB" autocomplete="postal-code" style="text-transform:uppercase;">
+          <div class="field-error" id="err_postcode">Please enter a valid UK postcode.</div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>Garage Phone</label>
+        <input type="tel" id="garagePhone" class="input-field" placeholder="e.g. 01234 567890" autocomplete="tel">
+      </div>
+
+      <div class="field-group">
+        <label>Number of Technicians</label>
+        <select id="techCount" class="input-field">
+          <option value="1">1 Technician</option>
+          <option value="2">2 Technicians</option>
+          <option value="3">3 Technicians</option>
+          <option value="4">4 Technicians</option>
+          <option value="5+">5+ Technicians</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label>MOT Station?</label>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="motStation" value="yes" id="motYes"> Yes, we carry out MOTs
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="motStation" value="no" id="motNo" checked> No
+          </label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>How did you hear about us?</label>
+        <select id="hearAbout" class="input-field">
+          <option value="">Select an option</option>
+          <option value="google">Google</option>
+          <option value="social_media">Social Media</option>
+          <option value="word_of_mouth">Word of Mouth</option>
+          <option value="cold_call">Cold Call</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="step-actions">
+        <button type="button" class="btn-back" id="back2">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+        <button type="button" class="btn-next" id="next2">
+          Continue <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================
+         STEP 3 — Confirmation
+         ======================== -->
+    <div class="step-pane" id="step3">
+      <h2>Almost There!</h2>
+      <p>Review your details and start your free trial.</p>
+
+      <div class="signup-summary" id="summaryBox">
+        <div class="summary-row">
+          <span class="summary-label">Garage</span>
+          <span class="summary-value" id="summaryGarage">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Owner</span>
+          <span class="summary-value" id="summaryOwner">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Email</span>
+          <span class="summary-value" id="summaryEmail">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Plan</span>
+          <span class="summary-value red" id="summaryPlan">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Location</span>
+          <span class="summary-value" id="summaryLocation">—</span>
+        </div>
+      </div>
+
+      <div class="trial-notice">
+        <i class="fas fa-gift"></i>
+        <span>Your 14-day free trial starts now. You won't be charged until your trial ends, and you can cancel any time.</span>
+      </div>
+
+      <label class="terms-check">
+        <input type="checkbox" id="termsCheck">
+        I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Privacy Policy</a>
+      </label>
+      <div class="field-error" id="err_terms">You must agree to the terms to continue.</div>
+
+      <button type="button" class="btn-next full-width" id="submitBtn">
+        Start Your Free Trial <i class="fas fa-arrow-right"></i>
+      </button>
+
+      <p style="text-align:center;font-size:0.78rem;color:var(--text-dim);margin-top:1rem;">
+        No credit card required. Cancel anytime.
+      </p>
+
+      <div class="step-actions" style="margin-top:0.75rem;justify-content:flex-start;">
+        <button type="button" class="btn-back" id="back3">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /signup-card -->
+</div><!-- /signup-body -->
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script type="module" src="/js/signup.js"></script>
+
+</body>
+</html>

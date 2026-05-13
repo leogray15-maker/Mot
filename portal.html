@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Customer Portal</title>
+  <meta name="description" content="Check your vehicle history, invoices and VHC reports.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/portal.css">
+</head>
+<body id="portalPage">
+
+<!-- Loading overlay -->
+<div class="portal-loading" id="portalLoading">
+  <i class="fas fa-circle-notch fa-spin"></i>
+  <span>Loading…</span>
+</div>
+
+<!-- Error screen (invalid/missing garageId) -->
+<div class="portal-error" id="portalError" style="display:none">
+  <div class="portal-error-card">
+    <i class="fas fa-link-slash"></i>
+    <h2>Invalid Portal Link</h2>
+    <p>Please contact your garage for their correct customer portal link.</p>
+  </div>
+</div>
+
+<!-- ===========================
+     SCREEN 1: VERIFICATION
+     =========================== -->
+<div id="portalVerify" style="display:none">
+  <div class="portal-verify-wrap">
+
+    <div class="portal-brand" id="verifyBrand">
+      <div id="verifyLogoWrap">
+        <div class="portal-logo-placeholder"><i class="fas fa-car-side"></i></div>
+      </div>
+      <div class="portal-brand-name" id="verifyGarageName">Your Garage</div>
+    </div>
+
+    <div class="portal-verify-card">
+      <h1>Check Your Vehicle History</h1>
+      <p class="portal-verify-sub">Enter your email address and vehicle registration to access your records.</p>
+
+      <form id="verifyForm" novalidate>
+        <div class="portal-form-group">
+          <label for="verifyEmail">Email Address</label>
+          <div class="portal-input-wrap">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="verifyEmail" placeholder="your@email.com" autocomplete="email" required>
+          </div>
+        </div>
+        <div class="portal-form-group">
+          <label for="verifyReg">Vehicle Registration</label>
+          <div class="portal-input-wrap">
+            <i class="fas fa-car"></i>
+            <input type="text" id="verifyReg" placeholder="AB21 XYZ" autocomplete="off" style="text-transform:uppercase" required>
+          </div>
+        </div>
+
+        <div class="portal-verify-error" id="verifyError" style="display:none">
+          <i class="fas fa-exclamation-circle"></i>
+          <span id="verifyErrorMsg">No records found for these details. Please check and try again, or contact your garage.</span>
+        </div>
+
+        <button type="submit" class="portal-btn-primary" id="verifyBtn">
+          <i class="fas fa-search"></i> Find My Records
+        </button>
+      </form>
+
+      <p class="portal-privacy-note">
+        <i class="fas fa-lock"></i>
+        Your details are only used to retrieve your records and are never shared with third parties.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ===========================
+     SCREEN 2: CUSTOMER DASHBOARD
+     =========================== -->
+<div id="portalDash" style="display:none">
+
+  <!-- Top bar -->
+  <header class="portal-topbar">
+    <div class="portal-topbar-inner">
+      <div class="portal-topbar-brand">
+        <div id="dashLogoWrap">
+          <div class="portal-logo-placeholder small"><i class="fas fa-car-side"></i></div>
+        </div>
+        <div class="portal-topbar-name" id="dashGarageName">Garage</div>
+      </div>
+      <button class="portal-topbar-logout" id="portalLogoutBtn">
+        <i class="fas fa-arrow-right-from-bracket"></i> Sign Out
+      </button>
+    </div>
+  </header>
+
+  <main class="portal-main">
+
+    <!-- Greeting -->
+    <div class="portal-greeting">
+      <h1>Welcome back, <span id="dashCustomerName">there</span></h1>
+      <p id="dashGreetingSub">Here's your vehicle history and upcoming due dates.</p>
+    </div>
+
+    <!-- Vehicle card -->
+    <div class="portal-vehicle-card" id="dashVehicleCard">
+      <div class="portal-vehicle-reg-wrap">
+        <div class="portal-vehicle-reg" id="dashReg">AB21 XYZ</div>
+        <div class="portal-vehicle-label">UK Registered</div>
+      </div>
+      <div class="portal-vehicle-info">
+        <div class="portal-vehicle-name" id="dashVehicleName">Vehicle</div>
+        <div class="portal-vehicle-details">
+          <div class="portal-vehicle-detail">
+            <span class="portal-vehicle-detail-label">MOT Due</span>
+            <span class="portal-vehicle-detail-value" id="dashMotDue">—</span>
+          </div>
+          <div class="portal-mot-countdown" id="dashMotCountdown">
+            <div class="portal-mot-days" id="dashMotDays">—</div>
+            <div class="portal-mot-status" id="dashMotStatus">days remaining</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="portal-tabs">
+      <button class="portal-tab active" data-tab="history"><i class="fas fa-history"></i> History</button>
+      <button class="portal-tab" data-tab="invoices"><i class="fas fa-file-invoice-dollar"></i> Invoices</button>
+      <button class="portal-tab" data-tab="vhcReports"><i class="fas fa-clipboard-check"></i> VHC Reports</button>
+      <button class="portal-tab" data-tab="advisories"><i class="fas fa-triangle-exclamation"></i> Advisories</button>
+      <button class="portal-tab" data-tab="bookAgain"><i class="fas fa-calendar-plus"></i> Book Again</button>
+    </div>
+
+    <!-- Tab: History -->
+    <div class="portal-tab-panel active" id="tab-history">
+      <div class="portal-section-header">
+        <h2>Service History</h2>
+        <p>All work carried out on your vehicle at this garage.</p>
+      </div>
+      <div class="portal-table-wrap">
+        <table class="portal-table" id="historyTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Service</th>
+              <th>Description</th>
+              <th class="text-right">Cost</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody">
+            <tr><td colspan="4" class="portal-table-empty"><i class="fas fa-folder-open"></i> No service history found.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab: Invoices -->
+    <div class="portal-tab-panel" id="tab-invoices" style="display:none">
+      <div class="portal-section-header">
+        <h2>Invoices</h2>
+        <p>Your invoices and payment status.</p>
+      </div>
+      <div class="portal-invoice-list" id="invoiceList">
+        <div class="portal-table-empty"><i class="fas fa-file-invoice"></i> No invoices found.</div>
+      </div>
+    </div>
+
+    <!-- Tab: VHC Reports -->
+    <div class="portal-tab-panel" id="tab-vhcReports" style="display:none">
+      <div class="portal-section-header">
+        <h2>Vehicle Health Check Reports</h2>
+        <p>Your last 3 inspection reports.</p>
+      </div>
+      <div class="portal-vhc-list" id="vhcReportList">
+        <div class="portal-table-empty"><i class="fas fa-clipboard-check"></i> No VHC reports found.</div>
+      </div>
+    </div>
+
+    <!-- Tab: Advisories -->
+    <div class="portal-tab-panel" id="tab-advisories" style="display:none">
+      <div class="portal-section-header">
+        <h2>Outstanding Advisories</h2>
+        <p>Amber and red items from your latest inspection that have not yet been resolved.</p>
+      </div>
+      <div class="portal-advisories-list" id="advisoriesList">
+        <div class="portal-table-empty"><i class="fas fa-check-circle" style="color:var(--green)"></i> No outstanding advisories — great news!</div>
+      </div>
+    </div>
+
+    <!-- Tab: Book Again -->
+    <div class="portal-tab-panel" id="tab-bookAgain" style="display:none">
+      <div class="portal-book-again">
+        <div class="portal-book-again-icon"><i class="fas fa-calendar-check"></i></div>
+        <h2>Book Your Next Appointment</h2>
+        <p>Ready for your next service or MOT? Book online in minutes — we'll confirm within the hour.</p>
+        <a class="portal-btn-primary" id="bookAgainLink" href="#">
+          <i class="fas fa-arrow-right"></i> Book Now
+        </a>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Print invoice overlay -->
+<div class="portal-print-overlay" id="portalPrintOverlay" style="display:none">
+  <div class="portal-print-card" id="portalPrintCard">
+    <div class="portal-print-actions">
+      <button onclick="window.print()" class="portal-btn-primary" style="gap:8px"><i class="fas fa-print"></i> Print</button>
+      <button onclick="document.getElementById('portalPrintOverlay').style.display='none'" class="portal-btn-outline">
+        <i class="fas fa-times"></i> Close
+      </button>
+    </div>
+    <div id="portalPrintContent"></div>
+  </div>
+</div>
+
+<script type="module" src="/js/portal.js"></script>
+</body>
+</html>

@@ -1,9 +1,88 @@
-/* Dashboard entry point — imports all dashboard modules in dependency order */
-import './dashboard.js';      // core: navigate, showToast, formatDate, getSettings, auth guard
-import './whatsapp.js';       // sendMOTReminderWA, promptReviewRequest (needs _customersData from dashboard)
-import './notifications.js';  // addNotification, badge
-import './bookings.js';       // viewBookingModal, calendar, onSnapshot listener
-import './revenue.js';        // charts
-import './jobs.js';           // job cards
-import './invoices.js';       // invoices + invoice counter
-import './settings.js';       // extended settings forms
+/* ===========================
+   GarageOS — Dashboard Entry Point
+   Imports all modules in dependency order
+   =========================== */
+
+// ——— Core infrastructure (must be first) ———
+import './dashboard.js';        // auth guard, openSection, trial check, nav
+
+// ——— UI helpers ———
+import './ui.js';               // showModal, closeModal, showConfirm, showEmptyState
+
+// ——— Notifications ———
+import './notifications.js';    // addNotification, badge
+
+// ——— Settings (loaded early so other modules can call getSettings()) ———
+import { initSettings } from './settings.js';
+
+// ——— Core CRM modules ———
+import { initEnquiries }    from './enquiries.js';
+import { initCustomers }    from './customers.js';
+import { initBookings }     from './bookings.js';
+import { initJobs }         from './jobs.js';
+import { initInvoices }     from './invoices.js';
+import { initRevenue }      from './revenue.js';
+
+// ——— Workshop tools ———
+import { initVrmLookup }    from './vrm-lookup.js';
+import { initJobClock }     from './job-clock.js';
+import { initApprovals }    from './photo-approval.js';
+
+// ——— VHC ———
+import { initVhc }          from './vhc.js';
+
+// ——— Opportunities & pipeline ———
+import { initOpportunities } from './opportunities.js';
+
+// ——— Fleet & parts ———
+import { initFleet }        from './fleet.js';
+import { initParts }        from './parts.js';
+
+// ——— MOT, reminders, comms ———
+import { initMotTracker }   from './mot-tracker.js';
+import { initReminders }    from './reminders-engine.js';
+import { initCommsLog }     from './comms-log.js';
+
+// ——— Reports & Z-read ———
+import { initReports }      from './reports.js';
+import { initZRead }        from './z-read.js';
+
+// ——— Multi-user / teams ———
+import { initUsers, enforceRoleRestrictions } from './multi-user.js';
+
+// ——— AI Assistant ———
+import { initAiAssistant }  from './ai-assistant.js';
+
+// ——— WhatsApp helpers ———
+import './whatsapp.js';
+
+// ——— Boot sequence ———
+document.addEventListener('DOMContentLoaded', async () => {
+  // Settings must be loaded synchronously before other modules read them
+  await initSettings();
+
+  // Apply role restrictions to sidebar
+  enforceRoleRestrictions();
+
+  // Initialise all feature modules (each checks section visibility internally)
+  initEnquiries();
+  initCustomers();
+  initBookings();
+  initJobs();
+  initInvoices();
+  initRevenue();
+  initVrmLookup();
+  initJobClock();
+  initApprovals();
+  initVhc();
+  initOpportunities();
+  initFleet();
+  initParts();
+  initMotTracker();
+  initReminders();
+  initCommsLog();
+  initReports();
+  initZRead();
+  initUsers();
+  initAiAssistant();
+});

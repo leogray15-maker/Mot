@@ -3,9 +3,120 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Staff Login | Premier MOT & Service</title>
+  <title>Login | GarageOS</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/landing.css">
+  <style>
+    /* Inline overrides for login-specific additions */
+    .login-forgot-link {
+      display: block;
+      text-align: right;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: -8px;
+      margin-bottom: 20px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .login-forgot-link:hover { color: var(--red); }
+
+    .login-divider {
+      border: none;
+      border-top: 1px solid var(--border-strong);
+      margin: 24px 0;
+    }
+
+    .reset-form {
+      display: none;
+    }
+
+    .reset-form h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+
+    .reset-form p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .btn-reset {
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      border: 1px solid var(--red);
+      color: var(--red);
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .btn-reset:hover {
+      background: rgba(224,32,32,0.08);
+    }
+
+    .btn-reset:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .reset-success {
+      display: none;
+      background: rgba(22,163,74,0.1);
+      border: 1px solid rgba(22,163,74,0.3);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      color: #86efac;
+      margin-top: 12px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .reset-success.show { display: flex; }
+
+    .login-signup-prompt {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .login-signup-prompt a {
+      color: var(--red);
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .login-signup-prompt a:hover { color: #ff4444; }
+
+    .pw-show-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      cursor: pointer;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+
+    .pw-show-toggle:hover { color: var(--white); }
+
+    .input-wrap-rel { position: relative; }
+    .input-wrap-rel input { padding-right: 42px !important; }
+  </style>
 </head>
 <body class="login-page">
 
@@ -14,49 +125,159 @@
 <div class="login-card">
   <div class="login-logo">
     <div class="login-logo-icon">
-      <i class="fas fa-car-burst"></i>
+      <i class="fas fa-garage"></i>
     </div>
-    <h1>Premier MOT & Service</h1>
-    <p>Staff Administration Portal</p>
+    <h1>GarageOS</h1>
+    <p>Sign in to your garage dashboard</p>
   </div>
 
-  <h2 class="login-title">Welcome Back</h2>
-  <p class="login-sub">Sign in to access the CRM dashboard.</p>
-
+  <!-- Error display -->
   <div class="login-error" id="loginError">
     <i class="fas fa-exclamation-circle"></i>
-    <span>Incorrect username or password. Please try again.</span>
+    <span id="loginErrorMsg">Incorrect email or password. Please try again.</span>
   </div>
 
+  <!-- Login form -->
   <form id="loginForm" autocomplete="off">
     <div class="form-group">
-      <label>Email</label>
+      <label>Email Address</label>
       <div class="input-wrap">
         <i class="fas fa-envelope"></i>
-        <input type="email" id="loginEmail" name="email" placeholder="admin@premiermot.co.uk" autocomplete="email" required>
+        <input type="email" id="loginEmail" name="email" placeholder="you@yourgarage.co.uk" autocomplete="email" required>
       </div>
     </div>
+
     <div class="form-group">
       <label>Password</label>
-      <div class="input-wrap">
+      <div class="input-wrap input-wrap-rel">
         <i class="fas fa-lock"></i>
         <input type="password" id="loginPassword" name="password" placeholder="••••••••" autocomplete="current-password" required>
+        <button type="button" class="pw-show-toggle" id="loginPwToggle" aria-label="Show password">
+          <i class="fas fa-eye" id="loginPwIcon"></i>
+        </button>
       </div>
     </div>
+
+    <span class="login-forgot-link" id="forgotLink">Forgot your password?</span>
+
     <button type="submit" class="btn-login">
-      <i class="fas fa-arrow-right-to-bracket"></i> Sign In
+      Sign In <i class="fas fa-arrow-right"></i>
     </button>
   </form>
 
-  <div class="login-footer">
-    <a href="index.html" style="color:var(--text-dim);transition:color 0.2s">
-      <i class="fas fa-arrow-left"></i> Back to public website
-    </a>
+  <!-- Reset password inline form -->
+  <hr class="login-divider" id="resetDivider" style="display:none;">
+  <div class="reset-form" id="resetForm">
+    <h3><i class="fas fa-key" style="color:var(--red);margin-right:6px;"></i> Reset Your Password</h3>
+    <p>Enter your email address and we'll send you a link to reset your password.</p>
+
+    <div class="form-group">
+      <label>Email Address</label>
+      <div class="input-wrap">
+        <i class="fas fa-envelope"></i>
+        <input type="email" id="resetEmail" placeholder="you@yourgarage.co.uk" autocomplete="email">
+      </div>
+    </div>
+
+    <button type="button" class="btn-reset" id="resetBtn">
+      <i class="fas fa-paper-plane"></i> Send Reset Email
+    </button>
+
+    <div class="reset-success" id="resetSuccess">
+      <i class="fas fa-check-circle"></i>
+      <span>Reset email sent. Check your inbox (and spam folder).</span>
+    </div>
+  </div>
+
+  <!-- Sign up prompt -->
+  <div class="login-signup-prompt">
+    Don't have an account? <a href="signup.html">Start your free trial <i class="fas fa-arrow-right" style="font-size:0.75rem;"></i></a>
   </div>
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
 
 <script type="module" src="/js/auth.js"></script>
+
+<script>
+(function () {
+  // Password show/hide toggle
+  const loginPwToggle = document.getElementById('loginPwToggle');
+  const loginPassword = document.getElementById('loginPassword');
+  const loginPwIcon   = document.getElementById('loginPwIcon');
+
+  if (loginPwToggle && loginPassword) {
+    loginPwToggle.addEventListener('click', () => {
+      const isText = loginPassword.type === 'text';
+      loginPassword.type = isText ? 'password' : 'text';
+      loginPwIcon.className = isText ? 'fas fa-eye' : 'fas fa-eye-slash';
+    });
+  }
+
+  // Forgot password — show inline reset flow
+  const forgotLink   = document.getElementById('forgotLink');
+  const resetDivider = document.getElementById('resetDivider');
+  const resetForm    = document.getElementById('resetForm');
+  const resetEmail   = document.getElementById('resetEmail');
+  const loginEmail   = document.getElementById('loginEmail');
+
+  if (forgotLink) {
+    forgotLink.addEventListener('click', () => {
+      const isVisible = resetForm.style.display === 'block';
+      if (isVisible) {
+        resetForm.style.display = 'none';
+        resetDivider.style.display = 'none';
+        forgotLink.textContent = 'Forgot your password?';
+      } else {
+        resetForm.style.display = 'block';
+        resetDivider.style.display = 'block';
+        forgotLink.textContent = 'Cancel password reset';
+        // Pre-fill reset email if login email already entered
+        if (loginEmail && loginEmail.value && resetEmail) {
+          resetEmail.value = loginEmail.value;
+        }
+        resetEmail.focus();
+      }
+    });
+  }
+
+  // Reset password submit
+  const resetBtn     = document.getElementById('resetBtn');
+  const resetSuccess = document.getElementById('resetSuccess');
+
+  if (resetBtn) {
+    resetBtn.addEventListener('click', async () => {
+      const email = resetEmail ? resetEmail.value.trim() : '';
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        resetEmail.focus();
+        resetEmail.style.borderColor = '#dc2626';
+        setTimeout(() => { resetEmail.style.borderColor = ''; }, 2000);
+        return;
+      }
+
+      resetBtn.disabled = true;
+      resetBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sending…';
+
+      try {
+        // auth is exposed on window by firebase.js
+        await window.auth.sendPasswordResetEmail(email);
+        if (resetSuccess) resetSuccess.classList.add('show');
+        resetBtn.style.display = 'none';
+      } catch (err) {
+        resetBtn.disabled = false;
+        resetBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Reset Email';
+        // Show a toast if available, otherwise fallback to alert
+        const toastFn = window.showToast;
+        if (toastFn) {
+          toastFn('Could not send reset email. Please check the address and try again.', 'error');
+        } else {
+          alert('Could not send reset email. Please check the address and try again.');
+        }
+      }
+    });
+  }
+})();
+</script>
+
 </body>
 </html>

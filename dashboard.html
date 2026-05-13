@@ -3,54 +3,81 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard | Premier MOT & Service CRM</title>
+  <title>Dashboard | GarageOS</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body id="dashboardApp">
 
-<div id="appLoader" style="position:fixed;inset:0;background:#0d0d0d;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999">
-  <i class="fas fa-car-burst" style="font-size:2.5rem;color:#e02020;margin-bottom:16px"></i>
-  <div style="font-size:1rem;font-weight:600;color:#fff;margin-bottom:4px">Premier MOT CRM</div>
-  <div style="font-size:0.8rem;color:#666">Loading…</div>
+<!-- App Loader -->
+<div id="appLoader">
+  <div class="loader-icon"><i class="fas fa-garage"></i></div>
+  <div class="loader-brand">GarageOS</div>
+  <div class="loader-sub">Loading your dashboard…</div>
 </div>
 
-<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle menu">
-  <i class="fas fa-bars"></i>
-</button>
+<!-- Trial Banner -->
+<div id="trialBanner" class="trial-banner" style="display:none">
+  <i class="fas fa-clock"></i>
+  <span id="trialBannerText">Trial — 14 days remaining</span>
+  <a href="#" id="upgradeNowLink" class="trial-upgrade-link">Upgrade Now →</a>
+  <button id="dismissTrialBanner" class="trial-dismiss" aria-label="Dismiss"><i class="fas fa-times"></i></button>
+</div>
+
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
 
 <div class="dash-layout">
 
   <!-- SIDEBAR -->
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-      <div class="sidebar-brand-icon"><i class="fas fa-car-burst"></i></div>
+      <div class="sidebar-brand-icon"><i class="fas fa-garage"></i></div>
       <div class="sidebar-brand-text">
-        <strong>Premier MOT</strong>
-        <span>Admin CRM</span>
+        <strong id="sidebarGarageName">GarageOS</strong>
+        <span id="sidebarPlanBadge" class="plan-badge plan-starter">Starter</span>
       </div>
     </div>
+
     <nav class="sidebar-nav">
       <div class="nav-section-label">Main</div>
-      <button class="sidebar-link active" data-section="overview"><i class="fas fa-chart-line"></i> Overview</button>
-      <button class="sidebar-link" data-section="enquiries"><i class="fas fa-inbox"></i> Enquiries<span class="badge" id="enquiryBadge" style="display:none">0</span></button>
+      <button class="sidebar-link active" data-section="overview"><i class="fas fa-chart-line"></i><span>Overview</span></button>
+      <button class="sidebar-link" data-section="enquiries"><i class="fas fa-inbox"></i><span>Enquiries</span><span class="badge" id="enquiryBadge" style="display:none">0</span></button>
+      <button class="sidebar-link" data-section="bookings"><i class="fas fa-calendar-days"></i><span>Bookings</span><span class="badge" id="bookingsBadge" style="display:none">0</span></button>
 
-      <div class="nav-section-label" style="margin-top:12px">Operations</div>
-      <button class="sidebar-link" data-section="bookings"><i class="fas fa-calendar-days"></i> Bookings<span class="badge" id="bookingsBadge" style="display:none">0</span></button>
-      <button class="sidebar-link" data-section="jobs"><i class="fas fa-screwdriver-wrench"></i> Job Cards</button>
-      <button class="sidebar-link" data-section="mot"><i class="fas fa-calendar-check"></i> MOT Tracker</button>
+      <div class="nav-section-label">Workshop</div>
+      <button class="sidebar-link" data-section="jobs"><i class="fas fa-screwdriver-wrench"></i><span>Job Cards</span></button>
+      <button class="sidebar-link pro-feature" data-section="vhc"><i class="fas fa-clipboard-check"></i><span>VHC Reports</span><span class="pro-lock"><i class="fas fa-lock"></i> Pro</span></button>
+      <button class="sidebar-link" data-section="clock"><i class="fas fa-clock"></i><span>Job Clock</span></button>
+      <button class="sidebar-link" data-section="approvals"><i class="fas fa-camera"></i><span>Photo Approvals</span></button>
 
-      <div class="nav-section-label" style="margin-top:12px">Finance</div>
-      <button class="sidebar-link" data-section="invoices"><i class="fas fa-file-invoice-pound"></i> Invoices<span class="badge" id="invoicesBadge" style="display:none">0</span></button>
-      <button class="sidebar-link" data-section="revenue"><i class="fas fa-chart-bar"></i> Revenue</button>
+      <div class="nav-section-label">Sales</div>
+      <button class="sidebar-link pro-feature" data-section="opportunities"><i class="fas fa-filter-circle-dollar"></i><span>Opportunities</span><span class="pro-lock"><i class="fas fa-lock"></i> Pro</span></button>
+      <button class="sidebar-link" data-section="customers"><i class="fas fa-users"></i><span>Customers</span></button>
+      <button class="sidebar-link pro-feature" data-section="fleet"><i class="fas fa-truck"></i><span>Fleet</span><span class="pro-lock"><i class="fas fa-lock"></i> Pro</span></button>
 
-      <div class="nav-section-label" style="margin-top:12px">Management</div>
-      <button class="sidebar-link" data-section="customers"><i class="fas fa-users"></i> Customers</button>
-      <button class="sidebar-link" data-section="settings"><i class="fas fa-gear"></i> Settings</button>
+      <div class="nav-section-label">Finance</div>
+      <button class="sidebar-link" data-section="invoices"><i class="fas fa-file-invoice-pound"></i><span>Invoices</span><span class="badge" id="invoicesBadge" style="display:none">0</span></button>
+      <button class="sidebar-link" data-section="revenue"><i class="fas fa-chart-bar"></i><span>Revenue</span></button>
+      <button class="sidebar-link pro-feature" data-section="reports"><i class="fas fa-file-chart-column"></i><span>Reports</span><span class="pro-lock"><i class="fas fa-lock"></i> Pro</span></button>
+      <button class="sidebar-link" data-section="zread"><i class="fas fa-cash-register"></i><span>Z-Read</span></button>
+
+      <div class="nav-section-label">Service</div>
+      <button class="sidebar-link" data-section="mot"><i class="fas fa-calendar-check"></i><span>MOT Tracker</span></button>
+      <button class="sidebar-link pro-feature" data-section="parts"><i class="fas fa-boxes-stacking"></i><span>Parts &amp; Stock</span><span class="pro-lock"><i class="fas fa-lock"></i> Pro</span></button>
+      <button class="sidebar-link" data-section="reminders"><i class="fas fa-bell"></i><span>Reminders</span></button>
+
+      <div class="nav-section-label">Admin</div>
+      <button class="sidebar-link" data-section="settings"><i class="fas fa-gear"></i><span>Settings</span></button>
+      <button class="sidebar-link" data-section="users"><i class="fas fa-user-shield"></i><span>Users &amp; Roles</span></button>
     </nav>
+
     <div class="sidebar-footer">
-      <a href="index.html" target="_blank" class="sidebar-link"><i class="fas fa-external-link-alt"></i> Public Site</a>
-      <a href="booking.html" target="_blank" class="sidebar-link"><i class="fas fa-calendar-plus"></i> Booking Page</a>
+      <a href="technician.html" target="_blank" class="sidebar-link"><i class="fas fa-tablet-screen-button"></i><span>Technician Mode</span></a>
+      <a href="index.html" target="_blank" class="sidebar-link"><i class="fas fa-external-link-alt"></i><span>Public Site</span></a>
+      <button class="sidebar-link" id="logoutBtn"><i class="fas fa-right-from-bracket"></i><span>Logout</span></button>
     </div>
   </aside>
 
@@ -60,33 +87,27 @@
     <!-- TOPBAR -->
     <header class="topbar">
       <div class="topbar-left">
-        <div class="topbar-title">Premier MOT & Service</div>
-        <div class="topbar-breadcrumb">/ <span>Overview</span></div>
+        <div class="topbar-breadcrumb"><span id="topbarBreadcrumb">Overview</span></div>
       </div>
       <div class="topbar-right">
-        <!-- Notification Bell -->
+        <span class="plan-chip" id="planChip">Starter</span>
+        <button class="topbar-btn" id="closeOfDayBtn" style="display:none" title="Close of Day"><i class="fas fa-cash-register"></i> Z-Read</button>
+        <button class="topbar-btn ai-btn" id="aiBtn" title="AI Assistant (Pro)"><i class="fas fa-sparkles"></i></button>
         <div class="notif-wrap">
           <button class="notif-bell" id="notifBell" aria-label="Notifications">
             <i class="fas fa-bell"></i>
             <span class="notif-badge" id="notifBadge" style="display:none">0</span>
           </button>
           <div class="notif-dropdown" id="notifDropdown">
-            <div class="notif-header">
-              <span>Notifications</span>
-              <button class="notif-clear" id="clearNotifs">Clear all</button>
-            </div>
-            <div class="notif-list" id="notifList">
-              <div class="notif-empty"><i class="fas fa-bell-slash"></i><p>All caught up!</p></div>
-            </div>
+            <div class="notif-header"><span>Notifications</span><button id="clearNotifs">Clear all</button></div>
+            <div class="notif-list" id="notifList"><div class="notif-empty"><i class="fas fa-bell-slash"></i><p>All caught up!</p></div></div>
           </div>
         </div>
         <div class="topbar-user">
-          <div class="topbar-user-avatar">A</div>
-          <span class="topbar-user-name">admin</span>
+          <div class="topbar-avatar" id="userAvatar">A</div>
+          <span class="topbar-user-name" id="topbarUserName">Admin</span>
         </div>
-        <button class="btn-sm btn-danger" id="logoutBtn">
-          <i class="fas fa-right-from-bracket"></i> Logout
-        </button>
+        <button class="btn-sm btn-danger" id="topbarLogout"><i class="fas fa-right-from-bracket"></i></button>
       </div>
     </header>
 
@@ -95,586 +116,891 @@
 
       <!-- ======================== OVERVIEW ======================== -->
       <div class="section-page active" id="page-overview">
+
+        <!-- Onboarding Checklist -->
+        <div class="onboarding-checklist card" id="onboardingChecklist" style="display:none">
+          <div class="onboarding-header">
+            <div>
+              <h3>Welcome to GarageOS! <span id="onboardingName"></span></h3>
+              <p>Complete these steps to get your garage ready:</p>
+            </div>
+            <button class="btn-icon" id="dismissOnboarding" title="Dismiss"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="onboarding-progress"><div class="onboarding-bar" id="onboardingBar" style="width:0%"></div></div>
+          <div class="onboarding-items">
+            <label class="onboarding-item" id="ob-settings"><input type="checkbox" disabled> <i class="fas fa-gear"></i> Add your garage details <a href="#" data-section="settings">(Settings)</a></label>
+            <label class="onboarding-item" id="ob-logo"><input type="checkbox" disabled> <i class="fas fa-image"></i> Upload your logo <a href="#" data-section="settings">(Settings → Branding)</a></label>
+            <label class="onboarding-item" id="ob-customer"><input type="checkbox" disabled> <i class="fas fa-user-plus"></i> Add your first customer <a href="#" data-section="customers">(Customers)</a></label>
+            <label class="onboarding-item" id="ob-booking"><input type="checkbox" disabled> <i class="fas fa-calendar-plus"></i> Create your first booking <a href="#" data-section="bookings">(Bookings)</a></label>
+            <label class="onboarding-item" id="ob-mot"><input type="checkbox" disabled> <i class="fas fa-car"></i> Set up MOT reminder templates <a href="#" data-section="settings">(Settings)</a></label>
+            <label class="onboarding-item" id="ob-team"><input type="checkbox" disabled> <i class="fas fa-users"></i> Add your team members <a href="#" data-section="users">(Users)</a></label>
+            <label class="onboarding-item" id="ob-link"><input type="checkbox" disabled> <i class="fas fa-link"></i> Share your booking link <a href="#" data-section="settings">(Settings → Booking)</a></label>
+          </div>
+        </div>
+
         <div class="overview-header">
-          <h1 id="overviewGreeting">Good morning, Admin</h1>
-          <p>Here's what's happening at Premier MOT & Service today.</p>
-        </div>
-
-        <!-- Daily summary -->
-        <div class="panel" style="margin-bottom:20px">
-          <div class="panel-header">
-            <div class="panel-title"><i class="fas fa-sun"></i> Daily Summary</div>
+          <div>
+            <h1 id="overviewGreeting">Good morning!</h1>
+            <p id="overviewSubtitle">Here's what's happening at your garage today.</p>
           </div>
-          <div class="panel-body" id="dailySummaryBody" style="display:flex;flex-direction:column;gap:8px"></div>
-        </div>
-
-        <div class="stats-grid">
-          <div class="stat-card"><div class="stat-info"><div class="stat-label">Total Enquiries</div><div class="stat-value" id="stat-total">0</div><div class="stat-delta up"><i class="fas fa-arrow-up"></i> All time</div></div><div class="stat-icon red"><i class="fas fa-inbox"></i></div></div>
-          <div class="stat-card"><div class="stat-info"><div class="stat-label">New Today</div><div class="stat-value" id="stat-today">0</div><div class="stat-delta"><i class="fas fa-calendar"></i> Today</div></div><div class="stat-icon blue"><i class="fas fa-star"></i></div></div>
-          <div class="stat-card"><div class="stat-info"><div class="stat-label">Awaiting Response</div><div class="stat-value" id="stat-awaiting">0</div><div class="stat-delta down"><i class="fas fa-clock"></i> Needs action</div></div><div class="stat-icon amber"><i class="fas fa-hourglass-half"></i></div></div>
-          <div class="stat-card"><div class="stat-info"><div class="stat-label">Completed Jobs</div><div class="stat-value" id="stat-completed">0</div><div class="stat-delta up"><i class="fas fa-check"></i> All time</div></div><div class="stat-icon green"><i class="fas fa-circle-check"></i></div></div>
-        </div>
-
-        <!-- MOT Reminder Widget -->
-        <div class="panel">
-          <div class="panel-header">
-            <div class="panel-title"><i class="fab fa-whatsapp" style="color:#25d366"></i> MOT Reminders to Send</div>
-            <button class="btn-sm btn-ghost-sm" onclick="navigate('mot')">View All MOTs <i class="fas fa-arrow-right"></i></button>
-          </div>
-          <div class="panel-body" id="motReminderWidget">
-            <div class="reminder-empty"><i class="fas fa-check-circle" style="color:var(--green)"></i> No reminders due.</div>
+          <div class="overview-actions">
+            <button class="btn-primary" id="quickNewBooking"><i class="fas fa-calendar-plus"></i> New Booking</button>
+            <button class="btn-secondary" id="quickNewJob"><i class="fas fa-wrench"></i> New Job</button>
+            <button class="btn-secondary" id="quickNewCustomer"><i class="fas fa-user-plus"></i> New Customer</button>
           </div>
         </div>
 
-        <div class="panel">
-          <div class="panel-header">
-            <div class="panel-title"><i class="fas fa-clock"></i> Recent Enquiries</div>
-            <button class="btn-sm btn-ghost-sm" onclick="navigate('enquiries')">View All <i class="fas fa-arrow-right"></i></button>
-          </div>
-          <div class="panel-body no-pad">
-            <div class="table-wrap">
-              <table><thead><tr><th>Date</th><th>Name</th><th>Phone</th><th>Service</th><th>Status</th><th>Actions</th></tr></thead>
-              <tbody id="recentEnquiriesBody"><tr><td colspan="6" class="table-empty"><i class="fas fa-inbox"></i>Loading...</td></tr></tbody></table>
+        <!-- Stats Grid -->
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card animate-fade-in" id="stat-enquiries">
+            <div class="stat-card-left">
+              <div class="stat-label">New Enquiries</div>
+              <div class="stat-value" id="statEnquiries">—</div>
+              <div class="stat-delta" id="statEnquiriesDelta"></div>
             </div>
+            <div class="stat-icon stat-icon-blue"><i class="fas fa-inbox"></i></div>
+          </div>
+          <div class="stat-card animate-fade-in" id="stat-bookings">
+            <div class="stat-card-left">
+              <div class="stat-label">Bookings Today</div>
+              <div class="stat-value" id="statBookings">—</div>
+              <div class="stat-delta" id="statBookingsDelta"></div>
+            </div>
+            <div class="stat-icon stat-icon-green"><i class="fas fa-calendar-check"></i></div>
+          </div>
+          <div class="stat-card animate-fade-in" id="stat-jobs">
+            <div class="stat-card-left">
+              <div class="stat-label">Open Jobs</div>
+              <div class="stat-value" id="statJobs">—</div>
+              <div class="stat-delta" id="statJobsDelta"></div>
+            </div>
+            <div class="stat-icon stat-icon-amber"><i class="fas fa-screwdriver-wrench"></i></div>
+          </div>
+          <div class="stat-card animate-fade-in" id="stat-revenue">
+            <div class="stat-card-left">
+              <div class="stat-label">Revenue Today</div>
+              <div class="stat-value" id="statRevenue">—</div>
+              <div class="stat-delta" id="statRevenueDelta"></div>
+            </div>
+            <div class="stat-icon stat-icon-red"><i class="fas fa-pound-sign"></i></div>
+          </div>
+          <div class="stat-card animate-fade-in" id="stat-invoices-unpaid">
+            <div class="stat-card-left">
+              <div class="stat-label">Unpaid Invoices</div>
+              <div class="stat-value" id="statUnpaid">—</div>
+              <div class="stat-delta" id="statUnpaidDelta"></div>
+            </div>
+            <div class="stat-icon stat-icon-red"><i class="fas fa-file-invoice-pound"></i></div>
+          </div>
+          <div class="stat-card animate-fade-in" id="stat-pipeline">
+            <div class="stat-card-left">
+              <div class="stat-label">Pipeline Value</div>
+              <div class="stat-value" id="statPipeline">—</div>
+              <div class="stat-delta" id="statPipelineDelta"></div>
+            </div>
+            <div class="stat-icon stat-icon-gold"><i class="fas fa-filter-circle-dollar"></i></div>
           </div>
         </div>
 
-        <div class="panel">
-          <div class="panel-header"><div class="panel-title"><i class="fas fa-bolt"></i> Quick Actions</div></div>
-          <div class="panel-body">
-            <div class="quick-actions">
-              <button class="btn-sm btn-primary-sm" id="quickAddCustomer"><i class="fas fa-user-plus"></i> Add Customer</button>
-              <button class="btn-sm btn-ghost-sm" id="quickViewEnquiries"><i class="fas fa-inbox"></i> All Enquiries</button>
-              <button class="btn-sm btn-ghost-sm" onclick="navigate('bookings')"><i class="fas fa-calendar-days"></i> Bookings</button>
-              <button class="btn-sm btn-ghost-sm" onclick="navigate('jobs')"><i class="fas fa-screwdriver-wrench"></i> Job Cards</button>
-              <button class="btn-sm btn-ghost-sm" onclick="navigate('mot')"><i class="fas fa-car"></i> MOT Tracker</button>
-            </div>
+        <!-- Two column -->
+        <div class="overview-grid">
+          <div class="card">
+            <div class="card-header"><h3><i class="fas fa-calendar-check"></i> Today's Bookings</h3></div>
+            <div id="todayBookingsList"><div class="loading-placeholder"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3><i class="fas fa-inbox"></i> Recent Enquiries</h3></div>
+            <div id="recentEnquiriesList"><div class="loading-placeholder"></div></div>
+          </div>
+        </div>
+
+        <!-- Alerts row -->
+        <div class="alerts-row">
+          <div class="card" id="lowStockAlerts" style="display:none">
+            <div class="card-header"><h3><i class="fas fa-boxes-stacking text-warning"></i> Low Stock Alerts</h3></div>
+            <div id="lowStockList"></div>
+          </div>
+          <div class="card" id="motRemindersDue">
+            <div class="card-header"><h3><i class="fas fa-car text-warning"></i> MOT Reminders Due</h3></div>
+            <div id="motRemindersToday"><div class="loading-placeholder"></div></div>
           </div>
         </div>
       </div>
 
       <!-- ======================== ENQUIRIES ======================== -->
       <div class="section-page" id="page-enquiries">
-        <div class="overview-header"><h1>Enquiries</h1><p>All booking requests submitted through the website.</p></div>
-        <div class="panel">
-          <div class="toolbar">
-            <div class="search-wrap"><i class="fas fa-search"></i><input type="text" id="enquirySearch" placeholder="Search by name, email or reg..."></div>
-            <select class="filter-select" id="enquiryFilter">
-              <option value="all">All Statuses</option>
-              <option>New</option><option>Contacted</option><option>Booked In</option><option>Completed</option><option>Cancelled</option>
-            </select>
-          </div>
-          <div class="table-wrap">
-            <table><thead><tr><th>Date</th><th>Name</th><th>Phone</th><th>Email</th><th>Reg</th><th>Service</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody id="enquiriesBody"><tr><td colspan="8" class="table-empty"><i class="fas fa-inbox"></i>Loading...</td></tr></tbody></table>
-          </div>
+        <div class="section-header">
+          <h2>Enquiries</h2>
+          <button class="btn-primary" id="newEnquiryBtn"><i class="fas fa-plus"></i> New Enquiry</button>
+        </div>
+        <div class="filter-bar">
+          <input type="text" id="enquirySearch" class="search-input" placeholder="Search enquiries…">
+          <select id="enquiryStatusFilter" class="filter-select">
+            <option value="">All Statuses</option>
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="booked">Booked</option>
+            <option value="not_interested">Not Interested</option>
+          </select>
+          <input type="date" id="enquiryDateFilter" class="filter-date">
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="enquiriesTable">
+            <thead><tr>
+              <th>Date</th><th>Name</th><th>Phone</th><th>Email</th><th>Reg</th><th>Service</th><th>Status</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="enquiriesTbody"></tbody>
+          </table>
         </div>
       </div>
 
       <!-- ======================== BOOKINGS ======================== -->
       <div class="section-page" id="page-bookings">
-        <div class="overview-header">
-          <h1>Bookings</h1>
-          <p>Online bookings made via the public booking page.</p>
+        <div class="section-header">
+          <h2>Bookings</h2>
+          <div class="section-actions">
+            <div class="view-toggles">
+              <button class="view-toggle active" data-view="month"><i class="fas fa-calendar"></i> Month</button>
+              <button class="view-toggle" data-view="week"><i class="fas fa-calendar-week"></i> Week</button>
+              <button class="view-toggle" data-view="day"><i class="fas fa-calendar-day"></i> Day</button>
+              <button class="view-toggle" data-view="list"><i class="fas fa-list"></i> List</button>
+            </div>
+            <button class="btn-primary" id="newBookingBtn"><i class="fas fa-plus"></i> New Booking</button>
+          </div>
         </div>
-        <div class="panel">
-          <div class="toolbar">
-            <div class="search-wrap"><i class="fas fa-search"></i><input type="text" id="bookingsSearch" placeholder="Search bookings..."></div>
-            <select class="filter-select" id="bookingsFilter">
-              <option value="all">All Statuses</option>
-              <option>Confirmed</option><option>Completed</option><option>Cancelled</option><option>No Show</option>
-            </select>
-            <div style="display:flex;gap:6px">
-              <button class="btn-sm btn-primary-sm active" id="bookingsViewList"><i class="fas fa-list"></i> List</button>
-              <button class="btn-sm btn-ghost-sm" id="bookingsViewCal"><i class="fas fa-calendar-week"></i> Calendar</button>
-            </div>
+        <div class="filter-bar">
+          <input type="text" id="bookingSearch" class="search-input" placeholder="Search bookings…">
+          <select id="bookingStatusFilter" class="filter-select">
+            <option value="">All Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="in_progress">In Progress</option>
+            <option value="complete">Complete</option>
+            <option value="no_show">No Show</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <button class="btn-secondary" id="printDaySheetBtn"><i class="fas fa-print"></i> Print Day Sheet</button>
+        </div>
+        <div id="calendarNav" class="calendar-nav">
+          <button id="calPrev"><i class="fas fa-chevron-left"></i></button>
+          <span id="calTitle">May 2026</span>
+          <button id="calNext"><i class="fas fa-chevron-right"></i></button>
+          <button id="calToday" class="btn-sm btn-secondary">Today</button>
+        </div>
+        <div id="bookingsCalendar"></div>
+        <div id="bookingsList" style="display:none">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Date</th><th>Time</th><th>Customer</th><th>Reg</th><th>Service</th><th>Bay</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="bookingsTbody"></tbody>
+            </table>
           </div>
-          <div class="bookings-table-wrap">
-            <div class="table-wrap">
-              <table><thead><tr><th>Date</th><th>Time</th><th>Name</th><th>Phone</th><th>Service</th><th>Reg</th><th>Status</th><th>Actions</th></tr></thead>
-              <tbody id="bookingsBody"><tr><td colspan="8" class="table-empty"><i class="fas fa-calendar-days"></i>Loading...</td></tr></tbody></table>
-            </div>
-          </div>
-          <div id="bookingCalendarWrap" style="display:none;padding:20px"></div>
         </div>
       </div>
 
-      <!-- ======================== JOB CARDS ======================== -->
+      <!-- ======================== JOBS ======================== -->
       <div class="section-page" id="page-jobs">
-        <div class="overview-header"><h1>Job Cards</h1><p>Create and manage digital job cards for all vehicle work.</p></div>
-
-        <div class="panel" style="margin-bottom:24px">
-          <div class="panel-header"><div class="panel-title"><i class="fas fa-plus-circle"></i> Create New Job Card</div></div>
-          <div class="panel-body">
-            <form id="createJobForm" class="dash-form">
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Customer *</label>
-                  <select id="jobCustomerSelect" name="customer" required>
-                    <option value="">— Select customer —</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>Vehicle Registration</label>
-                  <input type="text" id="jobReg" name="reg" placeholder="AB21 XYZ" style="text-transform:uppercase">
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Service Type *</label>
-                  <select id="jobServiceType" name="serviceType" required>
-                    <option value="">Select service...</option>
-                    <option>MOT</option><option>Full Service</option><option>Interim Service</option>
-                    <option>Brakes</option><option>Tyres</option><option>Diagnostics</option><option>Other</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>Status</label>
-                  <select id="jobStatus" name="status">
-                    <option>Pending</option><option>In Progress</option><option>Awaiting Parts</option><option>Complete</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Date In</label>
-                  <input type="date" id="jobDateIn" name="dateIn">
-                </div>
-                <div class="form-group">
-                  <label>Expected Date Out</label>
-                  <input type="date" id="jobDateOut" name="dateOut">
-                </div>
-              </div>
-              <div class="form-group" style="margin-bottom:16px">
-                <label>Work Required</label>
-                <textarea id="jobWorkRequired" name="workRequired" placeholder="Describe the work to be carried out..." style="min-height:70px;width:100%;background:var(--dark-3);border:1px solid var(--border-strong);border-radius:var(--radius);padding:10px 12px;color:var(--white);font-family:inherit;resize:vertical"></textarea>
-              </div>
-
-              <!-- Parts table -->
-              <div style="margin-bottom:16px">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-                  <label style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-dim)">Parts Used</label>
-                  <button type="button" class="btn-sm btn-ghost-sm" onclick="addPartRow()"><i class="fas fa-plus"></i> Add Part</button>
-                </div>
-                <div id="partsContainer"></div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Labour Hours</label>
-                  <input type="number" id="jobLabourHours" name="labourHours" placeholder="0" min="0" step="0.5" oninput="updateJobLabourTotal()">
-                </div>
-                <div class="form-group">
-                  <label>Labour Rate (£/hr)</label>
-                  <input type="number" id="jobLabourRate" name="labourRate" placeholder="65" min="0" step="1" oninput="updateJobLabourTotal()">
-                </div>
-              </div>
-              <div class="form-group" style="margin-bottom:16px">
-                <label>Additional Notes</label>
-                <textarea id="jobNotes" name="notes" placeholder="Any additional notes..." style="min-height:60px;width:100%;background:var(--dark-3);border:1px solid var(--border-strong);border-radius:var(--radius);padding:10px 12px;color:var(--white);font-family:inherit;resize:vertical"></textarea>
-              </div>
-
-              <!-- Cost summary -->
-              <div style="background:var(--dark-3);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;display:flex;gap:32px;flex-wrap:wrap">
-                <div><div style="font-size:0.72rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Parts Cost</div><div style="font-size:1.1rem;font-weight:700;color:var(--white)" id="jobPartsCostDisplay">£0.00</div></div>
-                <div><div style="font-size:0.72rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Labour</div><div style="font-size:1.1rem;font-weight:700;color:var(--white)" id="jobLabourCostDisplay">£0.00</div></div>
-                <div><div style="font-size:0.72rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Job Total</div><div style="font-size:1.3rem;font-weight:900;color:var(--green)" id="jobTotalDisplay">£0.00</div></div>
-              </div>
-              <button type="submit" class="btn-sm btn-primary-sm" style="padding:10px 24px"><i class="fas fa-save"></i> Save Job Card</button>
-            </form>
+        <div class="section-header">
+          <h2>Job Cards</h2>
+          <div class="section-actions">
+            <div class="view-toggles">
+              <button class="view-toggle active" data-view="kanban"><i class="fas fa-columns"></i> Kanban</button>
+              <button class="view-toggle" data-view="list"><i class="fas fa-list"></i> List</button>
+            </div>
+            <button class="btn-primary" id="newJobBtn"><i class="fas fa-plus"></i> New Job Card</button>
           </div>
         </div>
-
-        <div class="panel">
-          <div class="panel-header"><div class="panel-title"><i class="fas fa-list"></i> All Job Cards</div></div>
-          <div class="toolbar">
-            <div class="search-wrap"><i class="fas fa-search"></i><input type="text" id="jobSearch" placeholder="Search jobs..."></div>
-            <select class="filter-select" id="jobFilter">
-              <option value="all">All Statuses</option>
-              <option>Pending</option><option>In Progress</option><option>Awaiting Parts</option><option>Complete</option>
-            </select>
-          </div>
+        <div class="filter-bar">
+          <input type="text" id="jobSearch" class="search-input" placeholder="Search by reg, customer…">
+          <select id="jobStatusFilter" class="filter-select">
+            <option value="">All Statuses</option>
+            <option value="waiting">Waiting</option>
+            <option value="in_progress">In Progress</option>
+            <option value="awaiting_parts">Awaiting Parts</option>
+            <option value="pending_payment">Pending Payment</option>
+            <option value="complete">Complete</option>
+          </select>
+        </div>
+        <div id="jobsKanban" class="kanban-board"></div>
+        <div id="jobsListView" style="display:none">
           <div class="table-wrap">
-            <table><thead><tr><th>Date In</th><th>Customer</th><th>Reg</th><th>Service</th><th>Status</th><th>Value</th><th>Out Date</th><th>Actions</th></tr></thead>
-            <tbody id="jobsBody"><tr><td colspan="8" class="table-empty"><i class="fas fa-screwdriver-wrench"></i>Loading...</td></tr></tbody></table>
+            <table class="data-table">
+              <thead><tr><th>Job #</th><th>Customer</th><th>Reg</th><th>Service</th><th>Tech</th><th>Status</th><th>Total</th><th>Created</th><th>Actions</th></tr></thead>
+              <tbody id="jobsTbody"></tbody>
+            </table>
           </div>
         </div>
       </div>
 
-      <!-- ======================== MOT TRACKER ======================== -->
-      <div class="section-page" id="page-mot">
-        <div class="overview-header"><h1>MOT Tracker</h1><p>Track MOT due dates and send WhatsApp reminders in one tap.</p></div>
-        <div class="mot-summary-bar">
-          <div class="mot-summary-item red"><div class="mot-summary-num" id="mot-overdue">0</div><div class="mot-summary-label"><i class="fas fa-exclamation-triangle"></i> Overdue</div></div>
-          <div class="mot-summary-item amber"><div class="mot-summary-num" id="mot-soon">0</div><div class="mot-summary-label"><i class="fas fa-clock"></i> Due within 30 days</div></div>
-          <div class="mot-summary-item green"><div class="mot-summary-num" id="mot-ok">0</div><div class="mot-summary-label"><i class="fas fa-check"></i> Up to date</div></div>
+      <!-- ======================== VHC ======================== -->
+      <div class="section-page" id="page-vhc">
+        <div class="section-header">
+          <h2>VHC Reports</h2>
+          <button class="btn-primary" id="newVhcBtn"><i class="fas fa-plus"></i> New VHC</button>
         </div>
-        <div class="panel">
-          <div class="panel-header"><div class="panel-title"><i class="fas fa-calendar-check"></i> MOT Due Dates</div></div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Date</th><th>Customer</th><th>Reg</th><th>Make/Model</th><th>Green</th><th>Amber</th><th>Red</th><th>Mechanic</th><th>Actions</th></tr></thead>
+            <tbody id="vhcTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ======================== CLOCK ======================== -->
+      <div class="section-page" id="page-clock">
+        <div class="section-header"><h2>Job Clock &amp; Time Tracking</h2></div>
+        <div id="activeClockSessions"></div>
+        <div class="card" style="margin-top:24px">
+          <div class="card-header"><h3>Time Log</h3></div>
           <div class="table-wrap">
-            <table><thead><tr><th>Customer</th><th>Reg</th><th>Vehicle</th><th>MOT Due</th><th>Status</th><th>Action</th></tr></thead>
-            <tbody id="motBody"><tr><td colspan="6" class="table-empty"><i class="fas fa-car"></i>Loading...</td></tr></tbody></table>
-          </div>
-        </div>
-        <div class="panel">
-          <div class="panel-header"><div class="panel-title"><i class="fab fa-whatsapp" style="color:#25d366"></i> Reminder Template</div></div>
-          <div class="panel-body">
-            <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:12px">Each "Send Reminder" button opens WhatsApp with this pre-filled message. Edit the template in Settings.</p>
-            <div id="motTemplatePreview" style="background:var(--dark-3);border:1px solid var(--border);border-radius:var(--radius);padding:16px;font-size:0.85rem;color:var(--text-muted);font-style:italic;line-height:1.6;white-space:pre-wrap"></div>
-            <button class="btn-sm btn-ghost-sm" style="margin-top:12px" onclick="navigate('settings')"><i class="fas fa-pen"></i> Edit Template in Settings</button>
+            <table class="data-table">
+              <thead><tr><th>Job</th><th>Technician</th><th>Start</th><th>End</th><th>Duration</th><th>Notes</th></tr></thead>
+              <tbody id="clockLogTbody"></tbody>
+            </table>
           </div>
         </div>
       </div>
 
-      <!-- ======================== INVOICES ======================== -->
-      <div class="section-page" id="page-invoices">
-        <div class="overview-header"><h1>Invoices</h1><p>Generate, send and track invoices from completed job cards.</p></div>
-        <div class="panel">
-          <div class="panel-header">
-            <div class="panel-title"><i class="fas fa-file-invoice-pound"></i> Invoice List</div>
-            <button class="btn-sm btn-ghost-sm" onclick="navigate('jobs')"><i class="fas fa-screwdriver-wrench"></i> Go to Job Cards</button>
-          </div>
-          <div class="table-wrap">
-            <table><thead><tr><th>Invoice #</th><th>Date</th><th>Customer</th><th>Service</th><th>Total</th><th>Payment</th><th>Actions</th></tr></thead>
-            <tbody id="invoicesBody"><tr><td colspan="7" class="table-empty"><i class="fas fa-file-invoice-pound"></i>Loading...</td></tr></tbody></table>
-          </div>
+      <!-- ======================== APPROVALS ======================== -->
+      <div class="section-page" id="page-approvals">
+        <div class="section-header"><h2>Photo Approvals</h2></div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Date</th><th>Customer</th><th>Reg</th><th>Issue</th><th>Amount</th><th>Photo</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="approvalsTbody"></tbody>
+          </table>
         </div>
       </div>
 
-      <!-- ======================== REVENUE ======================== -->
-      <div class="section-page" id="page-revenue">
-        <div class="overview-header"><h1>Revenue</h1><p>Financial overview based on completed job cards.</p></div>
-        <div class="stats-grid">
-          <div class="stat-card"><div class="stat-info"><div class="stat-label">This Month</div><div class="stat-value" id="rev-this-month">£0</div><div class="stat-delta" id="rev-month-delta">vs last month</div></div><div class="stat-icon green"><i class="fas fa-sterling-sign"></i></div></div>
-          <div class="stat-card"><div class="stat-info"><div class="stat-label">This Week</div><div class="stat-value" id="rev-this-week">£0</div><div class="stat-delta" id="rev-week-delta">vs last week</div></div><div class="stat-icon blue"><i class="fas fa-calendar-week"></i></div></div>
-          <div class="stat-card"><div class="stat-info"><div class="stat-label">Jobs This Month</div><div class="stat-value" id="rev-jobs-month">0</div><div class="stat-delta">Completed</div></div><div class="stat-icon amber"><i class="fas fa-screwdriver-wrench"></i></div></div>
-          <div class="stat-card"><div class="stat-info"><div class="stat-label">Avg Job Value</div><div class="stat-value" id="rev-avg-job">£0</div><div class="stat-delta">All time</div></div><div class="stat-icon red"><i class="fas fa-chart-bar"></i></div></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px" class="revenue-charts-grid">
-          <div class="panel">
-            <div class="panel-header"><div class="panel-title"><i class="fas fa-chart-line"></i> Monthly Revenue (6 months)</div></div>
-            <div class="panel-body"><div class="chart-wrap" style="height:240px;position:relative"><canvas id="revenueLineChart"></canvas></div></div>
-          </div>
-          <div class="panel">
-            <div class="panel-header"><div class="panel-title"><i class="fas fa-chart-pie"></i> Revenue by Service</div></div>
-            <div class="panel-body"><div class="chart-wrap" style="height:240px;position:relative"><canvas id="serviceDonutChart"></canvas></div></div>
+      <!-- ======================== OPPORTUNITIES ======================== -->
+      <div class="section-page" id="page-opportunities">
+        <div class="section-header">
+          <h2>Opportunities Pipeline</h2>
+          <div class="section-actions">
+            <div class="view-toggles">
+              <button class="view-toggle active" data-view="kanban"><i class="fas fa-columns"></i> Kanban</button>
+              <button class="view-toggle" data-view="list"><i class="fas fa-list"></i> List</button>
+            </div>
+            <button class="btn-primary" id="newOpportunityBtn"><i class="fas fa-plus"></i> Add Opportunity</button>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-bottom:24px">
-          <div class="stat-card"><div class="stat-info"><div class="stat-label">Total All Time</div><div class="stat-value" id="rev-total-all">£0</div><div class="stat-delta">From job cards</div></div><div class="stat-icon green"><i class="fas fa-coins"></i></div></div>
-          <div class="stat-card"><div class="stat-info"><div class="stat-label">Projected Month</div><div class="stat-value" id="rev-projected">£0</div><div class="stat-delta">Based on current pace</div></div><div class="stat-icon amber"><i class="fas fa-chart-line"></i></div></div>
+        <div class="pipeline-stats-bar" id="pipelineStatsBar">
+          <span id="pipelineTotal">£0 in open opportunities</span>
+          <span id="pipelineWinRate">0% conversion this month</span>
         </div>
-        <div class="panel">
-          <div class="panel-header"><div class="panel-title"><i class="fas fa-list"></i> Recent Completed Jobs</div></div>
+        <div id="opportunitiesKanban" class="kanban-board"></div>
+        <div id="opportunitiesListView" style="display:none">
           <div class="table-wrap">
-            <table><thead><tr><th>Date</th><th>Customer</th><th>Service</th><th>Reg</th><th>Value</th></tr></thead>
-            <tbody id="revenueJobsBody"><tr><td colspan="5" class="table-empty"><i class="fas fa-chart-bar"></i>Loading...</td></tr></tbody></table>
+            <table class="data-table">
+              <thead><tr><th>Customer</th><th>Reg</th><th>Issue</th><th>Value</th><th>Priority</th><th>Status</th><th>Source</th><th>Follow-up</th><th>Actions</th></tr></thead>
+              <tbody id="opportunitiesTbody"></tbody>
+            </table>
           </div>
         </div>
       </div>
 
       <!-- ======================== CUSTOMERS ======================== -->
       <div class="section-page" id="page-customers">
-        <div class="overview-header"><h1>Customers</h1><p>Manage customer records, vehicle details and communication history.</p></div>
-        <div class="panel" style="margin-bottom:24px">
-          <div class="panel-header"><div class="panel-title"><i class="fas fa-user-plus"></i> Add New Customer</div></div>
-          <div class="panel-body">
-            <form id="addCustomerForm" class="dash-form">
-              <div class="form-row"><div class="form-group"><label>Full Name *</label><input type="text" name="name" placeholder="John Smith" required></div><div class="form-group"><label>Phone Number *</label><input type="tel" name="phone" placeholder="07700 900000" required></div></div>
-              <div class="form-row"><div class="form-group"><label>Email Address</label><input type="email" name="email" placeholder="john@email.com"></div><div class="form-group"><label>Vehicle Registration</label><input type="text" name="reg" placeholder="AB21 XYZ" style="text-transform:uppercase"></div></div>
-              <div class="form-row"><div class="form-group"><label>Make</label><input type="text" name="make" placeholder="Ford"></div><div class="form-group"><label>Model</label><input type="text" name="model" placeholder="Focus"></div></div>
-              <div class="form-row"><div class="form-group"><label>Year</label><input type="number" name="year" placeholder="2020" min="1990" max="2026"></div><div class="form-group"><label>MOT Due Date</label><input type="date" name="motDue"></div></div>
-              <button type="submit" class="btn-sm btn-primary-sm" style="padding:10px 24px"><i class="fas fa-plus"></i> Add Customer</button>
-            </form>
+        <div class="section-header">
+          <h2>Customers</h2>
+          <div class="section-actions">
+            <button class="btn-secondary" id="exportCustomersBtn"><i class="fas fa-download"></i> Export CSV</button>
+            <button class="btn-primary" id="newCustomerBtn"><i class="fas fa-user-plus"></i> New Customer</button>
           </div>
         </div>
-        <div class="panel">
-          <div class="panel-header"><div class="panel-title"><i class="fas fa-users"></i> Customer List</div></div>
-          <div class="toolbar"><div class="search-wrap"><i class="fas fa-search"></i><input type="text" id="customerSearch" placeholder="Search customers..."></div></div>
+        <div class="filter-bar">
+          <input type="text" id="customerSearch" class="search-input" placeholder="Search by name, phone, reg…">
+          <select id="customerFilter" class="filter-select">
+            <option value="">All Customers</option>
+            <option value="fleet">Fleet</option>
+            <option value="noshows">Has No-Shows</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Vehicles</th><th>MOT Due</th><th>Last Visit</th><th>Lifetime Spend</th><th>Actions</th></tr></thead>
+            <tbody id="customersTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ======================== FLEET ======================== -->
+      <div class="section-page" id="page-fleet">
+        <div class="section-header"><h2>Fleet Management</h2></div>
+        <div id="fleetDashboard"></div>
+      </div>
+
+      <!-- ======================== INVOICES ======================== -->
+      <div class="section-page" id="page-invoices">
+        <div class="section-header">
+          <h2>Invoices</h2>
+          <div class="section-actions">
+            <button class="btn-secondary" id="exportInvoicesBtn"><i class="fas fa-download"></i> Export CSV</button>
+            <button class="btn-primary" id="newInvoiceBtn"><i class="fas fa-plus"></i> New Invoice</button>
+          </div>
+        </div>
+        <div class="tab-bar" id="invoiceTabBar">
+          <button class="tab-btn active" data-tab="all">All</button>
+          <button class="tab-btn" data-tab="draft">Draft</button>
+          <button class="tab-btn" data-tab="sent">Sent</button>
+          <button class="tab-btn" data-tab="partially_paid">Part Paid</button>
+          <button class="tab-btn" data-tab="paid">Paid</button>
+          <button class="tab-btn" data-tab="overdue">Overdue</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Invoice #</th><th>Date</th><th>Customer</th><th>Amount</th><th>Paid</th><th>Balance</th><th>Status</th><th>Due</th><th>Actions</th></tr></thead>
+            <tbody id="invoicesTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ======================== REVENUE ======================== -->
+      <div class="section-page" id="page-revenue">
+        <div class="section-header">
+          <h2>Revenue</h2>
+          <div class="section-actions">
+            <select id="revenueDateRange" class="filter-select">
+              <option value="today">Today</option>
+              <option value="week">This Week</option>
+              <option value="month" selected>This Month</option>
+              <option value="lastmonth">Last Month</option>
+              <option value="year">This Year</option>
+            </select>
+            <button class="btn-secondary" id="exportRevenueBtn"><i class="fas fa-download"></i> Export</button>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-card-left"><div class="stat-label">Total Revenue</div><div class="stat-value" id="revTotal">—</div></div><div class="stat-icon stat-icon-green"><i class="fas fa-pound-sign"></i></div></div>
+          <div class="stat-card"><div class="stat-card-left"><div class="stat-label">Jobs Completed</div><div class="stat-value" id="revJobs">—</div></div><div class="stat-icon stat-icon-blue"><i class="fas fa-check-circle"></i></div></div>
+          <div class="stat-card"><div class="stat-card-left"><div class="stat-label">Avg Job Value</div><div class="stat-value" id="revAvg">—</div></div><div class="stat-icon stat-icon-amber"><i class="fas fa-chart-line"></i></div></div>
+          <div class="stat-card"><div class="stat-card-left"><div class="stat-label">Outstanding</div><div class="stat-value" id="revOutstanding">—</div></div><div class="stat-icon stat-icon-red"><i class="fas fa-hourglass-half"></i></div></div>
+        </div>
+        <div class="charts-grid">
+          <div class="card chart-card"><div class="card-header"><h3>Revenue Over Time</h3></div><div class="chart-wrap"><canvas id="revenueChart"></canvas></div></div>
+          <div class="card chart-card"><div class="card-header"><h3>Revenue by Service</h3></div><div class="chart-wrap"><canvas id="serviceChart"></canvas></div></div>
+        </div>
+        <div class="card" style="margin-top:24px">
+          <div class="card-header"><h3>Recent Completed Jobs</h3></div>
           <div class="table-wrap">
-            <table><thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Reg</th><th>Vehicle</th><th>Year</th><th>Actions</th></tr></thead>
-            <tbody id="customersBody"><tr><td colspan="7" class="table-empty"><i class="fas fa-users"></i>Loading...</td></tr></tbody></table>
+            <table class="data-table">
+              <thead><tr><th>Date</th><th>Customer</th><th>Service</th><th>Technician</th><th>Total</th></tr></thead>
+              <tbody id="recentJobsTbody"></tbody>
+            </table>
           </div>
         </div>
+      </div>
+
+      <!-- ======================== REPORTS ======================== -->
+      <div class="section-page" id="page-reports">
+        <div class="section-header">
+          <h2>Reports</h2>
+          <div class="section-actions">
+            <input type="date" id="reportDateFrom" class="filter-date">
+            <input type="date" id="reportDateTo" class="filter-date">
+            <button class="btn-secondary" id="exportReportBtn"><i class="fas fa-download"></i> Export CSV</button>
+            <button class="btn-secondary" id="printReportBtn"><i class="fas fa-print"></i> Print</button>
+          </div>
+        </div>
+        <div class="reports-grid" id="reportsGrid">
+          <div class="report-card" data-report="dailyRevenue"><i class="fas fa-calendar-day"></i><span>Daily Revenue</span></div>
+          <div class="report-card" data-report="weeklySummary"><i class="fas fa-calendar-week"></i><span>Weekly Summary</span></div>
+          <div class="report-card" data-report="monthlyPnL"><i class="fas fa-chart-bar"></i><span>Monthly P&amp;L</span></div>
+          <div class="report-card" data-report="vatReport"><i class="fas fa-receipt"></i><span>VAT Report</span></div>
+          <div class="report-card" data-report="techPerformance"><i class="fas fa-user-wrench"></i><span>Technician Performance</span></div>
+          <div class="report-card" data-report="motPassFail"><i class="fas fa-car"></i><span>MOT Pass/Fail</span></div>
+          <div class="report-card" data-report="popularServices"><i class="fas fa-star"></i><span>Popular Services</span></div>
+          <div class="report-card" data-report="retention"><i class="fas fa-users"></i><span>Customer Retention</span></div>
+          <div class="report-card" data-report="noShows"><i class="fas fa-user-slash"></i><span>No-Show Report</span></div>
+          <div class="report-card" data-report="opportunities"><i class="fas fa-filter-circle-dollar"></i><span>Opportunities</span></div>
+          <div class="report-card" data-report="agedDebt"><i class="fas fa-hourglass"></i><span>Aged Debtors</span></div>
+          <div class="report-card" data-report="stockMovement"><i class="fas fa-boxes-stacking"></i><span>Stock Movement</span></div>
+          <div class="report-card" data-report="heatmap"><i class="fas fa-fire"></i><span>Busy Times Heatmap</span></div>
+          <div class="report-card" data-report="zReadHistory"><i class="fas fa-cash-register"></i><span>Z-Read History</span></div>
+          <div class="report-card" data-report="topCustomers"><i class="fas fa-trophy"></i><span>Top Customers</span></div>
+        </div>
+        <div id="reportOutput" style="display:none">
+          <div class="card">
+            <div class="card-header"><h3 id="reportTitle">Report</h3></div>
+            <div id="reportContent"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================== Z-READ ======================== -->
+      <div class="section-page" id="page-zread">
+        <div class="section-header">
+          <h2>Z-Read / End of Day</h2>
+          <div class="section-actions">
+            <input type="date" id="zreadDate" class="filter-date">
+            <button class="btn-primary" id="generateZreadBtn"><i class="fas fa-cash-register"></i> Generate Z-Read</button>
+          </div>
+        </div>
+        <div id="zreadOutput"></div>
+        <div class="card" style="margin-top:24px">
+          <div class="card-header"><h3>Z-Read History</h3></div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Date</th><th>Jobs</th><th>Invoiced</th><th>Collected</th><th>Outstanding</th><th>Generated By</th><th>Actions</th></tr></thead>
+              <tbody id="zreadHistoryTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================== MOT TRACKER ======================== -->
+      <div class="section-page" id="page-mot">
+        <div class="section-header">
+          <h2>MOT Tracker</h2>
+          <div class="section-actions">
+            <button class="btn-secondary" id="bulkMotBtn"><i class="fas fa-paper-plane"></i> Bulk Send Reminders</button>
+          </div>
+        </div>
+        <div class="mot-summary-bar" id="motSummaryBar">
+          <span class="mot-stat mot-expired" id="motExpiredCount">0 Expired</span>
+          <span class="mot-stat mot-urgent" id="motUrgentCount">0 Due in 7 days</span>
+          <span class="mot-stat mot-warning" id="motWarnCount">0 Due in 30 days</span>
+          <span class="mot-stat mot-ok" id="motOkCount">0 OK</span>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Customer</th><th>Phone</th><th>Reg</th><th>Make/Model</th><th>MOT Due</th><th>Days Left</th><th>Last Reminder</th><th>Actions</th></tr></thead>
+            <tbody id="motTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ======================== PARTS ======================== -->
+      <div class="section-page" id="page-parts">
+        <div class="section-header">
+          <h2>Parts &amp; Stock Control</h2>
+          <div class="section-actions">
+            <button class="btn-secondary" id="reorderListBtn"><i class="fas fa-list-check"></i> Reorder List</button>
+            <button class="btn-primary" id="newPartBtn"><i class="fas fa-plus"></i> Add Part</button>
+          </div>
+        </div>
+        <div class="stats-grid stats-grid-4">
+          <div class="stat-card"><div class="stat-card-left"><div class="stat-label">Total SKUs</div><div class="stat-value" id="partsTotal">—</div></div><div class="stat-icon stat-icon-blue"><i class="fas fa-boxes-stacking"></i></div></div>
+          <div class="stat-card"><div class="stat-card-left"><div class="stat-label">Low Stock</div><div class="stat-value" id="partsLow">—</div></div><div class="stat-icon stat-icon-amber"><i class="fas fa-triangle-exclamation"></i></div></div>
+          <div class="stat-card"><div class="stat-card-left"><div class="stat-label">Out of Stock</div><div class="stat-value" id="partsOut">—</div></div><div class="stat-icon stat-icon-red"><i class="fas fa-circle-exclamation"></i></div></div>
+          <div class="stat-card"><div class="stat-card-left"><div class="stat-label">Stock Value</div><div class="stat-value" id="partsValue">—</div></div><div class="stat-icon stat-icon-green"><i class="fas fa-pound-sign"></i></div></div>
+        </div>
+        <div class="filter-bar">
+          <input type="text" id="partsSearch" class="search-input" placeholder="Search parts…">
+          <select id="partsCategoryFilter" class="filter-select">
+            <option value="">All Categories</option>
+            <option value="brakes">Brakes</option>
+            <option value="tyres">Tyres</option>
+            <option value="filters">Filters</option>
+            <option value="oils">Oils</option>
+            <option value="electrical">Electrical</option>
+            <option value="exhaust">Exhaust</option>
+            <option value="suspension">Suspension</option>
+            <option value="consumables">Consumables</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Part #</th><th>Category</th><th>Supplier</th><th>Cost</th><th>Sale</th><th>Stock</th><th>Reorder</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="partsTbody"></tbody>
+          </table>
+        </div>
+        <div class="card" style="margin-top:24px">
+          <div class="card-header"><h3>Suppliers <button class="btn-sm btn-primary" id="newSupplierBtn" style="float:right"><i class="fas fa-plus"></i> Add Supplier</button></h3></div>
+          <div id="suppliersList"></div>
+        </div>
+      </div>
+
+      <!-- ======================== REMINDERS ======================== -->
+      <div class="section-page" id="page-reminders">
+        <div class="section-header"><h2>Smart Reminders</h2></div>
+        <div class="tab-bar">
+          <button class="tab-btn active" data-tab="mot-reminders">MOT Reminders</button>
+          <button class="tab-btn" data-tab="booking-seq">Booking Sequence</button>
+          <button class="tab-btn" data-tab="service-rem">Service Reminders</button>
+          <button class="tab-btn" data-tab="birthdays">Birthdays</button>
+        </div>
+        <div id="remindersContent"></div>
       </div>
 
       <!-- ======================== SETTINGS ======================== -->
       <div class="section-page" id="page-settings">
-        <div class="overview-header"><h1>Settings</h1><p>Manage all garage preferences, templates and system settings.</p></div>
-        <div class="settings-grid">
+        <div class="section-header"><h2>Settings</h2></div>
+        <div class="tab-bar" id="settingsTabBar">
+          <button class="tab-btn active" data-tab="general">General</button>
+          <button class="tab-btn" data-tab="branding">Branding</button>
+          <button class="tab-btn" data-tab="notifications">Notifications</button>
+          <button class="tab-btn" data-tab="booking">Booking</button>
+          <button class="tab-btn" data-tab="financial">Financial</button>
+          <button class="tab-btn" data-tab="apikeys">API Keys</button>
+          <button class="tab-btn" data-tab="subscription">Subscription</button>
+        </div>
+        <div id="settingsContent"></div>
+      </div>
 
-          <!-- Garage Details -->
-          <div class="panel">
-            <div class="panel-header"><div class="panel-title"><i class="fas fa-building"></i> Garage Details</div></div>
-            <div class="panel-body">
-              <form id="settingsGarageForm" class="dash-form">
-                <div class="form-group"><label>Garage Name</label><input type="text" id="settingGarageName" placeholder="Premier MOT & Service"></div>
-                <div class="form-group"><label>Phone Number</label><input type="tel" id="settingPhone" placeholder="01234 567890"></div>
-                <div class="form-group"><label>Email Address</label><input type="email" id="settingEmail" placeholder="info@premiermot.co.uk"></div>
-                <div class="form-group"><label>Address</label><input type="text" id="settingAddress" placeholder="14 Industrial Way, Chelmsford"></div>
-                <button type="submit" class="btn-sm btn-primary-sm" style="padding:10px 24px"><i class="fas fa-save"></i> Save Details</button>
-              </form>
+      <!-- ======================== USERS ======================== -->
+      <div class="section-page" id="page-users">
+        <div class="section-header"><h2>Users &amp; Roles</h2></div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>PIN</th><th>Last Login</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="usersTbody"></tbody>
+          </table>
+        </div>
+        <div class="card" style="margin-top:24px">
+          <div class="card-header"><h3>Invite New User</h3></div>
+          <form id="inviteUserForm" class="form-grid">
+            <div class="form-group"><label>Name</label><input type="text" id="inviteName" class="form-input" required></div>
+            <div class="form-group"><label>Email</label><input type="email" id="inviteEmail" class="form-input" required></div>
+            <div class="form-group"><label>Role</label>
+              <select id="inviteRole" class="form-input">
+                <option value="manager">Manager</option>
+                <option value="technician">Technician</option>
+                <option value="receptionist">Receptionist</option>
+              </select>
             </div>
-          </div>
-
-          <!-- WhatsApp & Links -->
-          <div class="panel">
-            <div class="panel-header"><div class="panel-title"><i class="fab fa-whatsapp" style="color:#25d366"></i> WhatsApp & Links</div></div>
-            <div class="panel-body">
-              <form id="settingsExtendedForm" class="dash-form">
-                <div class="form-group"><label>Site URL (for booking links)</label><input type="url" id="settingSiteURL" placeholder="https://mot-ruby.vercel.app"></div>
-                <div class="form-group"><label>Google Review Link</label><input type="url" id="settingGoogleLink" placeholder="https://g.page/r/..."></div>
-                <div class="form-group"><label>MOT Reminder Template</label><textarea id="settingWATemplate" style="min-height:90px;width:100%;background:var(--dark-3);border:1px solid var(--border-strong);border-radius:var(--radius);padding:10px 12px;color:var(--white);font-family:inherit;resize:vertical;font-size:0.85rem" placeholder="Use [FirstName] [MOTDueDate] [Year] [Make] [Model] [Reg] [SiteURL] [PhoneNumber] [GarageName]"></textarea></div>
-                <div class="form-group"><label>Review Request Template</label><textarea id="settingReviewTemplate" style="min-height:80px;width:100%;background:var(--dark-3);border:1px solid var(--border-strong);border-radius:var(--radius);padding:10px 12px;color:var(--white);font-family:inherit;resize:vertical;font-size:0.85rem" placeholder="Use [FirstName] [GarageName] [GoogleReviewLink]"></textarea></div>
-                <button type="submit" class="btn-sm btn-primary-sm" style="padding:10px 24px"><i class="fas fa-save"></i> Save Templates</button>
-              </form>
-            </div>
-          </div>
-
-          <!-- Financial -->
-          <div class="panel">
-            <div class="panel-header"><div class="panel-title"><i class="fas fa-sterling-sign"></i> Financial Settings</div></div>
-            <div class="panel-body">
-              <div class="dash-form">
-                <div class="form-group"><label>Bank Details (for invoices)</label><textarea id="settingBankDetails" style="min-height:60px;width:100%;background:var(--dark-3);border:1px solid var(--border-strong);border-radius:var(--radius);padding:10px 12px;color:var(--white);font-family:inherit;resize:vertical;font-size:0.85rem" placeholder="Sort code: 12-34-56 | Account: 12345678 | Payee: Premier MOT Ltd"></textarea></div>
-                <div class="form-group"><label>Default Labour Rate (£/hr)</label><input type="number" id="settingLabourRate" placeholder="65" min="0" style="background:var(--dark-3);border:1px solid var(--border-strong);border-radius:var(--radius);padding:10px 12px;color:var(--white);font-family:inherit;width:100%"></div>
-                <div class="form-group" style="display:flex;align-items:center;gap:12px;margin-bottom:0">
-                  <input type="checkbox" id="settingVAT" style="width:18px;height:18px;cursor:pointer">
-                  <label for="settingVAT" style="cursor:pointer;font-size:0.88rem;color:var(--text);text-transform:none;letter-spacing:0;font-weight:400">VAT Registered (add 20% to invoices)</label>
-                </div>
-                <div class="form-group" id="vatNumberRow" style="display:none;margin-top:10px"><label>VAT Number</label><input type="text" id="settingVATNumber" placeholder="GB123456789" style="background:var(--dark-3);border:1px solid var(--border-strong);border-radius:var(--radius);padding:10px 12px;color:var(--white);font-family:inherit;width:100%"></div>
-                <button type="button" class="btn-sm btn-primary-sm" style="padding:10px 24px;margin-top:16px" onclick="saveExtendedSettings()"><i class="fas fa-save"></i> Save Financial Settings</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- MOT Reminder Settings -->
-          <div class="panel">
-            <div class="panel-header"><div class="panel-title"><i class="fas fa-car"></i> MOT Reminder Settings</div></div>
-            <div class="panel-body">
-              <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px">Show reminders on the overview when a customer's MOT is due within these timeframes:</p>
-              <div style="display:flex;gap:20px;margin-bottom:20px;flex-wrap:wrap">
-                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.88rem"><input type="checkbox" id="reminderDay7" style="width:16px;height:16px"> 7 days</label>
-                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.88rem"><input type="checkbox" id="reminderDay14" style="width:16px;height:16px"> 14 days</label>
-                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.88rem"><input type="checkbox" id="reminderDay30" style="width:16px;height:16px"> 30 days</label>
-              </div>
-              <button type="button" class="btn-sm btn-primary-sm" onclick="saveExtendedSettings()"><i class="fas fa-save"></i> Save Reminder Settings</button>
-            </div>
-          </div>
-
-          <!-- Working Hours -->
-          <div class="panel" style="grid-column:1/-1">
-            <div class="panel-header"><div class="panel-title"><i class="fas fa-clock"></i> Working Hours & Availability</div></div>
-            <div class="panel-body">
-              <form id="settingsHoursForm" class="dash-form">
-                <div style="display:grid;gap:8px;margin-bottom:20px">
-                  <div class="wh-row" id="wh-row-monday">
-                    <div class="wh-day-name">Monday</div>
-                    <input type="checkbox" id="wh_open_monday" class="wh-open-cb">
-                    <label for="wh_open_monday" class="wh-open-label">Open</label>
-                    <input type="time" id="wh_start_monday" class="wh-time-input">
-                    <span class="wh-to">to</span>
-                    <input type="time" id="wh_end_monday" class="wh-time-input">
-                  </div>
-                  <div class="wh-row" id="wh-row-tuesday">
-                    <div class="wh-day-name">Tuesday</div>
-                    <input type="checkbox" id="wh_open_tuesday" class="wh-open-cb">
-                    <label for="wh_open_tuesday" class="wh-open-label">Open</label>
-                    <input type="time" id="wh_start_tuesday" class="wh-time-input">
-                    <span class="wh-to">to</span>
-                    <input type="time" id="wh_end_tuesday" class="wh-time-input">
-                  </div>
-                  <div class="wh-row" id="wh-row-wednesday">
-                    <div class="wh-day-name">Wednesday</div>
-                    <input type="checkbox" id="wh_open_wednesday" class="wh-open-cb">
-                    <label for="wh_open_wednesday" class="wh-open-label">Open</label>
-                    <input type="time" id="wh_start_wednesday" class="wh-time-input">
-                    <span class="wh-to">to</span>
-                    <input type="time" id="wh_end_wednesday" class="wh-time-input">
-                  </div>
-                  <div class="wh-row" id="wh-row-thursday">
-                    <div class="wh-day-name">Thursday</div>
-                    <input type="checkbox" id="wh_open_thursday" class="wh-open-cb">
-                    <label for="wh_open_thursday" class="wh-open-label">Open</label>
-                    <input type="time" id="wh_start_thursday" class="wh-time-input">
-                    <span class="wh-to">to</span>
-                    <input type="time" id="wh_end_thursday" class="wh-time-input">
-                  </div>
-                  <div class="wh-row" id="wh-row-friday">
-                    <div class="wh-day-name">Friday</div>
-                    <input type="checkbox" id="wh_open_friday" class="wh-open-cb">
-                    <label for="wh_open_friday" class="wh-open-label">Open</label>
-                    <input type="time" id="wh_start_friday" class="wh-time-input">
-                    <span class="wh-to">to</span>
-                    <input type="time" id="wh_end_friday" class="wh-time-input">
-                  </div>
-                  <div class="wh-row" id="wh-row-saturday">
-                    <div class="wh-day-name">Saturday</div>
-                    <input type="checkbox" id="wh_open_saturday" class="wh-open-cb">
-                    <label for="wh_open_saturday" class="wh-open-label">Open</label>
-                    <input type="time" id="wh_start_saturday" class="wh-time-input">
-                    <span class="wh-to">to</span>
-                    <input type="time" id="wh_end_saturday" class="wh-time-input">
-                  </div>
-                  <div class="wh-row" id="wh-row-sunday">
-                    <div class="wh-day-name">Sunday</div>
-                    <input type="checkbox" id="wh_open_sunday" class="wh-open-cb">
-                    <label for="wh_open_sunday" class="wh-open-label">Open</label>
-                    <input type="time" id="wh_start_sunday" class="wh-time-input">
-                    <span class="wh-to">to</span>
-                    <input type="time" id="wh_end_sunday" class="wh-time-input">
-                  </div>
-                </div>
-                <div class="form-row" style="max-width:400px">
-                  <div class="form-group"><label>Max Bookings Per Hour Slot</label><input type="number" id="settingMaxSlots" placeholder="2" min="1" max="10"></div>
-                </div>
-                <button type="submit" class="btn-sm btn-primary-sm" style="padding:10px 24px"><i class="fas fa-save"></i> Save Working Hours</button>
-              </form>
-
-              <!-- Blocked dates -->
-              <div style="margin-top:28px;padding-top:24px;border-top:1px solid var(--border)">
-                <h4 style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:14px">Blocked Dates (holidays, fully booked days)</h4>
-                <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
-                  <input type="date" id="newBlockedDate" style="background:var(--dark-3);border:1px solid var(--border-strong);border-radius:var(--radius);padding:8px 12px;color:var(--white);font-family:inherit;font-size:0.85rem">
-                  <button class="btn-sm btn-ghost-sm" id="addBlockedDateBtn"><i class="fas fa-plus"></i> Block Date</button>
-                </div>
-                <div id="blockedDatesList" style="display:flex;flex-wrap:wrap;gap:8px"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Password -->
-          <div class="panel">
-            <div class="panel-header"><div class="panel-title"><i class="fas fa-lock"></i> Change Password</div></div>
-            <div class="panel-body">
-              <form id="settingsPasswordForm" class="dash-form">
-                <div class="form-group"><label>Username</label><input type="text" id="settingUsername" disabled style="opacity:0.5;cursor:not-allowed;background:var(--dark-3);border:1px solid var(--border-strong);border-radius:var(--radius);padding:10px 12px;color:var(--white);font-family:inherit;width:100%"></div>
-                <div class="form-group"><label>Current Password</label><input type="password" id="currentPassword" placeholder="Enter current password" required style="background:var(--dark-3);border:1px solid var(--border-strong);border-radius:var(--radius);padding:10px 12px;color:var(--white);font-family:inherit;width:100%"></div>
-                <div class="form-group"><label>New Password</label><input type="password" id="newPassword" placeholder="Min 6 characters" required style="background:var(--dark-3);border:1px solid var(--border-strong);border-radius:var(--radius);padding:10px 12px;color:var(--white);font-family:inherit;width:100%"></div>
-                <div class="form-group"><label>Confirm Password</label><input type="password" id="confirmPassword" placeholder="Repeat new password" required style="background:var(--dark-3);border:1px solid var(--border-strong);border-radius:var(--radius);padding:10px 12px;color:var(--white);font-family:inherit;width:100%"></div>
-                <button type="submit" class="btn-sm btn-primary-sm" style="padding:10px 24px"><i class="fas fa-key"></i> Update Password</button>
-              </form>
-            </div>
-          </div>
-
-          <!-- Data Management -->
-          <div class="panel">
-            <div class="panel-header"><div class="panel-title"><i class="fas fa-database"></i> Data Management</div></div>
-            <div class="panel-body">
-              <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px">All data is stored securely in Firebase Firestore.</p>
-              <div style="display:flex;gap:10px;flex-wrap:wrap">
-                <button class="btn-sm btn-ghost-sm" onclick="exportData()"><i class="fas fa-download"></i> Export JSON</button>
-                <button class="btn-sm btn-danger" onclick="clearAllData()"><i class="fas fa-trash"></i> Clear All Data</button>
-              </div>
-              <div style="margin-top:20px;display:flex;flex-direction:column;gap:8px">
-                <div style="display:flex;justify-content:space-between;font-size:0.82rem;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-dim)">Version</span><span>Premier CRM v2.0</span></div>
-                <div style="display:flex;justify-content:space-between;font-size:0.82rem;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-dim)">Enquiries</span><span id="infoEnquiries">—</span></div>
-                <div style="display:flex;justify-content:space-between;font-size:0.82rem;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-dim)">Customers</span><span id="infoCustomers">—</span></div>
-                <div style="display:flex;justify-content:space-between;font-size:0.82rem;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-dim)">Bookings</span><span id="infoBookings">—</span></div>
-                <div style="display:flex;justify-content:space-between;font-size:0.82rem;padding:6px 0"><span style="color:var(--text-dim)">Job Cards</span><span id="infoJobs">—</span></div>
-              </div>
-            </div>
-          </div>
-
+            <div class="form-group form-full"><button type="submit" class="btn-primary">Send Invitation</button></div>
+          </form>
         </div>
       </div>
 
     </main>
-  </div>
-</div>
+  </div><!-- /.dash-main -->
+</div><!-- /.dash-layout -->
 
 <!-- ======================== MODALS ======================== -->
 
-<!-- Enquiry Detail -->
-<div class="dash-modal-overlay" id="enquiryDetailModal">
-  <div class="dash-modal">
-    <div class="dash-modal-header"><h2><i class="fas fa-inbox" style="color:var(--red);margin-right:8px"></i> Enquiry Details</h2><button class="dash-modal-close" id="closeEnquiryModal"><i class="fas fa-times"></i></button></div>
-    <div class="dash-modal-body" id="enquiryDetailContent"></div>
+<!-- Generic Confirm Modal -->
+<div class="modal-overlay" id="confirmModal" style="display:none">
+  <div class="modal-panel modal-sm">
+    <div class="modal-header"><h3 id="confirmTitle">Confirm</h3><button class="modal-close" data-modal="confirmModal"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body"><p id="confirmMessage">Are you sure?</p></div>
+    <div class="modal-footer"><button class="btn-secondary" id="confirmCancel">Cancel</button><button class="btn-danger" id="confirmOk">Confirm</button></div>
   </div>
 </div>
 
-<!-- Customer Profile -->
-<div class="dash-modal-overlay" id="customerProfileModal">
-  <div class="dash-modal" style="max-width:700px">
-    <div class="dash-modal-header"><h2><i class="fas fa-user" style="color:var(--red);margin-right:8px"></i> Customer Profile</h2><button class="dash-modal-close" id="closeCustomerModal"><i class="fas fa-times"></i></button></div>
-    <div class="dash-modal-body" id="customerProfileContent"></div>
+<!-- Upgrade Modal -->
+<div class="modal-overlay" id="upgradeModal" style="display:none">
+  <div class="modal-panel modal-lg">
+    <div class="modal-header"><h3>Upgrade Your Plan</h3><button class="modal-close" data-modal="upgradeModal"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <p class="modal-subtitle">Unlock more features to grow your garage business.</p>
+      <div class="pricing-cards-mini">
+        <div class="pricing-card-mini">
+          <h4>Starter</h4><div class="price">£49<span>/mo</span></div>
+          <ul><li>CRM + Bookings + Jobs</li><li>Invoicing + MOT Tracker</li><li>Up to 2 users</li></ul>
+          <a href="[STRIPE_STARTER_LINK]" class="btn-primary btn-full">Choose Starter</a>
+        </div>
+        <div class="pricing-card-mini featured">
+          <h4>Pro <span class="popular-tag">Most Popular</span></h4><div class="price">£79<span>/mo</span></div>
+          <ul><li>Everything in Starter</li><li>VHC + AI Assistant + Fleet</li><li>Full Reports + Opportunities</li><li>Up to 5 users</li></ul>
+          <a href="[STRIPE_PRO_LINK]" class="btn-primary btn-full">Choose Pro</a>
+        </div>
+        <div class="pricing-card-mini">
+          <h4>Enterprise</h4><div class="price">£129<span>/mo</span></div>
+          <ul><li>Everything in Pro</li><li>Unlimited users</li><li>White label + Custom domain</li><li>Priority support</li></ul>
+          <a href="[STRIPE_ENTERPRISE_LINK]" class="btn-primary btn-full">Choose Enterprise</a>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- Booking Detail -->
-<div class="dash-modal-overlay" id="bookingDetailModal">
-  <div class="dash-modal">
-    <div class="dash-modal-header"><h2><i class="fas fa-calendar-days" style="color:var(--red);margin-right:8px"></i> Booking Details</h2><button class="dash-modal-close" id="closeBookingModal"><i class="fas fa-times"></i></button></div>
-    <div class="dash-modal-body" id="bookingDetailContent"></div>
+<!-- Booking Modal -->
+<div class="modal-overlay" id="bookingModal" style="display:none">
+  <div class="modal-panel modal-md">
+    <div class="modal-header"><h3 id="bookingModalTitle">New Booking</h3><button class="modal-close" data-modal="bookingModal"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <form id="bookingForm" class="form-grid">
+        <div class="form-group form-full"><label>Customer</label><input type="text" id="bookingCustomerSearch" class="form-input" placeholder="Search existing customer or type name…"><div id="customerAutocomplete" class="autocomplete-list" style="display:none"></div><input type="hidden" id="bookingCustomerId"></div>
+        <div class="form-group"><label>Vehicle Reg</label><div class="input-with-btn"><input type="text" id="bookingReg" class="form-input" data-vrm="true" placeholder="AB12 CDE"><button type="button" class="btn-sm btn-secondary" id="bookingVrmLookup"><i class="fas fa-search"></i></button></div></div>
+        <div class="form-group"><label>Service Type</label>
+          <select id="bookingService" class="form-input">
+            <option value="MOT">MOT Test</option>
+            <option value="Full Service">Full Service</option>
+            <option value="Interim Service">Interim Service</option>
+            <option value="Tyres">Tyres</option>
+            <option value="Brakes">Brakes</option>
+            <option value="Diagnostics">Diagnostics</option>
+            <option value="Bodywork">Bodywork</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Date</label><input type="date" id="bookingDate" class="form-input" required></div>
+        <div class="form-group"><label>Time</label><input type="time" id="bookingTime" class="form-input" required></div>
+        <div class="form-group"><label>Bay</label><select id="bookingBay" class="form-input"><option value="1">Bay 1</option><option value="2">Bay 2</option><option value="3">Bay 3</option><option value="4">Bay 4</option></select></div>
+        <div class="form-group"><label>Colour Label</label>
+          <select id="bookingColour" class="form-input">
+            <option value="#dc2626">MOT (Red)</option>
+            <option value="#3b82f6">Full Service (Blue)</option>
+            <option value="#eab308">Tyres (Yellow)</option>
+            <option value="#f97316">Brakes (Orange)</option>
+            <option value="#22c55e">Collection (Green)</option>
+            <option value="#a855f7">Fleet (Purple)</option>
+            <option value="#6b7280">Waiting Customer (Grey)</option>
+            <option value="#0891b2">Diagnostics (Cyan)</option>
+            <option value="#8b5cf6">Warranty (Violet)</option>
+            <option value="#ec4899">Free Check (Pink)</option>
+          </select>
+        </div>
+        <div class="form-group form-full"><label>Notes</label><textarea id="bookingNotes" class="form-input" rows="2"></textarea></div>
+      </form>
+    </div>
+    <div class="modal-footer"><button class="btn-secondary" data-modal="bookingModal">Cancel</button><button class="btn-primary" id="saveBookingBtn">Save Booking</button></div>
   </div>
 </div>
 
-<!-- Job Card Detail -->
-<div class="dash-modal-overlay" id="jobDetailModal">
-  <div class="dash-modal" style="max-width:700px">
-    <div class="dash-modal-header"><h2><i class="fas fa-screwdriver-wrench" style="color:var(--red);margin-right:8px"></i> Job Card Details</h2><button class="dash-modal-close" id="closeJobModal"><i class="fas fa-times"></i></button></div>
-    <div class="dash-modal-body" id="jobDetailContent"></div>
+<!-- Job Modal -->
+<div class="modal-overlay" id="jobModal" style="display:none">
+  <div class="modal-panel modal-xl">
+    <div class="modal-header"><h3 id="jobModalTitle">New Job Card</h3><button class="modal-close" data-modal="jobModal"><i class="fas fa-times"></i></button></div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="job-vehicle">Vehicle</button>
+      <button class="modal-tab" data-tab="job-details">Job Details</button>
+      <button class="modal-tab" data-tab="job-parts">Parts &amp; Labour</button>
+      <button class="modal-tab" data-tab="job-vhc">VHC</button>
+      <button class="modal-tab" data-tab="job-approvals">Approvals</button>
+      <button class="modal-tab" data-tab="job-comms">Communications</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="jobId">
+      <!-- Vehicle Tab -->
+      <div class="modal-tab-content active" id="job-vehicle">
+        <div class="form-grid">
+          <div class="form-group"><label>Registration</label><div class="input-with-btn"><input type="text" id="jobReg" class="form-input" data-vrm="true" placeholder="AB12 CDE"><button type="button" class="btn-sm btn-secondary" id="jobVrmLookup"><i class="fas fa-search"></i> Lookup</button></div></div>
+          <div class="form-group"><label>Make</label><input type="text" id="jobMake" class="form-input"></div>
+          <div class="form-group"><label>Model</label><input type="text" id="jobModel" class="form-input"></div>
+          <div class="form-group"><label>Year</label><input type="text" id="jobYear" class="form-input"></div>
+          <div class="form-group"><label>Fuel Type</label><input type="text" id="jobFuel" class="form-input"></div>
+          <div class="form-group"><label>Colour</label><input type="text" id="jobColour" class="form-input"></div>
+          <div class="form-group"><label>Engine CC</label><input type="text" id="jobEngineCC" class="form-input"></div>
+          <div class="form-group"><label>Mileage</label><input type="number" id="jobMileage" class="form-input"></div>
+          <div class="form-group"><label>MOT Expiry</label><input type="date" id="jobMotExpiry" class="form-input"><div id="jobMotCountdown" class="mot-countdown"></div></div>
+          <div class="form-group"><label>Customer</label><input type="text" id="jobCustomerSearch" class="form-input" placeholder="Search customer…"><div id="jobCustomerAutocomplete" class="autocomplete-list" style="display:none"></div><input type="hidden" id="jobCustomerId"></div>
+        </div>
+      </div>
+      <!-- Job Details Tab -->
+      <div class="modal-tab-content" id="job-details">
+        <div class="form-grid">
+          <div class="form-group"><label>Service Type</label>
+            <select id="jobService" class="form-input">
+              <option value="MOT">MOT Test</option>
+              <option value="Full Service">Full Service</option>
+              <option value="Interim Service">Interim Service</option>
+              <option value="Tyres">Tyres</option>
+              <option value="Brakes">Brakes</option>
+              <option value="Diagnostics">Diagnostics</option>
+              <option value="Exhaust">Exhaust</option>
+              <option value="Suspension">Suspension</option>
+              <option value="Electrical">Electrical</option>
+              <option value="Bodywork">Bodywork</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Assigned Technician</label><input type="text" id="jobTech" class="form-input"></div>
+          <div class="form-group"><label>Bay</label><select id="jobBay" class="form-input"><option value="1">Bay 1</option><option value="2">Bay 2</option><option value="3">Bay 3</option><option value="4">Bay 4</option></select></div>
+          <div class="form-group"><label>Status</label>
+            <select id="jobStatus" class="form-input">
+              <option value="waiting">Waiting</option>
+              <option value="in_progress">In Progress</option>
+              <option value="awaiting_parts">Awaiting Parts</option>
+              <option value="pending_payment">Pending Payment</option>
+              <option value="complete">Complete</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Estimated Hours</label><input type="number" id="jobEstHours" class="form-input" step="0.5" min="0"></div>
+          <div class="form-group"><label>Priority</label><select id="jobPriority" class="form-input"><option value="normal">Normal</option><option value="high">High</option><option value="urgent">Urgent</option></select></div>
+          <div class="form-group form-full"><label>Work Description</label><textarea id="jobDescription" class="form-input" rows="3" placeholder="Describe work to be carried out…"></textarea></div>
+          <div class="form-group form-full"><label>Internal Notes</label><textarea id="jobNotes" class="form-input" rows="2"></textarea></div>
+        </div>
+        <!-- Clock section -->
+        <div class="clock-section">
+          <div class="clock-buttons">
+            <button type="button" class="btn-success" id="clockOnBtn"><i class="fas fa-play"></i> Clock On</button>
+            <button type="button" class="btn-danger" id="clockOffBtn"><i class="fas fa-stop"></i> Clock Off</button>
+          </div>
+          <div id="jobTimeDisplay" class="time-display">Total: 0h 0m | Quoted: 0h</div>
+          <div id="clockLogList"></div>
+        </div>
+      </div>
+      <!-- Parts & Labour Tab -->
+      <div class="modal-tab-content" id="job-parts">
+        <div class="parts-section">
+          <div class="parts-header">
+            <h4>Parts</h4>
+            <button type="button" class="btn-sm btn-primary" id="addPartRowBtn"><i class="fas fa-plus"></i> Add Part</button>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="jobPartsTable">
+              <thead><tr><th>Part Name</th><th>Qty</th><th>Cost (£)</th><th>Sale (£)</th><th>Total</th><th></th></tr></thead>
+              <tbody id="jobPartsBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="labour-section">
+          <h4>Labour</h4>
+          <div class="form-grid">
+            <div class="form-group"><label>Labour Hours</label><input type="number" id="jobLabourHours" class="form-input" step="0.25" min="0" value="0"></div>
+            <div class="form-group"><label>Labour Rate (£/hr)</label><input type="number" id="jobLabourRate" class="form-input" value="65"></div>
+          </div>
+        </div>
+        <div class="job-totals">
+          <div class="total-row"><span>Parts Subtotal</span><span id="partsSubtotal">£0.00</span></div>
+          <div class="total-row"><span>Labour</span><span id="labourTotal">£0.00</span></div>
+          <div class="total-row total-vat"><span>VAT (20%)</span><span id="jobVat">£0.00</span></div>
+          <div class="total-row total-grand"><span>Total</span><span id="jobTotal">£0.00</span></div>
+        </div>
+        <div class="job-action-btns">
+          <button type="button" class="btn-secondary" id="sendApprovalBtn"><i class="fas fa-camera"></i> Send for Approval</button>
+          <button type="button" class="btn-primary" id="generateInvoiceBtn"><i class="fas fa-file-invoice-pound"></i> Generate Invoice</button>
+          <button type="button" class="btn-secondary" id="sendVhcBtn"><i class="fas fa-clipboard-check"></i> Send VHC Report</button>
+        </div>
+      </div>
+      <!-- VHC Tab -->
+      <div class="modal-tab-content" id="job-vhc">
+        <div id="vhcChecklist"></div>
+        <div class="vhc-footer" style="margin-top:16px">
+          <div class="form-group"><label>Mechanic Sign-off</label><input type="text" id="vhcMechanicName" class="form-input" placeholder="Technician name"></div>
+          <button type="button" class="btn-primary" id="saveVhcBtn"><i class="fas fa-clipboard-check"></i> Save &amp; Generate Report</button>
+        </div>
+      </div>
+      <!-- Approvals Tab -->
+      <div class="modal-tab-content" id="job-approvals">
+        <div id="jobApprovalsList"></div>
+      </div>
+      <!-- Communications Tab -->
+      <div class="modal-tab-content" id="job-comms">
+        <div id="jobCommsTimeline"></div>
+        <div class="add-note-form">
+          <textarea id="jobNoteText" class="form-input" rows="2" placeholder="Add a note…"></textarea>
+          <button type="button" class="btn-primary" id="addJobNoteBtn"><i class="fas fa-plus"></i> Add Note</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" data-modal="jobModal">Cancel</button>
+      <button class="btn-primary" id="saveJobBtn">Save Job Card</button>
+    </div>
   </div>
 </div>
 
-<!-- Invoice Detail -->
-<div class="dash-modal-overlay" id="invoiceDetailModal">
-  <div class="dash-modal" style="max-width:680px">
-    <div class="dash-modal-header"><h2><i class="fas fa-file-invoice-pound" style="color:var(--red);margin-right:8px"></i> Invoice</h2><button class="dash-modal-close" id="closeInvoiceModal"><i class="fas fa-times"></i></button></div>
-    <div class="dash-modal-body" id="invoiceDetailContent"></div>
+<!-- Customer Modal -->
+<div class="modal-overlay" id="customerModal" style="display:none">
+  <div class="modal-panel modal-xl">
+    <div class="modal-header"><h3 id="customerModalTitle">Customer Profile</h3><button class="modal-close" data-modal="customerModal"><i class="fas fa-times"></i></button></div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="cust-details">Details</button>
+      <button class="modal-tab" data-tab="cust-vehicles">Vehicles</button>
+      <button class="modal-tab" data-tab="cust-history">Job History</button>
+      <button class="modal-tab" data-tab="cust-invoices">Invoices</button>
+      <button class="modal-tab" data-tab="cust-comms">Communications</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="customerId">
+      <div class="modal-tab-content active" id="cust-details">
+        <div class="form-grid">
+          <div class="form-group"><label>Full Name</label><input type="text" id="custName" class="form-input" required></div>
+          <div class="form-group"><label>Phone</label><input type="tel" id="custPhone" class="form-input"></div>
+          <div class="form-group"><label>Email</label><input type="email" id="custEmail" class="form-input"></div>
+          <div class="form-group"><label>Date of Birth</label><input type="date" id="custDob" class="form-input"></div>
+          <div class="form-group form-full"><label>Address</label><textarea id="custAddress" class="form-input" rows="2"></textarea></div>
+          <div class="form-group"><label class="checkbox-label"><input type="checkbox" id="custIsFleet"> Fleet Customer</label></div>
+          <div class="form-group" id="fleetNameGroup" style="display:none"><label>Fleet/Company Name</label><input type="text" id="custFleetName" class="form-input"></div>
+          <div class="form-group"><label>No-Show Count</label><input type="number" id="custNoShows" class="form-input" value="0" min="0" readonly></div>
+          <div class="form-group"><label>Status</label><select id="custStatus" class="form-input"><option value="active">Active</option><option value="inactive">Inactive</option><option value="blacklisted">Blacklisted</option></select></div>
+        </div>
+      </div>
+      <div class="modal-tab-content" id="cust-vehicles">
+        <button class="btn-sm btn-primary" id="addVehicleBtn" style="margin-bottom:16px"><i class="fas fa-plus"></i> Add Vehicle</button>
+        <div id="vehiclesList"></div>
+      </div>
+      <div class="modal-tab-content" id="cust-history"><div id="custJobHistory"></div></div>
+      <div class="modal-tab-content" id="cust-invoices"><div id="custInvoiceList"></div></div>
+      <div class="modal-tab-content" id="cust-comms">
+        <div id="custCommsTimeline"></div>
+        <div class="add-note-form">
+          <textarea id="custNoteText" class="form-input" rows="2" placeholder="Add a note…"></textarea>
+          <button type="button" class="btn-primary" id="addCustNoteBtn"><i class="fas fa-plus"></i> Add Note</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn-secondary" data-modal="customerModal">Cancel</button><button class="btn-primary" id="saveCustomerBtn">Save Customer</button></div>
   </div>
 </div>
 
-<div class="toast-container" id="toastContainer"></div>
+<!-- Invoice Modal -->
+<div class="modal-overlay" id="invoiceModal" style="display:none">
+  <div class="modal-panel modal-lg">
+    <div class="modal-header"><h3 id="invoiceModalTitle">Invoice</h3><button class="modal-close" data-modal="invoiceModal"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="invoiceId">
+      <div class="form-grid">
+        <div class="form-group"><label>Customer</label><input type="text" id="invCustomerName" class="form-input" readonly></div>
+        <div class="form-group"><label>Invoice #</label><input type="text" id="invNumber" class="form-input" readonly></div>
+        <div class="form-group"><label>Date</label><input type="date" id="invDate" class="form-input"></div>
+        <div class="form-group"><label>Due Date</label><input type="date" id="invDueDate" class="form-input"></div>
+      </div>
+      <div class="line-items-section">
+        <div class="line-items-header"><h4>Line Items</h4><button type="button" class="btn-sm btn-primary" id="addLineItemBtn"><i class="fas fa-plus"></i> Add Item</button></div>
+        <div class="table-wrap">
+          <table class="data-table" id="lineItemsTable">
+            <thead><tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Total</th><th></th></tr></thead>
+            <tbody id="lineItemsBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="invoice-totals">
+        <div class="total-row"><span>Subtotal</span><span id="invSubtotal">£0.00</span></div>
+        <div class="total-row"><span>VAT (20%)</span><span id="invVat">£0.00</span></div>
+        <div class="total-row total-grand"><span>Total</span><span id="invTotal">£0.00</span></div>
+        <div class="total-row total-paid"><span>Paid</span><span id="invPaid">£0.00</span></div>
+        <div class="total-row total-balance"><span>Balance Due</span><span id="invBalance">£0.00</span></div>
+      </div>
+      <div class="payment-section">
+        <h4>Record Payment</h4>
+        <div class="form-grid">
+          <div class="form-group"><label>Amount</label><input type="number" id="paymentAmount" class="form-input" step="0.01" min="0"></div>
+          <div class="form-group"><label>Method</label><select id="paymentMethod" class="form-input"><option value="cash">Cash</option><option value="card">Card</option><option value="transfer">Bank Transfer</option></select></div>
+          <div class="form-group"><label>Date</label><input type="date" id="paymentDate" class="form-input"></div>
+          <div class="form-group"><button type="button" class="btn-primary" id="recordPaymentBtn" style="margin-top:22px"><i class="fas fa-plus"></i> Record Payment</button></div>
+        </div>
+        <div id="paymentsList"></div>
+      </div>
+      <div class="form-group"><label>Terms / Notes</label><textarea id="invNotes" class="form-input" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" id="printInvoiceBtn"><i class="fas fa-print"></i> Print</button>
+      <button class="btn-secondary" id="sendInvoiceBtn"><i class="fas fa-envelope"></i> Send</button>
+      <button class="btn-secondary" data-modal="invoiceModal">Cancel</button>
+      <button class="btn-primary" id="saveInvoiceBtn">Save Invoice</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI Assistant Panel -->
+<div id="aiPanel" class="ai-panel">
+  <div class="ai-header">
+    <div class="ai-title"><i class="fas fa-sparkles"></i> AI Assistant</div>
+    <button class="btn-icon" id="closeAiPanel"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="ai-body" id="aiMessages">
+    <div class="ai-welcome">
+      <i class="fas fa-sparkles ai-welcome-icon"></i>
+      <h4>Hi! I'm your GarageOS AI Assistant</h4>
+      <p>Ask me anything about your garage — revenue, bookings, customer reminders, or draft WhatsApp messages.</p>
+    </div>
+  </div>
+  <div class="ai-footer">
+    <input type="text" id="aiInput" class="ai-input" placeholder="Ask anything… e.g. 'Give me a morning briefing'">
+    <button class="btn-primary" id="aiSendBtn"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+<div id="aiOverlay" class="ai-overlay" style="display:none"></div>
+
+<!-- Toast Container -->
+<div id="toastContainer" class="toast-container"></div>
 
 <script type="module" src="/js/dashboard-entry.js"></script>
-
-<script>
-function exportData() {
-  const data = {
-    enquiries: window._enquiriesData || [],
-    customers: window._customersData || [],
-    bookings:  window._bookingsData  || [],
-    jobs:      window._jobsData      || [],
-    invoices:  window._invoicesData  || [],
-    settings:  typeof getSettings === 'function' ? getSettings() : {},
-    exportedAt: new Date().toISOString()
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `premier-crm-${new Date().toISOString().split('T')[0]}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-async function clearAllData() {
-  if (!confirm('Delete ALL enquiries, customers, bookings, jobs, invoices and settings?')) return;
-  if (!confirm('This cannot be undone. Confirm?')) return;
-  try {
-    const cols = ['enquiries','customers','bookings','jobs','invoices','notifications','wa_logs'];
-    for (const col of cols) {
-      const snap = await db.collection(col).get();
-      const batch = db.batch();
-      snap.docs.forEach(d => batch.delete(d.ref));
-      await batch.commit();
-    }
-    await db.collection('settings').doc('config').delete();
-    location.reload();
-  } catch (e) {
-    alert('Failed to clear data. Please try again.');
-  }
-}
-function updateInfoPanel() {
-  const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-  setText('infoEnquiries', (window._enquiriesData || []).length);
-  setText('infoCustomers', (window._customersData || []).length);
-  setText('infoBookings',  (window._bookingsData  || []).length);
-  setText('infoJobs',      (window._jobsData      || []).length);
-}
-document.querySelectorAll('.sidebar-link[data-section="settings"]').forEach(b => b.addEventListener('click', updateInfoPanel));
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </body>
 </html>

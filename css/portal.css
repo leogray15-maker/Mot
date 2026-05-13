@@ -1,0 +1,870 @@
+/* ===========================
+   GarageOS — Customer Portal Styles
+   White-label, branded via CSS vars
+   =========================== */
+
+:root {
+  /* Garage brand colours — overridden dynamically by portal.js */
+  --brand-primary:   #e02020;
+  --brand-secondary: #b91818;
+  --brand-text:      #ffffff;
+
+  /* Status colours */
+  --green:        #16a34a;
+  --green-bg:     rgba(22,163,74,0.08);
+  --green-border: rgba(22,163,74,0.25);
+  --amber:        #d97706;
+  --amber-bg:     rgba(217,119,6,0.08);
+  --amber-border: rgba(217,119,6,0.25);
+  --red:          #dc2626;
+  --red-bg:       rgba(220,38,38,0.08);
+  --red-border:   rgba(220,38,38,0.25);
+
+  /* Page */
+  --page-bg:    #f4f5f7;
+  --card-bg:    #ffffff;
+  --topbar-bg:  #111111;
+  --text:       #1a1a1a;
+  --text-muted: #6b7280;
+  --text-dim:   #9ca3af;
+  --border:     #e5e7eb;
+  --border-dark: #d1d5db;
+
+  /* Misc */
+  --radius:    8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --shadow:    0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 24px rgba(0,0,0,0.12);
+  --transition: 0.2s ease;
+
+  /* Plate */
+  --plate-yellow: #FFD700;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--page-bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+a { color: var(--brand-primary); text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+/* ===========================
+   LOADING / ERROR STATES
+   =========================== */
+.portal-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  background: var(--page-bg);
+}
+.portal-loading i { font-size: 2rem; color: var(--brand-primary); }
+
+.portal-error {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+.portal-error-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 48px 40px;
+  text-align: center;
+  max-width: 460px;
+  width: 100%;
+  box-shadow: var(--shadow-md);
+}
+.portal-error-card i {
+  font-size: 3rem;
+  color: var(--red);
+  margin-bottom: 20px;
+  display: block;
+}
+.portal-error-card h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 10px; }
+.portal-error-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.7; }
+
+/* ===========================
+   VERIFICATION SCREEN
+   =========================== */
+.portal-verify-wrap {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: var(--page-bg);
+}
+
+/* Garage branding block above the card */
+.portal-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.portal-brand-name {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--text);
+  text-align: center;
+}
+.portal-logo-placeholder {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-lg);
+  background: var(--brand-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 2rem;
+}
+.portal-logo-placeholder.small {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius);
+  font-size: 1.1rem;
+}
+.portal-logo-img {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-lg);
+  object-fit: contain;
+  background: #fff;
+  border: 1px solid var(--border);
+}
+.portal-logo-img.small {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius);
+}
+
+.portal-verify-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: var(--shadow-md);
+}
+.portal-verify-card h1 {
+  font-size: 1.3rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+.portal-verify-sub {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+
+.portal-form-group {
+  margin-bottom: 16px;
+}
+.portal-form-group label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+.portal-input-wrap {
+  position: relative;
+}
+.portal-input-wrap i {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+.portal-input-wrap input {
+  width: 100%;
+  padding: 11px 14px 11px 36px;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+  font-family: inherit;
+  color: var(--text);
+  background: #fff;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  -webkit-appearance: none;
+}
+.portal-input-wrap input:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px rgba(224,32,32,0.1);
+}
+
+.portal-verify-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--red-bg);
+  border: 1px solid var(--red-border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 0.84rem;
+  color: var(--red);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.portal-verify-error i { flex-shrink: 0; margin-top: 2px; }
+
+.portal-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 13px 24px;
+  background: var(--brand-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background var(--transition), transform var(--transition), opacity var(--transition);
+}
+.portal-btn-primary:hover { background: var(--brand-secondary); transform: translateY(-1px); }
+.portal-btn-primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+.portal-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius);
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--transition);
+}
+.portal-btn-outline:hover { border-color: var(--text); color: var(--text); }
+
+.portal-privacy-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.portal-privacy-note i { flex-shrink: 0; }
+
+/* ===========================
+   TOP BAR (dashboard)
+   =========================== */
+.portal-topbar {
+  background: var(--topbar-bg);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 0 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.portal-topbar-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.portal-topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.portal-topbar-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.portal-topbar-logout {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius);
+  color: rgba(255,255,255,0.55);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: inherit;
+}
+.portal-topbar-logout:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+
+/* ===========================
+   MAIN CONTENT
+   =========================== */
+.portal-main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 20px 80px;
+}
+
+/* Greeting */
+.portal-greeting {
+  margin-bottom: 28px;
+}
+.portal-greeting h1 {
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  font-weight: 900;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.portal-greeting h1 span { color: var(--brand-primary); }
+.portal-greeting p { font-size: 0.9rem; color: var(--text-muted); }
+
+/* ===========================
+   VEHICLE CARD
+   =========================== */
+.portal-vehicle-card {
+  background: var(--topbar-bg);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-bottom: 28px;
+  color: #fff;
+  flex-wrap: wrap;
+}
+.portal-vehicle-reg-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.portal-vehicle-reg {
+  background: var(--plate-yellow);
+  color: #000;
+  font-weight: 900;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  letter-spacing: 0.1em;
+  padding: 8px 18px;
+  border-radius: 5px;
+  border: 2px solid rgba(0,0,0,0.12);
+  text-transform: uppercase;
+  position: relative;
+  min-width: 150px;
+  text-align: center;
+}
+.portal-vehicle-reg::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 7px;
+  background: linear-gradient(180deg, #003399 0%, #003399 40%, #fff 40%, #fff 60%, #cc0000 60%, #cc0000 100%);
+  border-radius: 3px 0 0 3px;
+}
+.portal-vehicle-label {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.35);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.portal-vehicle-info { flex: 1; min-width: 0; }
+.portal-vehicle-name {
+  font-size: 1.25rem;
+  font-weight: 900;
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+.portal-vehicle-details {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+.portal-vehicle-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.portal-vehicle-detail-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: rgba(255,255,255,0.4);
+}
+.portal-vehicle-detail-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.85);
+}
+
+/* MOT countdown */
+.portal-mot-countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+.portal-mot-days {
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #fff;
+}
+.portal-mot-days.status-ok     { color: #4ade80; }
+.portal-mot-days.status-warning { color: #fbbf24; }
+.portal-mot-days.status-urgent  { color: #f87171; }
+.portal-mot-days.status-expired { color: #f87171; }
+.portal-mot-status {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.4);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ===========================
+   TABS
+   =========================== */
+.portal-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 24px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.portal-tabs::-webkit-scrollbar { display: none; }
+.portal-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: color var(--transition), border-color var(--transition);
+}
+.portal-tab:hover { color: var(--text); }
+.portal-tab.active { color: var(--brand-primary); border-bottom-color: var(--brand-primary); }
+.portal-tab i { font-size: 0.8rem; }
+
+.portal-tab-panel { display: none; }
+.portal-tab-panel.active { display: block; }
+
+.portal-section-header { margin-bottom: 20px; }
+.portal-section-header h2 { font-size: 1.05rem; font-weight: 800; margin-bottom: 4px; }
+.portal-section-header p { font-size: 0.85rem; color: var(--text-muted); }
+
+/* ===========================
+   TABLE (Job History)
+   =========================== */
+.portal-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.portal-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card-bg);
+  font-size: 0.88rem;
+}
+.portal-table thead tr {
+  background: #f9fafb;
+  border-bottom: 1px solid var(--border);
+}
+.portal-table th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-dim);
+}
+.portal-table th.text-right,
+.portal-table td.text-right { text-align: right; }
+.portal-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  color: var(--text);
+}
+.portal-table tr:last-child td { border-bottom: none; }
+.portal-table tr:hover td { background: #fafafa; }
+.portal-table-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.88rem;
+}
+.portal-table-empty i { margin-right: 8px; }
+
+/* ===========================
+   INVOICE LIST
+   =========================== */
+.portal-invoice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.portal-invoice-row {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow);
+  flex-wrap: wrap;
+}
+.portal-invoice-num {
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: var(--text);
+  font-family: monospace;
+  min-width: 90px;
+}
+.portal-invoice-date {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  flex: 1;
+}
+.portal-invoice-amount {
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--text);
+}
+.portal-invoice-status {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.portal-invoice-status.paid {
+  background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border);
+}
+.portal-invoice-status.outstanding {
+  background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border);
+}
+.portal-invoice-status.overdue {
+  background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border);
+}
+.portal-invoice-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  background: transparent;
+  font-family: inherit;
+  transition: all var(--transition);
+}
+.portal-invoice-download:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
+
+/* ===========================
+   VHC REPORT LIST
+   =========================== */
+.portal-vhc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.portal-vhc-row {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow);
+  flex-wrap: wrap;
+}
+.portal-vhc-date { font-size: 0.82rem; color: var(--text-muted); min-width: 100px; }
+.portal-vhc-vehicle { font-weight: 700; font-size: 0.88rem; flex: 1; }
+.portal-vhc-tl {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.portal-vhc-tl-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.portal-vhc-tl-dot .dot {
+  width: 10px; height: 10px; border-radius: 50%;
+}
+.portal-vhc-tl-dot.green .dot { background: var(--green); }
+.portal-vhc-tl-dot.amber .dot { background: var(--amber); }
+.portal-vhc-tl-dot.red   .dot { background: var(--red); }
+.portal-vhc-tl-dot.green { color: var(--green); }
+.portal-vhc-tl-dot.amber { color: var(--amber); }
+.portal-vhc-tl-dot.red   { color: var(--red); }
+.portal-vhc-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  background: var(--brand-primary);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background var(--transition);
+}
+.portal-vhc-link:hover { background: var(--brand-secondary); color: #fff; }
+
+/* ===========================
+   ADVISORIES
+   =========================== */
+.portal-advisories-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.portal-advisory-row {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  box-shadow: var(--shadow);
+}
+.portal-advisory-dot {
+  width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;
+}
+.portal-advisory-dot.amber { background: var(--amber); box-shadow: 0 0 0 3px var(--amber-bg); }
+.portal-advisory-dot.red   { background: var(--red);   box-shadow: 0 0 0 3px var(--red-bg); }
+.portal-advisory-content { flex: 1; min-width: 0; }
+.portal-advisory-name { font-weight: 700; font-size: 0.88rem; margin-bottom: 2px; }
+.portal-advisory-notes { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; }
+.portal-advisory-cat {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+/* ===========================
+   BOOK AGAIN
+   =========================== */
+.portal-book-again {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 48px 40px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  max-width: 480px;
+  margin: 0 auto;
+}
+.portal-book-again-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--green-bg);
+  border: 2px solid var(--green-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  font-size: 1.8rem;
+  color: var(--green);
+}
+.portal-book-again h2 { font-size: 1.2rem; font-weight: 900; margin-bottom: 8px; }
+.portal-book-again p { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+.portal-book-again .portal-btn-primary { width: auto; }
+
+/* ===========================
+   PRINT INVOICE OVERLAY
+   =========================== */
+.portal-print-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 9999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+.portal-print-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  width: 100%;
+  max-width: 680px;
+  box-shadow: var(--shadow-md);
+}
+.portal-print-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.portal-print-actions .portal-btn-primary { width: auto; }
+
+/* Print invoice content */
+.print-invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--border);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.print-invoice-garage { font-size: 0.88rem; color: var(--text-muted); line-height: 1.7; }
+.print-invoice-garage strong { font-size: 1.1rem; color: var(--text); display: block; margin-bottom: 4px; }
+.print-invoice-meta { text-align: right; }
+.print-invoice-meta .inv-num { font-size: 1.2rem; font-weight: 900; color: var(--brand-primary); }
+.print-invoice-meta p { font-size: 0.82rem; color: var(--text-muted); margin-top: 4px; }
+.print-invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+  font-size: 0.88rem;
+}
+.print-invoice-table th {
+  border-bottom: 2px solid var(--border);
+  padding: 8px 0;
+  text-align: left;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-dim);
+}
+.print-invoice-table td {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.print-invoice-table tr:last-child td { border-bottom: none; }
+.print-invoice-totals {
+  border-top: 2px solid var(--border);
+  padding-top: 16px;
+  text-align: right;
+}
+.print-invoice-totals p { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 4px; }
+.print-invoice-totals .total-line {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--text);
+  margin-top: 8px;
+}
+.print-invoice-paid-stamp {
+  display: inline-block;
+  border: 3px solid var(--green);
+  color: var(--green);
+  font-size: 1.4rem;
+  font-weight: 900;
+  padding: 6px 20px;
+  border-radius: 6px;
+  transform: rotate(-8deg);
+  margin-top: 16px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* ===========================
+   RESPONSIVE
+   =========================== */
+@media (max-width: 640px) {
+  .portal-verify-card { padding: 28px 20px; }
+  .portal-main { padding: 20px 12px 60px; }
+  .portal-vehicle-card { gap: 16px; padding: 20px 16px; }
+  .portal-vehicle-name { font-size: 1rem; }
+  .portal-mot-days { font-size: 1.6rem; }
+  .portal-tab { padding: 8px 12px; font-size: 0.8rem; }
+  .portal-invoice-row { padding: 12px 14px; }
+  .portal-book-again { padding: 32px 20px; }
+  .portal-print-card { padding: 24px 16px; }
+}
+
+/* ===========================
+   PRINT
+   =========================== */
+@media print {
+  .portal-topbar { display: none !important; }
+  .portal-tabs { display: none !important; }
+  .portal-print-actions { display: none !important; }
+  .portal-print-overlay {
+    position: static;
+    background: none;
+    padding: 0;
+  }
+  .portal-print-card {
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+    max-width: 100%;
+  }
+  body { background: #fff !important; }
+}
