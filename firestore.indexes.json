@@ -32,6 +32,22 @@
         { "fieldPath": "status",    "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "technician_sessions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "jobId",   "order": "ASCENDING" },
+        { "fieldPath": "endTime", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "technician_sessions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "endTime",   "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

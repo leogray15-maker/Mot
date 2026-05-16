@@ -48,7 +48,6 @@
       <div class="nav-section-label">Sales</div>
       <button class="sidebar-link" data-section="opportunities"><i class="fas fa-filter-circle-dollar"></i><span>Opportunities</span></button>
       <button class="sidebar-link" data-section="customers"><i class="fas fa-users"></i><span>Customers</span></button>
-      <button class="sidebar-link" data-section="fleet"><i class="fas fa-truck"></i><span>Fleet</span></button>
 
       <div class="nav-section-label">Finance</div>
       <button class="sidebar-link" data-section="invoices"><i class="fas fa-file-invoice-pound"></i><span>Invoices</span><span class="badge" id="invoicesBadge" style="display:none">0</span></button>
@@ -295,8 +294,8 @@
           <h2>Job Cards</h2>
           <div class="section-actions">
             <div class="view-toggles">
-              <button class="view-toggle active" data-view="kanban"><i class="fas fa-columns"></i> Kanban</button>
-              <button class="view-toggle" data-view="list"><i class="fas fa-list"></i> List</button>
+              <button class="view-toggle active" id="jobViewKanban" data-view="kanban"><i class="fas fa-columns"></i> Kanban</button>
+              <button class="view-toggle" id="jobViewList" data-view="list"><i class="fas fa-list"></i> List</button>
             </div>
             <button class="btn-primary" id="newJobBtn"><i class="fas fa-plus"></i> New Job Card</button>
           </div>
@@ -331,7 +330,7 @@
         </div>
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>Date</th><th>Customer</th><th>Reg</th><th>Make/Model</th><th>Green</th><th>Amber</th><th>Red</th><th>Mechanic</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Date</th><th>Customer</th><th>Reg</th><th>Make/Model</th><th>Results</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="vhcTbody"></tbody>
           </table>
         </div>
@@ -403,7 +402,6 @@
           <input type="text" id="customerSearch" class="search-input" placeholder="Search by name, phone, reg…">
           <select id="customerFilter" class="filter-select">
             <option value="">All Customers</option>
-            <option value="fleet">Fleet</option>
             <option value="noshows">Has No-Shows</option>
           </select>
         </div>
@@ -413,12 +411,6 @@
             <tbody id="customersTbody"></tbody>
           </table>
         </div>
-      </div>
-
-      <!-- ======================== FLEET ======================== -->
-      <div class="section-page" id="page-fleet">
-        <div class="section-header"><h2>Fleet Management</h2></div>
-        <div id="fleetDashboard"></div>
       </div>
 
       <!-- ======================== INVOICES ======================== -->

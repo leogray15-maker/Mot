@@ -12,7 +12,7 @@ import { requireAuth } from './auth.js';
 const PLAN_FEATURES = {
   starter:    ['overview', 'enquiries', 'customers', 'bookings', 'settings'],
   pro:        ['overview', 'enquiries', 'customers', 'bookings', 'jobs', 'vhc', 'clock',
-               'approvals', 'opportunities', 'fleet', 'invoices', 'revenue', 'reports',
+               'approvals', 'opportunities', 'invoices', 'revenue', 'reports',
                'zread', 'mot', 'parts', 'reminders', 'settings', 'team', 'users', 'whatsapp', 'ai'],
   enterprise: ['all']
 };
@@ -292,7 +292,6 @@ function loadSection(section) {
     clock:         () => import('./job-clock.js').then(m => m.initJobClock?.()).catch(e => console.warn(e)),
     approvals:     () => import('./photo-approval.js').then(m => m.initApprovals?.()).catch(e => console.warn(e)),
     opportunities: () => import('./opportunities.js').then(m => m.initOpportunities?.()).catch(e => console.warn(e)),
-    fleet:         () => import('./fleet.js').then(m => m.initFleet?.()).catch(e => console.warn(e)),
     invoices:      () => import('./invoices.js').then(() => window.sectionLoaders?.invoices?.()).catch(e => console.warn(e)),
     revenue:       () => import('./revenue.js').then(() => window.sectionLoaders?.revenue?.()).catch(e => console.warn(e)),
     reports:       () => import('./reports.js').then(m => m.initReports?.()).catch(e => console.warn(e)),
