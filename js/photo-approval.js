@@ -182,4 +182,4 @@ export function getApprovalsByJob(jobId) {
   return allApprovals.filter(a => a.jobId === jobId);
 }
 
-function docsToArr(snap) { return snap.docs.map(d => ({ id: d.id, ...d.data() })); }
+

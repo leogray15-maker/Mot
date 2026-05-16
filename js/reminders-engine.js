@@ -265,4 +265,4 @@ function getDaysUntil(dateStr) {
   return Math.ceil((d - Date.now()) / 86400000);
 }
 
-function docsToArr(snap) { return snap.docs.map(d => ({ id: d.id, ...d.data() })); }
+

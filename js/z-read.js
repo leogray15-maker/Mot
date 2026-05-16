@@ -208,4 +208,3 @@ window.viewZRead = async (id) => {
 };
 
 function getTodayStr() { return new Date().toISOString().split('T')[0]; }
-function docsToArr(snap) { return snap.docs.map(d => ({ id: d.id, ...d.data() })); }
