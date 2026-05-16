@@ -1,5 +1,5 @@
 /* ===========================
-   GarageOS — VHC Dashboard Logic + Public Report
+   MOT Car Repairs — VHC Dashboard Logic + Public Report
    =========================== */
 
 import { db, garageRef, garageDoc, getGarageId, docsToArr, fsAdd, fsUpdate, showSpinner, hideSpinner } from './firebase.js';
@@ -328,7 +328,7 @@ export function sendVhcReport(jobId, customerName, phone) {
   const fullUrl = `${window.location.origin}${url}`;
   const s = getSettings();
   const firstName = (customerName || 'there').split(' ')[0];
-  const msg = `Hi ${firstName}, your Vehicle Health Check report is ready! You can view it here: ${fullUrl}\n\nIf you have any questions or would like to book any repairs, please call us on ${s.phone || '01234 567890'}. — ${s.garageName || 'Your Garage'}`;
+  const msg = `Hi ${firstName}, your Vehicle Health Check report is ready! You can view it here: ${fullUrl}\n\nIf you have any questions or would like to book any repairs, please call us on ${s.phone || '07749 207399'}. — ${s.garageName || 'MOT Car Repairs'}`;
   const num = buildWAPhone(phone);
   if (!num) {
     if (typeof showToast === 'function') showToast('No phone number — copy the link manually', 'info');

@@ -1,5 +1,5 @@
 /* ===========================
-   Premier MOT — WhatsApp System
+   MOT Car Repairs — WhatsApp System
    =========================== */
 
 import { db, fsUpdate } from './firebase.js';
@@ -31,8 +31,8 @@ function buildMOTReminderMessage(customer) {
     .replace(/\[Model\]/g,      customer.model || '')
     .replace(/\[Reg\]/g,        customer.reg   || '')
     .replace(/\[SiteURL\]/g,    s.siteURL      || 'https://mot-ruby.vercel.app')
-    .replace(/\[PhoneNumber\]/g,s.phone        || '01234 567890')
-    .replace(/\[GarageName\]/g, s.garageName   || 'Premier MOT & Service');
+    .replace(/\[PhoneNumber\]/g,s.phone        || '07749 207399')
+    .replace(/\[GarageName\]/g, s.garageName   || 'MOT Car Repairs');
 }
 
 function buildReviewRequestMessage(customer) {
@@ -40,14 +40,14 @@ function buildReviewRequestMessage(customer) {
   const firstName = (customer.name || 'there').split(' ')[0];
   return (s.reviewTemplate || 'Hi [FirstName], thanks for visiting [GarageName]! We\'d love a Google review: [GoogleReviewLink] — [GarageName]')
     .replace(/\[FirstName\]/g,       firstName)
-    .replace(/\[GarageName\]/g,      s.garageName       || 'Premier MOT & Service')
+    .replace(/\[GarageName\]/g,      s.garageName       || 'MOT Car Repairs')
     .replace(/\[GoogleReviewLink\]/g, s.googleReviewLink || 'https://g.page/r/your-review-link');
 }
 
 function buildInvoiceWhatsAppMessage(invoice) {
   const s = getSettings();
   const firstName = (invoice.customerName || 'there').split(' ')[0];
-  return `Hi ${firstName}, please find your invoice (${invoice.invoiceNumber}) for ${invoice.service || 'our services'} on ${formatDate(invoice.date)}.\n\nTotal: £${(invoice.total || 0).toFixed(2)}${invoice.vatApplied ? ' (inc. VAT)' : ''}.\n\nPlease transfer to: ${s.bankDetails || 'details to follow'}.\n\nThanks — ${s.garageName || 'Premier MOT & Service'}`;
+  return `Hi ${firstName}, please find your invoice (${invoice.invoiceNumber}) for ${invoice.service || 'our services'} on ${formatDate(invoice.date)}.\n\nTotal: £${(invoice.total || 0).toFixed(2)}${invoice.vatApplied ? ' (inc. VAT)' : ''}.\n\nPlease transfer to: ${s.bankDetails || 'details to follow'}.\n\nThanks — ${s.garageName || 'MOT Car Repairs'}`;
 }
 
 async function sendMOTReminderWA(customerId) {

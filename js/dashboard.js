@@ -1,5 +1,5 @@
 /* ===========================
-   GarageOS — Dashboard (Multi-Tenant)
+   MOT Car Repairs — Dashboard
    =========================== */
 
 import firebase, { getGarageId, auth, db, garageRef, garageDoc, accountRef, docsToArr, fsAdd, fsUpdate } from './firebase.js';
@@ -180,7 +180,7 @@ export function showUpgradeModal(message) {
   overlay.innerHTML = `
     <div class="modal-panel upgrade-panel animate-slide-up">
       <div class="modal-header">
-        <h3><i class="fas fa-star"></i> Upgrade GarageOS</h3>
+        <h3><i class="fas fa-star"></i> Upgrade Your Plan</h3>
         <button class="modal-close" onclick="window.closeModal('upgradeModal')">&times;</button>
       </div>
       <div class="modal-body">
@@ -193,12 +193,12 @@ export function showUpgradeModal(message) {
           <div class="plan-card featured">
             <h4>Pro</h4><p class="plan-price">£49/mo</p>
             <ul><li>Everything in Starter</li><li>Job Cards</li><li>Invoicing</li><li>MOT Tracker</li><li>WhatsApp</li><li>Revenue Reports</li></ul>
-            <button class="btn btn-primary" onclick="window.location.href='mailto:hello@garageos.co.uk?subject=Upgrade to Pro'">Get Pro</button>
+            <button class="btn btn-primary" onclick="window.location.href='tel:07749207399'">Get Pro</button>
           </div>
           <div class="plan-card">
             <h4>Enterprise</h4><p class="plan-price">£99/mo</p>
             <ul><li>Everything in Pro</li><li>Multi-user team</li><li>AI Assistant</li><li>White-label</li></ul>
-            <button class="btn btn-secondary" onclick="window.location.href='mailto:hello@garageos.co.uk?subject=Enterprise Enquiry'">Contact Us</button>
+            <button class="btn btn-secondary" onclick="window.location.href='tel:07749207399'">Contact Us</button>
           </div>
         </div>
       </div>

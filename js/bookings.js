@@ -1,5 +1,5 @@
 /* ===========================
-   Premier MOT — Bookings (Firebase)
+   MOT Car Repairs — Bookings (Firebase)
    =========================== */
 
 import { db, docsToArr, fsAdd, fsUpdate, fsDel, showSpinner, hideSpinner } from './firebase.js';
@@ -174,12 +174,12 @@ if (document.getElementById('publicBookingPage')) {
       const refEl = document.getElementById('bookingRefDisplay');
       if (refEl) refEl.textContent = ref;
       const phoneEl = document.getElementById('confirmPhone');
-      if (phoneEl) phoneEl.textContent = s.phone || '01234 567890';
+      if (phoneEl) phoneEl.textContent = s.phone || '07749 207399';
 
       // WA confirmation to customer
       const custNum = bkData.phone.replace(/[\s\-\(\)]/g,'').replace(/^0/,'44');
       setTimeout(() => window.open(
-        `https://wa.me/${custNum}?text=${encodeURIComponent('Thanks for booking with us! Your ' + bkData.service + ' booking (Ref: ' + ref + ') is confirmed for ' + bkData.date + ' at ' + bkData.time + '. We\'ll call you within 1 hour. — ' + (s.garageName || 'Premier MOT'))}`,
+        `https://wa.me/${custNum}?text=${encodeURIComponent('Thanks for booking with us! Your ' + bkData.service + ' booking (Ref: ' + ref + ') is confirmed for ' + bkData.date + ' at ' + bkData.time + '. We\'ll call you within 1 hour. — ' + (s.garageName || 'MOT Car Repairs'))}`,
         '_blank', 'noopener'
       ), 600);
 
@@ -422,7 +422,7 @@ function sendBookingReminderWA(id) {
   const b = window._bookingsData.find(x => x.id === id);
   if (!b || !b.phone) return;
   const s = getSettings();
-  const msg = `Hi ${b.name.split(' ')[0]}, just confirming your ${b.service} booking at ${s.garageName||'Premier MOT'} on ${b.date} at ${b.time}. See you then! Any questions, call ${s.phone||'01234 567890'}.`;
+  const msg = `Hi ${b.name.split(' ')[0]}, just confirming your ${b.service} booking at ${s.garageName||'MOT Car Repairs'} on ${b.date} at ${b.time}. See you then! Any questions, call ${s.phone||'07749 207399'}.`;
   const num = b.phone.replace(/[\s\-\(\)]/g,'').replace(/^0/,'44');
   window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
   showToast('WhatsApp opened', 'success');

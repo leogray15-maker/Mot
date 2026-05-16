@@ -1,5 +1,5 @@
 /* ===========================
-   GarageOS — AI Business Assistant
+   MOT Car Repairs — AI Business Assistant
    =========================== */
 
 import { garageRef, docsToArr } from './firebase.js';
@@ -239,6 +239,6 @@ window.clearAiHistory = () => {
   sessionStorage.removeItem('aiHistory');
   const container = document.getElementById('aiMessages');
   if (container) {
-    container.innerHTML = `<div class="ai-welcome"><i class="fas fa-sparkles ai-welcome-icon"></i><h4>Hi! I'm your GarageOS AI Assistant</h4><p>Ask me anything about your garage — revenue, bookings, customer reminders, or draft WhatsApp messages.</p></div>`;
+    container.innerHTML = `<div class="ai-welcome"><i class="fas fa-sparkles ai-welcome-icon"></i><h4>Hi! I'm your AI Business Assistant</h4><p>Ask me anything about your garage — revenue, bookings, customer reminders, or draft WhatsApp messages.</p></div>`;
   }
 };

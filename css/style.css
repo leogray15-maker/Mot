@@ -1,12 +1,12 @@
 /* ===========================
-   Premier MOT & Service
+   MOT Car Repairs
    Public Site Styles
    =========================== */
 
 :root {
-  --red: #e02020;
-  --red-dark: #b91818;
-  --red-light: #ff3333;
+  --red: #F59E0B;
+  --red-dark: #D97706;
+  --red-light: #FBBF24;
   --black: #0d0d0d;
   --dark: #151515;
   --dark-2: #1e1e1e;
@@ -19,9 +19,9 @@
   --text-dim: #707070;
   --white: #ffffff;
   --border: rgba(255,255,255,0.08);
-  --border-red: rgba(224,32,32,0.3);
+  --border-red: rgba(245,158,11,0.3);
   --shadow: 0 4px 24px rgba(0,0,0,0.5);
-  --shadow-red: 0 4px 24px rgba(224,32,32,0.25);
+  --shadow-red: 0 4px 24px rgba(245,158,11,0.25);
   --radius: 8px;
   --radius-lg: 12px;
   --transition: 0.25s ease;
@@ -55,7 +55,7 @@ ul { list-style: none; }
 
 .section-tag {
   display: inline-block;
-  background: rgba(224,32,32,0.15);
+  background: rgba(245,158,11,0.15);
   color: var(--red-light);
   border: 1px solid var(--border-red);
   padding: 4px 14px;
@@ -205,8 +205,8 @@ ul { list-style: none; }
 }
 
 .nav-book-link {
-  background: rgba(224,32,32,0.1) !important;
-  border: 1px solid rgba(224,32,32,0.3) !important;
+  background: rgba(245,158,11,0.1) !important;
+  border: 1px solid rgba(245,158,11,0.3) !important;
   color: var(--red-light) !important;
   font-weight: 600 !important;
   gap: 6px;
@@ -288,7 +288,7 @@ ul { list-style: none; }
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at 60% 50%, rgba(224,32,32,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 60% 50%, rgba(245,158,11,0.08) 0%, transparent 60%),
     linear-gradient(180deg, var(--black) 0%, var(--dark) 100%);
 }
 
@@ -314,7 +314,7 @@ ul { list-style: none; }
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(224,32,32,0.12);
+  background: rgba(245,158,11,0.12);
   border: 1px solid var(--border-red);
   padding: 8px 16px;
   border-radius: 30px;
@@ -406,7 +406,7 @@ ul { list-style: none; }
 .trust-icon {
   width: 44px;
   height: 44px;
-  background: rgba(224,32,32,0.12);
+  background: rgba(245,158,11,0.12);
   border: 1px solid var(--border-red);
   border-radius: var(--radius);
   display: flex;
@@ -490,7 +490,7 @@ ul { list-style: none; }
 .service-icon {
   width: 56px;
   height: 56px;
-  background: rgba(224,32,32,0.12);
+  background: rgba(245,158,11,0.12);
   border: 1px solid var(--border-red);
   border-radius: var(--radius);
   display: flex;
@@ -560,7 +560,7 @@ ul { list-style: none; }
 
 .pricing-card.featured {
   border-color: var(--red);
-  background: linear-gradient(135deg, var(--dark-2) 0%, rgba(224,32,32,0.05) 100%);
+  background: linear-gradient(135deg, var(--dark-2) 0%, rgba(245,158,11,0.05) 100%);
 }
 
 .pricing-card.featured::after {
@@ -590,7 +590,7 @@ ul { list-style: none; }
 .pricing-icon {
   width: 60px;
   height: 60px;
-  background: rgba(224,32,32,0.12);
+  background: rgba(245,158,11,0.12);
   border: 1px solid var(--border-red);
   border-radius: 50%;
   display: flex;
@@ -692,7 +692,7 @@ ul { list-style: none; }
   font-weight: 900;
   color: var(--white);
   margin: 0 auto 20px;
-  box-shadow: 0 8px 24px rgba(224,32,32,0.35);
+  box-shadow: 0 8px 24px rgba(245,158,11,0.35);
 }
 
 .step-card h3 {
@@ -1322,7 +1322,7 @@ ul { list-style: none; }
 .contact-detail-icon {
   width: 40px;
   height: 40px;
-  background: rgba(224,32,32,0.12);
+  background: rgba(245,158,11,0.12);
   border: 1px solid var(--border-red);
   border-radius: var(--radius);
   display: flex;
@@ -1448,4 +1448,139 @@ ul { list-style: none; }
   .trust-bar-inner { grid-template-columns: 1fr 1fr; }
   .pricing-card.featured::after { display: none; }
   .contact-form-card { padding: 24px; }
+}
+
+/* ===========================
+   HOME PAGE — WHY US / ABOUT
+   =========================== */
+
+.why-section {
+  padding: 100px 20px;
+  background: var(--dark);
+}
+
+.why-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: start;
+}
+
+.why-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.why-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.why-list li:last-child { border-bottom: none; }
+
+.why-list li i {
+  color: var(--red);
+  flex-shrink: 0;
+  font-size: 0.85rem;
+}
+
+.why-contact-card {
+  background: var(--dark-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.why-contact-card h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+
+/* Homepage services section wrapper */
+.services-section {
+  padding: 100px 20px;
+  background: var(--black);
+}
+
+.services-section .container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.service-card .btn {
+  margin-top: 16px;
+  font-size: 0.85rem;
+  padding: 10px 18px;
+}
+
+/* Hero section (homepage) */
+.hero-section {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  padding: 120px 20px 80px;
+  background:
+    radial-gradient(ellipse at 60% 40%, rgba(245,158,11,0.07) 0%, transparent 60%),
+    linear-gradient(180deg, var(--black) 0%, var(--dark) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.hero-inner .section-tag {
+  margin-bottom: 24px;
+}
+
+.hero-inner .section-title {
+  font-size: clamp(2.4rem, 6vw, 3.8rem);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  margin-bottom: 0;
+}
+
+.hero-ctas {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .why-grid { grid-template-columns: 1fr; gap: 40px; }
+  .hero-ctas { flex-direction: column; align-items: flex-start; }
+  .hero-section { padding: 100px 20px 60px; }
 }
