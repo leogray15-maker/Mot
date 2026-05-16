@@ -12,7 +12,7 @@ function showResult(msg, type) {
   if (!resultEl) return;
   resultEl.textContent = msg;
   resultEl.className   = `setup-result ${type}`;
-  resultEl.style.display = '';
+  resultEl.style.display = 'block';
 }
 
 if (form) {
@@ -86,7 +86,7 @@ if (form) {
       await auth.signOut();
 
       form.style.display = 'none';
-      if (successEl) successEl.style.display = '';
+      if (successEl) successEl.style.display = 'block';
 
     } catch (err) {
       console.error('Setup error:', err);
