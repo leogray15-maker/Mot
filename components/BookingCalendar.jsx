@@ -90,12 +90,16 @@ export default function BookingCalendar({ garageId }) {
     };
     toggles.forEach(t => t.addEventListener('click', handleToggle));
 
-    // Custom event for programmatic opening (e.g. overview "New Booking")
+    // Custom event for programmatic opening (e.g. overview quick-add or enquiry convert)
     const handleOpen = e => {
-      const { date, time } = e.detail || {};
+      const detail = e.detail || {};
       setNewSlot({
-        date: date || new Date().toISOString().slice(0, 10),
-        time: time || '09:00',
+        date:         detail.date || new Date().toISOString().slice(0, 10),
+        time:         detail.time || '09:00',
+        customerName: detail.customerName,
+        vehicleReg:   detail.vehicleReg,
+        serviceType:  detail.serviceType,
+        phone:        detail.phone,
       });
     };
     window.addEventListener('openNewBooking', handleOpen);
@@ -195,6 +199,7 @@ export default function BookingCalendar({ garageId }) {
           garageId={garageId}
           initialDate={newSlot.date}
           initialTime={newSlot.time}
+          prefill={newSlot}
           garageSettings={settings}
           onClose={() => setNewSlot(null)}
         />

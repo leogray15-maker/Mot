@@ -2110,3 +2110,25 @@ tbody tr:hover { background: rgba(255,255,255,0.02); }
   font-size: 1.2rem;
   color: var(--red);
 }
+
+/* ===========================
+   SETTINGS TAB PANELS
+   =========================== */
+
+.settings-tab-panel { display: none; margin-top: 20px; }
+.settings-tab-panel.active { display: block; }
+
+.wh-row.wh-closed td { opacity: 0.45; }
+
+.checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.875rem; color: var(--text); }
+.checkbox-label input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--red); }
+
+/* Detail grid for enquiry / other detail modals */
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; margin-bottom: 12px; }
+.detail-item label { display: block; font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+.detail-item p { color: var(--text); font-size: 0.875rem; margin: 0; }
+.detail-item p.mono { font-family: monospace; }
+
+@media (max-width: 600px) {
+  .detail-grid { grid-template-columns: 1fr; }
+}

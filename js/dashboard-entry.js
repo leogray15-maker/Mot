@@ -14,6 +14,7 @@ import './notifications.js';    // addNotification, badge
 
 // ——— Settings (loaded early so other modules can call getSettings()) ———
 import { initSettings } from './dashboard.js';
+import './settings.js';          // registers extended settings section loader
 
 // ——— Core CRM modules (self-register via window.sectionLoaders) ———
 import './enquiries.js';

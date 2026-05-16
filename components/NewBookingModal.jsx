@@ -45,18 +45,18 @@ async function dvlaLookup(reg, apiKey) {
 const today = () => new Date().toISOString().slice(0, 10);
 
 export default function NewBookingModal({
-  garageId, initialDate, initialTime, garageSettings, onClose,
+  garageId, initialDate, initialTime, prefill, garageSettings, onClose,
 }) {
-  const numberOfBays   = garageSettings?.numberOfBays  || 3;
-  const defaultDuration = garageSettings?.slotDuration || 60;
+  const numberOfBays    = garageSettings?.numberOfBays  || 3;
+  const defaultDuration = garageSettings?.slotDuration  || 60;
 
   const [form, setForm] = useState({
-    vehicleReg:    '',
-    customerName:  '',
-    customerPhone: '',
-    serviceType:   'MOT Test',
-    date:          initialDate || today(),
-    timeSlot:      initialTime || '09:00',
+    vehicleReg:    prefill?.vehicleReg   || '',
+    customerName:  prefill?.customerName || '',
+    customerPhone: prefill?.phone        || '',
+    serviceType:   prefill?.serviceType  || 'MOT Test',
+    date:          initialDate           || today(),
+    timeSlot:      initialTime           || '09:00',
     duration:      defaultDuration,
     bayNumber:     1,
     technicianId:  '',
