@@ -11,7 +11,9 @@ import { requireAuth } from './auth.js';
 
 const PLAN_FEATURES = {
   starter:    ['overview', 'enquiries', 'customers', 'bookings', 'settings'],
-  pro:        ['overview', 'enquiries', 'customers', 'bookings', 'jobs', 'invoices', 'mot', 'whatsapp', 'revenue', 'team', 'settings'],
+  pro:        ['overview', 'enquiries', 'customers', 'bookings', 'jobs', 'vhc', 'clock',
+               'approvals', 'opportunities', 'fleet', 'invoices', 'revenue', 'reports',
+               'zread', 'mot', 'parts', 'reminders', 'settings', 'team', 'users', 'whatsapp', 'ai'],
   enterprise: ['all']
 };
 
@@ -21,7 +23,7 @@ const PLAN_FEATURES = {
  * @returns {boolean}
  */
 export function checkPlanAccess(feature) {
-  const plan = sessionStorage.getItem('plan') || 'starter';
+  const plan = sessionStorage.getItem('plan') || 'enterprise';
   const features = PLAN_FEATURES[plan] || PLAN_FEATURES.starter;
   return features.includes('all') || features.includes(feature);
 }
@@ -215,8 +217,8 @@ function updateTopbar(user, userData) {
   const userName   = sessionStorage.getItem('userName')   || userData?.name || user.email?.split('@')[0] || 'User';
   const plan       = sessionStorage.getItem('plan')       || 'starter';
 
-  setText('topbarGarageName', garageName);
-  setText('topbarUserName',   userName);
+  setText('topbarUserName',    userName);
+  setText('sidebarGarageName', garageName);
 
   const brand = document.querySelector('.sidebar-brand-text strong');
   if (brand) brand.textContent = garageName;
@@ -274,17 +276,33 @@ function navigate(section) {
 }
 
 function loadSection(section) {
+  // Modules that self-register via window.sectionLoaders take priority
+  if (typeof window.sectionLoaders?.[section] === 'function') {
+    window.sectionLoaders[section]();
+    return;
+  }
+
   const loaders = {
-    overview:  loadOverview,
-    enquiries: loadEnquiries,
-    customers: () => import('./customers.js').then(m => m.initCustomers()),
-    bookings:  () => import('./bookings.js').catch(() => loadBookingsFallback()),
-    jobs:      () => import('./jobs.js').catch(e => console.warn('jobs module', e)),
-    invoices:  () => import('./invoices.js').catch(e => console.warn('invoices module', e)),
-    mot:       loadMOTTracker,
-    revenue:   () => import('./revenue.js').catch(e => console.warn('revenue module', e)),
-    settings:  () => import('./settings.js').catch(e => loadSettingsFallback()),
-    team:      loadTeam
+    overview:      loadOverview,
+    enquiries:     () => import('./enquiries.js').then(m => m.initEnquiries()).catch(() => loadEnquiries()),
+    customers:     () => import('./customers.js').then(m => m.initCustomers()).catch(e => console.warn(e)),
+    bookings:      () => import('./bookings.js').catch(() => loadBookingsFallback()),
+    jobs:          () => import('./jobs.js').catch(e => console.warn('jobs module', e)),
+    vhc:           () => import('./vhc.js').then(m => m.initVhcSection?.()).catch(e => console.warn(e)),
+    clock:         () => import('./job-clock.js').then(m => m.initJobClock?.()).catch(e => console.warn(e)),
+    approvals:     () => import('./photo-approval.js').then(m => m.initApprovals?.()).catch(e => console.warn(e)),
+    opportunities: () => import('./opportunities.js').then(m => m.initOpportunities?.()).catch(e => console.warn(e)),
+    fleet:         () => import('./fleet.js').then(m => m.initFleet?.()).catch(e => console.warn(e)),
+    invoices:      () => import('./invoices.js').then(() => window.sectionLoaders?.invoices?.()).catch(e => console.warn(e)),
+    revenue:       () => import('./revenue.js').then(() => window.sectionLoaders?.revenue?.()).catch(e => console.warn(e)),
+    reports:       () => import('./reports.js').then(m => m.initReports?.()).catch(e => console.warn(e)),
+    zread:         () => import('./z-read.js').then(m => m.initZRead?.()).catch(e => console.warn(e)),
+    mot:           () => import('./mot-tracker.js').then(m => m.initMotTracker?.()).catch(() => loadMOTTracker()),
+    parts:         () => import('./parts.js').then(m => m.initParts?.()).catch(e => console.warn(e)),
+    reminders:     () => import('./reminders-engine.js').then(m => m.initReminders?.()).catch(e => console.warn(e)),
+    settings:      () => import('./settings.js').catch(() => loadSettingsFallback()),
+    users:         () => import('./multi-user.js').then(m => m.initUsers?.()).catch(e => console.warn(e)),
+    team:          loadTeam
   };
   const fn = loaders[section];
   if (fn) fn();
@@ -439,7 +457,7 @@ function loadOverview() {
     .onSnapshot(snap => {
       _todayBookings = docsToArr(snap).filter(b => b.status !== 'Cancelled');
       hideSkeleton('overviewStats');
-      setCount('statTodayBookings', _todayBookings.length);
+      setCount('statBookings', _todayBookings.length);
       renderTodayBookings(_todayBookings);
     }, err => {
       hideSkeleton('overviewStats');
@@ -454,8 +472,8 @@ function loadOverview() {
     garageRef('parts').get(),
     garageRef('customers').get()
   ]).then(([enqRes, jobRes, invRes, partsRes, custRes]) => {
-    if (enqRes.status === 'fulfilled')  setCount('statNewEnquiries',  enqRes.value.size);
-    if (jobRes.status === 'fulfilled')  setCount('statOpenJobs',      jobRes.value.size);
+    if (enqRes.status === 'fulfilled')  setCount('statEnquiries', enqRes.value.size);
+    if (jobRes.status === 'fulfilled')  setCount('statJobs',      jobRes.value.size);
 
     if (invRes.status === 'fulfilled') {
       let unpaid = 0, pipelineValue = 0;
@@ -463,8 +481,8 @@ function loadOverview() {
         unpaid++;
         pipelineValue += parseFloat(d.data().total || 0);
       });
-      setCount('statUnpaidInvoices', unpaid);
-      setText('statPipelineValue', formatCurrency(pipelineValue));
+      setCount('statUnpaid', unpaid);
+      setText('statPipeline', formatCurrency(pipelineValue));
     }
 
     // Low stock check
@@ -479,17 +497,47 @@ function loadOverview() {
 
     // MOT reminders due in next 30 days
     if (custRes.status === 'fulfilled') {
-      const now     = Date.now();
-      const in30    = now + 30 * 86400000;
-      const motDue  = custRes.value.docs.filter(d => {
-        const motDate = d.data().motDue;
-        if (!motDate) return false;
-        const t = new Date(motDate).getTime();
-        return t >= now && t <= in30;
-      });
+      const now    = Date.now();
+      const in30   = now + 30 * 86400000;
+      const motDue = custRes.value.docs
+        .filter(d => {
+          const motDate = d.data().motDue;
+          if (!motDate) return false;
+          const t = new Date(motDate).getTime();
+          return t >= now && t <= in30;
+        })
+        .map(d => ({ id: d.id, ...d.data() }));
       setCount('statMOTDue', motDue.length);
+      renderMOTRemindersDue(motDue);
     }
   });
+
+  // Revenue Today (from paid invoices + completed jobs)
+  garageRef('invoices').where('date', '==', todayStr).get()
+    .then(snap => {
+      let revenue = 0;
+      snap.forEach(d => {
+        const inv = d.data();
+        if (['Paid', 'paid'].includes(inv.paymentStatus)) {
+          revenue += parseFloat(inv.total || 0);
+        }
+      });
+      if (revenue > 0) {
+        setText('statRevenue', formatCurrency(revenue));
+        return;
+      }
+      // Fallback: sum completed jobs for today
+      return garageRef('jobs').where('dateIn', '==', todayStr).get().then(jSnap => {
+        jSnap.forEach(d => {
+          const j = d.data();
+          if (['complete', 'Complete', 'completed', 'Completed'].includes(j.status)) {
+            revenue += parseFloat(j.jobValue || 0);
+          }
+        });
+        setText('statRevenue', formatCurrency(revenue));
+      });
+    })
+    .catch(() => setText('statRevenue', '£0.00'));
 
   // Recent enquiries
   garageRef('enquiries').orderBy('createdAt', 'desc').limit(5).get()
@@ -516,20 +564,46 @@ function renderTodayBookings(bookings) {
 }
 
 function renderRecentEnquiries(enquiries) {
-  const el = document.getElementById('recentEnquiriesBody');
+  const el = document.getElementById('recentEnquiriesList');
   if (!el) return;
   if (enquiries.length === 0) {
-    el.innerHTML = `<tr><td colspan="5" class="table-empty"><i class="fas fa-inbox"></i> No enquiries yet.</td></tr>`;
+    el.innerHTML = `<p class="empty-note"><i class="fas fa-inbox"></i> No recent enquiries.</p>`;
     return;
   }
   el.innerHTML = enquiries.map(e => `
-    <tr>
-      <td class="td-muted">${formatDate(e.createdAt || e.date)}</td>
-      <td class="td-name">${esc(e.name)}</td>
-      <td>${esc(e.phone)}</td>
-      <td>${esc(e.service)}</td>
-      <td><span class="badge ${statusBadge(e.status)}">${esc(e.status)}</span></td>
-    </tr>`).join('');
+    <div class="mini-row">
+      <div class="mini-row-left">
+        <span class="mini-name">${esc(e.name || '—')}</span>
+        <span class="mini-sub">${esc(e.service || '—')} &bull; ${esc(e.phone || '—')}</span>
+      </div>
+      <div class="mini-row-right">
+        <span class="badge ${statusBadge(e.status)}">${esc(e.status || '—')}</span>
+        <span class="mini-date">${formatDate(e.createdAt || e.date)}</span>
+      </div>
+    </div>`).join('');
+}
+
+function renderMOTRemindersDue(customers) {
+  const el = document.getElementById('motRemindersToday');
+  if (!el) return;
+  if (!customers.length) {
+    el.innerHTML = `<p class="empty-note"><i class="fas fa-check-circle"></i> No MOT reminders due in the next 30 days.</p>`;
+    return;
+  }
+  el.innerHTML = customers.slice(0, 5).map(c => {
+    const daysLeft = Math.round((new Date(c.motDue).getTime() - Date.now()) / 86400000);
+    const cls = daysLeft <= 0 ? 'badge-danger' : daysLeft <= 7 ? 'badge-warning' : 'badge-new';
+    const label = daysLeft <= 0 ? `${Math.abs(daysLeft)}d overdue` : `${daysLeft}d left`;
+    return `<div class="mini-row">
+      <div class="mini-row-left">
+        <span class="mini-name">${esc(c.name || '—')}</span>
+        <span class="mini-sub">${esc(c.reg || '—')} &bull; Due ${formatDate(c.motDue)}</span>
+      </div>
+      <div class="mini-row-right">
+        <span class="badge ${cls}">${label}</span>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function renderLowStockAlert(parts) {
@@ -540,7 +614,7 @@ function renderLowStockAlert(parts) {
       <span>${esc(p.name)}</span>
       <span class="badge badge-danger">${p.stock ?? 0} left</span>
     </div>`).join('');
-  const wrapper = document.getElementById('lowStockAlert');
+  const wrapper = document.getElementById('lowStockAlerts');
   if (wrapper) wrapper.style.display = parts.length > 0 ? '' : 'none';
 }
 
@@ -588,7 +662,7 @@ function renderEnquiriesTable() {
     return matchStatus && matchSearch;
   });
 
-  const tbody = document.getElementById('enquiriesBody') || document.getElementById('enquiriesTable');
+  const tbody = document.getElementById('enquiriesTbody') || document.getElementById('enquiriesBody');
   if (!tbody) return;
 
   if (filtered.length === 0) {
@@ -696,36 +770,40 @@ async function loadMOTTracker() {
     const snap = await garageRef('customers').get();
     const customers = docsToArr(snap);
     const now = Date.now();
-    let overdue = 0, soon = 0, ok = 0;
+    let expired = 0, urgent = 0, warn = 0, ok = 0;
 
     const rows = customers.map(c => {
       if (!c.motDue) return null;
-      const due     = new Date(c.motDue + 'T12:00:00').getTime();
+      const due      = new Date(c.motDue + 'T12:00:00').getTime();
       const daysLeft = Math.round((due - now) / 86400000);
       let sc, label;
-      if (daysLeft < 0)        { sc = 'badge-danger';  label = `${Math.abs(daysLeft)}d overdue`; overdue++; }
-      else if (daysLeft <= 30) { sc = 'badge-warning'; label = `Due in ${daysLeft}d`; soon++; }
-      else                     { sc = 'badge-success'; label = `${daysLeft}d left`; ok++; }
+      if (daysLeft < 0)         { sc = 'badge-danger';  label = `${Math.abs(daysLeft)}d overdue`; expired++; }
+      else if (daysLeft <= 7)   { sc = 'badge-danger';  label = `Due in ${daysLeft}d`; urgent++; }
+      else if (daysLeft <= 30)  { sc = 'badge-warning'; label = `Due in ${daysLeft}d`; warn++; }
+      else                      { sc = 'badge-success'; label = `${daysLeft}d left`; ok++; }
       return `<tr>
         <td class="td-name">${esc(c.name)}</td>
+        <td>${esc(c.phone || '—')}</td>
         <td class="td-mono">${esc(c.reg || '—')}</td>
         <td class="td-muted">${esc((c.vehicles?.[0]?.make || c.make || '') + ' ' + (c.vehicles?.[0]?.model || c.model || ''))}</td>
         <td>${formatDate(c.motDue)}</td>
         <td><span class="badge ${sc}">${label}</span></td>
-        <td><button class="btn btn-sm btn-success" onclick="window.sendMOTReminderWA?.('${c.id}')"><i class="fab fa-whatsapp"></i> Remind</button></td>
+        <td>—</td>
+        <td><button class="btn-sm btn-success" onclick="window.sendMOTReminderWA?.('${c.id}')"><i class="fab fa-whatsapp"></i> Remind</button></td>
       </tr>`;
     }).filter(Boolean);
 
-    const tbody = document.getElementById('motBody');
+    const tbody = document.getElementById('motTbody');
     if (tbody) {
       tbody.innerHTML = rows.length
         ? rows.join('')
-        : `<tr><td colspan="6" class="table-empty"><i class="fas fa-car"></i> No customers with MOT dates recorded.</td></tr>`;
+        : `<tr><td colspan="8" class="table-empty"><i class="fas fa-car"></i> No customers with MOT dates recorded.</td></tr>`;
     }
 
-    setCount('motOverdueCount', overdue);
-    setCount('motSoonCount', soon);
-    setCount('motOkCount', ok);
+    setText('motExpiredCount', `${expired} Expired`);
+    setText('motUrgentCount',  `${urgent} Due in 7 days`);
+    setText('motWarnCount',    `${warn} Due in 30 days`);
+    setText('motOkCount',      `${ok} OK`);
 
   } catch (e) {
     console.error('loadMOTTracker error', e);
@@ -830,10 +908,24 @@ export async function initDashboard() {
     setupAIAssistant();
     checkOnboarding();
 
-    // Logout buttons
-    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    // Topbar logout button (sidebar logoutBtn is handled by auth.js)
+    document.getElementById('topbarLogout')?.addEventListener('click', async () => {
       const ok = await showConfirm({ title: 'Log out', message: 'Are you sure you want to log out?', confirmText: 'Log out' });
       if (ok) { auth.signOut().then(() => { sessionStorage.clear(); window.location.href = 'login.html'; }); }
+    });
+
+    // Quick action buttons in overview header
+    document.getElementById('quickNewBooking')?.addEventListener('click', () => {
+      navigate('bookings');
+      setTimeout(() => document.getElementById('newBookingBtn')?.click(), 400);
+    });
+    document.getElementById('quickNewJob')?.addEventListener('click', () => {
+      navigate('jobs');
+      setTimeout(() => document.getElementById('newJobBtn')?.click(), 400);
+    });
+    document.getElementById('quickNewCustomer')?.addEventListener('click', () => {
+      navigate('customers');
+      setTimeout(() => document.getElementById('newCustomerBtn')?.click(), 400);
     });
 
     // Import & start notifications
@@ -847,8 +939,10 @@ export async function initDashboard() {
     const savedSection = sessionStorage.getItem('activeSection') || 'overview';
     navigate(savedSection);
 
-    // Start enquiries listener eagerly for badge updates
-    loadEnquiries();
+    // Start enquiries listener eagerly for real-time badge updates
+    import('./enquiries.js')
+      .then(m => { m.initEnquiries(); _sectionLoaded['enquiries'] = true; })
+      .catch(() => loadEnquiries());
   });
 }
 
