@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Setup | MOT Car Repairs</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/landing.css">
+  <style>
+    body { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0d0d0d; padding: 24px; }
+    .setup-card { background: #1a1a1a; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 48px 40px; max-width: 440px; width: 100%; }
+    .setup-icon { font-size: 2.2rem; color: var(--red, #F59E0B); text-align: center; margin-bottom: 8px; }
+    .setup-title { font-size: 1.4rem; font-weight: 800; color: #fff; text-align: center; margin-bottom: 4px; }
+    .setup-sub { font-size: 0.85rem; color: #888; text-align: center; margin-bottom: 28px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: #ccc; margin-bottom: 6px; }
+    .form-group input { width: 100%; padding: 10px 14px; background: #111; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #fff; font-size: 0.9rem; box-sizing: border-box; }
+    .form-group input:focus { outline: none; border-color: var(--red, #F59E0B); }
+    .setup-btn { width: 100%; padding: 12px; background: var(--red, #F59E0B); color: #000; font-weight: 700; font-size: 0.95rem; border: none; border-radius: 8px; cursor: pointer; margin-top: 8px; }
+    .setup-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .setup-result { display: none; margin-top: 14px; padding: 12px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 500; }
+    .setup-result.error { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #f87171; }
+    .setup-result.success { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); color: #4ade80; }
+    .setup-success { display: none; text-align: center; padding: 20px 0; }
+    .setup-success i { font-size: 3rem; color: #4ade80; margin-bottom: 16px; display: block; }
+    .setup-success h2 { color: #fff; margin-bottom: 8px; font-size: 1.2rem; }
+    .setup-success p { color: #888; font-size: 0.9rem; margin-bottom: 20px; }
+    .setup-success a { display: inline-block; padding: 10px 24px; background: var(--red, #F59E0B); color: #000; font-weight: 700; border-radius: 8px; text-decoration: none; }
+    .setup-notice { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); border-radius: 8px; padding: 12px 14px; font-size: 0.82rem; color: #aaa; margin-bottom: 24px; line-height: 1.6; }
+    .setup-notice strong { color: #F59E0B; }
+  </style>
+</head>
+<body>
+
+<div class="setup-card">
+  <div class="setup-icon"><i class="fas fa-screwdriver-wrench"></i></div>
+  <div class="setup-title">Admin Account Setup</div>
+  <div class="setup-sub">MOT Car Repairs — Poole, Dorset</div>
+
+  <div class="setup-notice">
+    <strong>One-time setup.</strong> This creates the admin login for your dashboard. Run this once, then use <a href="login.html" style="color:#F59E0B">login.html</a> to access your dashboard.
+  </div>
+
+  <form id="setupForm">
+    <div class="form-group">
+      <label>Admin Email Address</label>
+      <input type="email" id="adminEmail" placeholder="admin@example.com" required autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label>Password (min 8 characters)</label>
+      <input type="password" id="adminPassword" placeholder="••••••••" required minlength="8" autocomplete="new-password">
+    </div>
+    <div class="form-group">
+      <label>Confirm Password</label>
+      <input type="password" id="adminPasswordConfirm" placeholder="••••••••" required autocomplete="new-password">
+    </div>
+    <button type="submit" class="setup-btn">Create Admin Account</button>
+    <div id="setupResult" class="setup-result"></div>
+  </form>
+
+  <div id="setupSuccess" class="setup-success">
+    <i class="fas fa-check-circle"></i>
+    <h2>Setup Complete!</h2>
+    <p>Your admin account has been created and the garage settings have been initialised. You can now log in to your dashboard.</p>
+    <a href="login.html"><i class="fas fa-arrow-right-to-bracket"></i> Go to Login</a>
+  </div>
+</div>
+
+<script type="module" src="/js/setup-entry.js"></script>
+</body>
+</html>

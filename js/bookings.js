@@ -64,8 +64,8 @@ if (document.getElementById('publicBookingPage')) {
     };
     try {
       const [settingsSnap, bookingsSnap] = await Promise.all([
-        db.collection('settings').doc('config').get(),
-        db.collection('bookings').get()
+        db.collection('garages/mot-car-repairs-poole/settings').doc('config').get(),
+        db.collection('garages/mot-car-repairs-poole/bookings').get()
       ]);
       const stored = settingsSnap.exists ? settingsSnap.data() : {};
       // Deep-merge so missing/empty workingHours always falls back to sensible defaults
@@ -169,7 +169,7 @@ if (document.getElementById('publicBookingPage')) {
     const ref = genBookingRef();
     const booking = { ref, ...bkData, status: 'Confirmed', createdAt: new Date().toISOString() };
     try {
-      await db.collection('bookings').add(booking);
+      await db.collection('garages/mot-car-repairs-poole/bookings').add(booking);
       const s = window._settings || {};
       const refEl = document.getElementById('bookingRefDisplay');
       if (refEl) refEl.textContent = ref;

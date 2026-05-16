@@ -958,7 +958,7 @@ function sortJobList(field) {
 }
 
 // ——— Init ———
-function initJobs() {
+export function initJobs() {
   // Event listeners (guards against missing elements during lazy load)
   getEl('jobSearch')?.addEventListener('input', e => { _jobSearch = e.target.value; renderJobList(window._jobsData); });
   getEl('jobStatusFilter')?.addEventListener('change', e => { _jobStatusFilter = e.target.value; renderJobList(window._jobsData); });

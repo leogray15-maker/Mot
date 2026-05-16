@@ -3,38 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="pageTitle">Book an Appointment</title>
+  <title>Book an Appointment | MOT Car Repairs Poole</title>
   <meta name="description" content="Book your vehicle service or MOT online. Quick, easy, confirmed within the hour.">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="css/bookings.css">
 </head>
 <body id="publicBookingPage">
 
-<!-- Invalid link screen -->
-<div id="bookingInvalidScreen" style="display:none;min-height:100vh;display:none;align-items:center;justify-content:center;padding:40px 20px;background:#0d0d0d">
-  <div style="background:#1e1e1e;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:48px 40px;text-align:center;max-width:460px;width:100%">
-    <i class="fas fa-link-slash" style="font-size:3rem;color:#e02020;margin-bottom:20px;display:block"></i>
-    <h2 style="font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:10px">Invalid Booking Link</h2>
-    <p style="font-size:0.9rem;color:#a0a0a0;line-height:1.7">Please contact your garage for their correct booking link.</p>
-  </div>
-</div>
-
-<!-- Main booking page (shown once garageId confirmed) -->
-<div id="bookingPageMain" style="display:none">
+<div id="bookingPageMain">
 
   <nav class="booking-nav">
     <div class="booking-nav-inner">
-      <a href="#" class="nav-logo" id="navLogo">
-        <span class="logo-main" id="navGarageName">Loading…</span>
-        <span class="logo-sub" id="navGarageTagline">Online Booking</span>
+      <a href="index.html" class="nav-logo" id="navLogo">
+        <span class="logo-main" id="navGarageName">MOT Car Repairs</span>
+        <span class="logo-sub" id="navGarageTagline">Poole, Dorset · Est. 2004</span>
       </a>
-      <a href="#" class="nav-back" id="navBackLink"><i class="fas fa-arrow-left"></i> Back to site</a>
+      <a href="index.html" class="nav-back" id="navBackLink"><i class="fas fa-arrow-left"></i> Back to site</a>
     </div>
   </nav>
 
   <div class="booking-page">
     <div class="booking-header">
-      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(224,32,32,0.12);border:1px solid rgba(224,32,32,0.3);padding:6px 16px;border-radius:20px;font-size:0.78rem;font-weight:600;color:#ff3333;margin-bottom:16px">
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);padding:6px 16px;border-radius:20px;font-size:0.78rem;font-weight:600;color:#F59E0B;margin-bottom:16px">
         <i class="fas fa-bolt"></i> Instant online booking — confirmed within the hour
       </div>
       <h1>Book Your <span>Appointment</span></h1>
@@ -194,7 +184,7 @@
         <h3>Booking Summary</h3>
         <div id="bookingSummaryRows"></div>
       </div>
-      <div style="background:rgba(224,32,32,0.06);border:1px solid rgba(224,32,32,0.2);border-radius:8px;padding:14px 16px;font-size:0.85rem;color:var(--text-muted);margin-bottom:20px">
+      <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:14px 16px;font-size:0.85rem;color:var(--text-muted);margin-bottom:20px">
         <i class="fas fa-info-circle" style="color:var(--red-light);margin-right:6px"></i>
         By confirming this booking you agree to our terms &amp; conditions. We'll confirm your booking by phone within 1 hour during opening hours.
       </div>
@@ -217,8 +207,8 @@
         <p style="font-size:0.85rem">If you need to make changes or it's urgent, call us on</p>
         <p style="font-size:1.1rem;font-weight:700;color:var(--white)" id="confirmPhone">—</p>
         <div class="confirm-actions">
-          <a href="#" class="btn-book btn-book-outline" id="confirmBackHome"><i class="fas fa-home"></i> Back to Home</a>
-          <a href="#" class="btn-book btn-book-primary" id="confirmBookAnother"><i class="fas fa-calendar-plus"></i> Book Another</a>
+          <a href="index.html" class="btn-book btn-book-outline" id="confirmBackHome"><i class="fas fa-home"></i> Back to Home</a>
+          <a href="booking.html" class="btn-book btn-book-primary" id="confirmBookAnother"><i class="fas fa-calendar-plus"></i> Book Another</a>
         </div>
       </div>
     </div>

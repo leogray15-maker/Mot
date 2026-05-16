@@ -1,5 +1,5 @@
 /* ===========================
-   GarageOS — Dashboard Entry Point
+   MOT Car Repairs — Dashboard Entry Point
    Imports all modules in dependency order
    =========================== */
 
@@ -13,15 +13,15 @@ import './ui.js';               // showModal, closeModal, showConfirm, showEmpty
 import './notifications.js';    // addNotification, badge
 
 // ——— Settings (loaded early so other modules can call getSettings()) ———
-import { initSettings } from './settings.js';
+import { initSettings } from './dashboard.js';
 
-// ——— Core CRM modules ———
-import { initEnquiries }    from './enquiries.js';
-import { initCustomers }    from './customers.js';
-import { initBookings }     from './bookings.js';
+// ——— Core CRM modules (self-register via window.sectionLoaders) ———
+import './enquiries.js';
+import './customers.js';
+import './bookings.js';
 import { initJobs }         from './jobs.js';
-import { initInvoices }     from './invoices.js';
-import { initRevenue }      from './revenue.js';
+import './invoices.js';
+import './revenue.js';
 
 // ——— Workshop tools ———
 import { initVrmLookup }    from './vrm-lookup.js';
@@ -29,7 +29,7 @@ import { initJobClock }     from './job-clock.js';
 import { initApprovals }    from './photo-approval.js';
 
 // ——— VHC ———
-import { initVhc }          from './vhc.js';
+import { initVhcSection }   from './vhc.js';
 
 // ——— Opportunities & pipeline ———
 import { initOpportunities } from './opportunities.js';
@@ -41,7 +41,7 @@ import { initParts }        from './parts.js';
 // ——— MOT, reminders, comms ———
 import { initMotTracker }   from './mot-tracker.js';
 import { initReminders }    from './reminders-engine.js';
-import { initCommsLog }     from './comms-log.js';
+import './comms-log.js';
 
 // ——— Reports & Z-read ———
 import { initReports }      from './reports.js';
@@ -58,29 +58,23 @@ import './whatsapp.js';
 
 // ——— Boot sequence ———
 document.addEventListener('DOMContentLoaded', async () => {
-  // Settings must be loaded synchronously before other modules read them
+  // Settings must be loaded before other modules read them
   await initSettings();
 
   // Apply role restrictions to sidebar
   enforceRoleRestrictions();
 
-  // Initialise all feature modules (each checks section visibility internally)
-  initEnquiries();
-  initCustomers();
-  initBookings();
+  // Initialise modules that require explicit init
   initJobs();
-  initInvoices();
-  initRevenue();
   initVrmLookup();
   initJobClock();
   initApprovals();
-  initVhc();
+  initVhcSection();
   initOpportunities();
   initFleet();
   initParts();
   initMotTracker();
   initReminders();
-  initCommsLog();
   initReports();
   initZRead();
   initUsers();

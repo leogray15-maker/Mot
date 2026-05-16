@@ -94,7 +94,7 @@ function statusBadge(status) {
 
 // ——— Settings (garage-scoped) ———
 
-async function initSettings() {
+export async function initSettings() {
   const gid = getGarageId();
   if (!gid) return;
   try {
