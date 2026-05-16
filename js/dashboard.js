@@ -130,7 +130,7 @@ async function loadAccount() {
 function checkTrialStatus() {
   const status    = _accountData.status || sessionStorage.getItem('planStatus') || 'trial';
   const trialEnd  = _accountData.trialEndsAt;
-  const plan      = _accountData.plan || sessionStorage.getItem('plan') || 'starter';
+  const plan      = _accountData.plan || sessionStorage.getItem('plan') || 'enterprise';
 
   if (status === 'active') return; // paid subscription — nothing to do
 
@@ -215,7 +215,7 @@ export function showUpgradeModal(message) {
 function updateTopbar(user, userData) {
   const garageName = sessionStorage.getItem('garageName') || getSettings().garageName || '';
   const userName   = sessionStorage.getItem('userName')   || userData?.name || user.email?.split('@')[0] || 'User';
-  const plan       = sessionStorage.getItem('plan')       || 'starter';
+  const plan       = sessionStorage.getItem('plan')       || 'enterprise';
 
   setText('topbarUserName',    userName);
   setText('sidebarGarageName', garageName);
