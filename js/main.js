@@ -1,5 +1,5 @@
 /* ===========================
-   Premier MOT — Public Site JS
+   MOT Car Repairs — Public Site JS
    =========================== */
 
 import { db } from './firebase.js';
