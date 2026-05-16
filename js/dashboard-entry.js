@@ -19,6 +19,7 @@ import { initSettings } from './dashboard.js';
 import './enquiries.js';
 import './customers.js';
 import './bookings.js';
+import './booking-calendar-mount.js'; // React FullCalendar — overrides bookings section
 import { initJobs }         from './jobs.js';
 import './invoices.js';
 import './revenue.js';
