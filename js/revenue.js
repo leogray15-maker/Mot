@@ -2,7 +2,8 @@
    Premier MOT — Revenue Dashboard (Firebase)
    =========================== */
 
-import { db, showSpinner, hideSpinner } from './firebase.js';
+import { db, garageRef, showSpinner, hideSpinner } from './firebase.js';
+import { formatDate, esc } from './utils.js';
 
 let revenueCharts = {};
 
@@ -10,7 +11,7 @@ async function loadRevenue() {
   showSpinner('page-revenue');
   let jobs = [];
   try {
-    const snap = await db.collection('jobs').where('status','==','Complete').get();
+    const snap = await garageRef('jobs').where('status', 'in', ['Complete', 'complete', 'completed']).get();
     jobs = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(j => j.jobValue > 0);
   } catch (e) {
     showToast('Failed to load revenue data', 'error');
@@ -39,17 +40,11 @@ async function loadRevenue() {
     ? (thisMonthRev / now.getDate()) * new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
     : 0;
 
-  setText('rev-this-month', '£' + thisMonthRev.toFixed(0));
-  setText('rev-this-week',  '£' + thisWeekRev.toFixed(0));
-  setText('rev-jobs-month', thisMonth.length);
-  setText('rev-avg-job',    '£' + avgJobVal.toFixed(0));
-  setText('rev-projected',  '£' + projectedMonth.toFixed(0));
-  setText('rev-total-all',  '£' + sum(jobs).toFixed(0));
-
-  const mComp = lastMonthRev > 0 ? ((thisMonthRev - lastMonthRev) / lastMonthRev * 100).toFixed(1) : null;
-  const wComp = lastWeekRev  > 0 ? ((thisWeekRev  - lastWeekRev)  / lastWeekRev  * 100).toFixed(1) : null;
-  renderDelta('rev-month-delta', mComp);
-  renderDelta('rev-week-delta',  wComp);
+  // HTML IDs: revTotal, revJobs, revAvg, revOutstanding
+  setText('revTotal',       '£' + thisMonthRev.toFixed(2));
+  setText('revJobs',        thisMonth.length);
+  setText('revAvg',         avgJobVal > 0 ? '£' + avgJobVal.toFixed(2) : '£0.00');
+  setText('revOutstanding', '£' + (sum(jobs) - sum(thisMonth)).toFixed(2));
 
   renderMonthlyChart(jobs);
   renderServiceChart(jobs);
@@ -68,7 +63,7 @@ function renderDelta(id, pct) {
 }
 
 function renderMonthlyChart(jobs) {
-  const canvas = document.getElementById('revenueLineChart');
+  const canvas = document.getElementById('revenueChart');
   if (!canvas) return;
   if (revenueCharts.line) revenueCharts.line.destroy();
 
@@ -101,7 +96,7 @@ function renderMonthlyChart(jobs) {
 }
 
 function renderServiceChart(jobs) {
-  const canvas = document.getElementById('serviceDonutChart');
+  const canvas = document.getElementById('serviceChart');
   if (!canvas) return;
   if (revenueCharts.donut) revenueCharts.donut.destroy();
 
@@ -125,7 +120,7 @@ function renderServiceChart(jobs) {
 }
 
 function renderRevenueTable(jobs) {
-  const tbody = document.getElementById('revenueJobsBody');
+  const tbody = document.getElementById('recentJobsTbody');
   if (!tbody) return;
   const recent = [...jobs].sort((a, b) => new Date(b.dateIn) - new Date(a.dateIn)).slice(0, 15);
   if (recent.length === 0) {
