@@ -112,17 +112,25 @@ export default function BookingCalendar({ garageId }) {
   }, []);
 
   // ── Map Firestore docs → FullCalendar events ─────────────────────────
+  // Normalise both booking sources:
+  //   Dashboard modal  → { timeSlot, vehicleReg, customerName, serviceType }
+  //   Public form      → { time, reg, name, service }
   const events = bookings
-    .filter(b => b.date && b.timeSlot)
-    .map(b => ({
-      id:              b.id,
-      title:           `${b.vehicleReg || ''} — ${b.customerName || ''}`,
-      start:           `${b.date}T${b.timeSlot}:00`,
-      end:             isoEnd(b.date, b.timeSlot, b.duration),
-      backgroundColor: STATUS_COLORS[b.status] || STATUS_COLORS.pending,
-      borderColor:     STATUS_COLORS[b.status] || STATUS_COLORS.pending,
-      extendedProps:   b,
-    }));
+    .filter(b => b.date && (b.timeSlot || b.time))
+    .map(b => {
+      const slot = b.timeSlot || b.time;
+      const reg  = b.vehicleReg || b.reg || '';
+      const name = b.customerName || b.name || '';
+      return {
+        id:              b.id,
+        title:           `${reg} — ${name}`,
+        start:           `${b.date}T${slot}:00`,
+        end:             isoEnd(b.date, slot, b.duration),
+        backgroundColor: STATUS_COLORS[(b.status || '').toLowerCase()] || STATUS_COLORS.pending,
+        borderColor:     STATUS_COLORS[(b.status || '').toLowerCase()] || STATUS_COLORS.pending,
+        extendedProps:   { ...b, timeSlot: slot, vehicleReg: reg, customerName: name, serviceType: b.serviceType || b.service || '', status: (b.status || 'pending').toLowerCase() },
+      };
+    });
 
   // ── Handlers ────────────────────────────────────────────────────────
   const handleSelect = useCallback(info => {
