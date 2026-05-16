@@ -240,8 +240,6 @@ function printInvoice(id) {
   win.document.close();
 }
 
-function esc(str) { if (!str) return ''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
 document.getElementById('closeInvoiceModal')?.addEventListener('click', () => document.getElementById('invoiceDetailModal')?.classList.remove('open'));
 document.getElementById('invoiceDetailModal')?.addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
 
