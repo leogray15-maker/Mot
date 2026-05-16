@@ -162,8 +162,19 @@ ul { list-style: none; }
 
 .nav-logo {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   line-height: 1.1;
+  text-decoration: none;
+}
+
+.nav-logo-img {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 480px) {
+  .nav-logo-img { height: 38px; }
 }
 
 .nav-logo .logo-main {
@@ -1583,4 +1594,12 @@ ul { list-style: none; }
   .why-grid { grid-template-columns: 1fr; gap: 40px; }
   .hero-ctas { flex-direction: column; align-items: flex-start; }
   .hero-section { padding: 100px 20px 60px; }
+}
+
+/* ===========================
+   REVIEWS SECTION EXTRAS
+   =========================== */
+
+@media (min-width: 640px) {
+  .rating-divider { display: block !important; }
 }
