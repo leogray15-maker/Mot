@@ -142,7 +142,7 @@ if (contactForm) {
 
 async function saveEnquiry(enquiry) {
   try {
-    await db.collection('enquiries').add(enquiry);
+    await db.collection('garages/mot-car-repairs-poole/enquiries').add(enquiry);
   } catch (e) {
     console.error('Failed to save enquiry', e);
   }

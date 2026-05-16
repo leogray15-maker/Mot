@@ -1,6 +1,5 @@
 /* ===========================
-   GarageOS — Firebase (compat v10)
-   Multi-tenant foundation layer
+   MOT Car Repairs — Firebase (compat v10)
    =========================== */
 
 import firebase from 'firebase/compat/app';
@@ -36,11 +35,8 @@ window.auth = auth;
  */
 export const SUPER_ADMIN_UID = 'q8Zob2UIzUSRosbkg1fZz7zHWwk1';
 
-/**
- * Pages that are allowed to load without a garageId in sessionStorage.
- * Matched against the current pathname's filename (lowercase).
- * The empty string covers the bare root path ('/').
- */
+export const GARAGE_ID = 'mot-car-repairs-poole';
+
 const PUBLIC_PAGES = new Set([
   '',
   'index.html',
@@ -49,7 +45,8 @@ const PUBLIC_PAGES = new Set([
   'admin.html',
   'booking.html',
   'vhc.html',
-  'portal.html'
+  'portal.html',
+  'setup.html'
 ]);
 
 /**

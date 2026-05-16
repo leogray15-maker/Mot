@@ -2,11 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ——— Top-level account records (one per garage tenant) ———
-    // Readable by the garage owner or any user whose platform_users document
-    // maps to this garageId (i.e. staff members of the garage).
-    // Creatable by any authenticated user (used during onboarding / sign-up).
-    // Updatable / deletable only by the garage owner.
+    // ——— Top-level account records ———
     match /accounts/{garageId} {
       allow read: if request.auth != null &&
         (request.auth.uid == resource.data.ownerUid ||
@@ -16,37 +12,46 @@ service cloud.firestore {
         request.auth.uid == resource.data.ownerUid;
     }
 
-    // ——— Platform user profiles (one per Firebase Auth user) ———
-    // Each user can read and write only their own document.
-    // The garageId field inside this document is what binds a user to a tenant.
+    // ——— Platform user profiles ———
     match /platform_users/{userId} {
       allow read, write: if request.auth != null &&
         request.auth.uid == userId;
     }
 
-    // ——— All tenant-scoped data ———
-    // A wildcard rule covering every sub-collection and document inside
-    // a garage's namespace. Access is gated by the calling user's garageId
-    // matching the path segment — enforcing strict tenant isolation.
+    // ——— Public booking form — unauthenticated creates allowed ———
+    match /garages/mot-car-repairs-poole/bookings/{bookingId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null &&
+        getUserGarageId() == 'mot-car-repairs-poole';
+    }
+
+    // ——— Public enquiry forms — unauthenticated creates allowed ———
+    match /garages/mot-car-repairs-poole/enquiries/{enquiryId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null &&
+        getUserGarageId() == 'mot-car-repairs-poole';
+    }
+
+    // ——— Settings — public read for slot availability check ———
+    match /garages/mot-car-repairs-poole/settings/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null &&
+        getUserGarageId() == 'mot-car-repairs-poole';
+    }
+
+    // ——— All other tenant-scoped data ———
     match /garages/{garageId}/{document=**} {
       allow read, write: if request.auth != null &&
         getUserGarageId() == garageId;
     }
 
-    // ——— VHC report public read override ———
-    // VHC (Vehicle Health Check) reports are readable without authentication
-    // so customers can view their report via a public portal link.
-    // Write access is still restricted to authenticated users of the garage.
-    // This rule is more specific than the wildcard above, so it takes precedence.
+    // ——— VHC reports — public read ———
     match /garages/{garageId}/vhc_reports/{vhcId} {
       allow read: if true;
       allow write: if request.auth != null &&
         getUserGarageId() == garageId;
     }
 
-    // ——— Helper function ———
-    // Reads the calling user's platform_users document to retrieve their garageId.
-    // Used throughout the rules above to enforce tenant isolation server-side.
     function getUserGarageId() {
       return get(/databases/$(database)/documents/platform_users/$(request.auth.uid)).data.garageId;
     }
