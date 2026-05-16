@@ -341,10 +341,6 @@ async function getBookings(range) {
   return docsToArr(snap);
 }
 
-function docsToArr(snap) {
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-}
-
 function getMonthStart() {
   const d = new Date(); d.setDate(1);
   return d.toISOString().split('T')[0];
