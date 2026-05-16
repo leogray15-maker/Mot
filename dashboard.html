@@ -965,7 +965,7 @@
         </div>
         <div class="job-action-btns" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
           <button type="button" class="btn-primary" id="jobInvoiceBtn"><i class="fas fa-file-invoice-pound"></i> Generate Invoice</button>
-          <button type="button" class="btn-secondary" onclick="window.sendVhcReport?.(_openJobId)"><i class="fas fa-clipboard-check"></i> Send VHC</button>
+          <button type="button" class="btn-secondary" onclick="window.sendVhcReport?.(window._currentOpenJobId)"><i class="fas fa-clipboard-check"></i> Send VHC</button>
         </div>
       </div>
 

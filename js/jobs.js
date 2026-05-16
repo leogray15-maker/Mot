@@ -453,6 +453,7 @@ function renderLabourTab(j) {
 // ——— Open job modal ———
 async function openJobModal(id) {
   _openJobId = id;
+  window._currentOpenJobId = id;   // expose for inline onclicks
   _activeJobTab = 'vehicle';
   _partRowIdx = 0;
 
@@ -511,6 +512,30 @@ async function openJobModal(id) {
     statusBanner.innerHTML = j
       ? `${statusBadgeHtml(j.status)} ${priorityBadgeHtml(j.priority)} <span class="td-muted" style="font-size:0.8rem">Created ${formatDate(j.createdAt)}</span>`
       : '';
+  }
+
+  // Populate clock display
+  const timeDisplay = getEl('jobTimeDisplay');
+  if (timeDisplay) {
+    const actualH = j?.actualHours || 0;
+    const quotedH = j?.estimatedHours || 0;
+    const h = Math.floor(actualH);
+    const m = Math.round((actualH - h) * 60);
+    timeDisplay.textContent = `Total: ${h}h ${m}m | Quoted: ${quotedH}h`;
+  }
+  const clockLogList = getEl('clockLogList');
+  if (clockLogList) {
+    const log = j?.clockLog || [];
+    clockLogList.innerHTML = log.length
+      ? log.map(entry => {
+          const start = entry.startTime?.toDate ? entry.startTime.toDate() : new Date(entry.startTime || 0);
+          const dur   = entry.duration ? `${Math.floor(entry.duration / 60)}h ${entry.duration % 60}m` : '—';
+          return `<div style="font-size:0.78rem;color:var(--text-dim);padding:3px 0">
+            <i class="fas fa-user-hard-hat"></i> ${esc(entry.techName || '—')} &bull;
+            ${start.toLocaleDateString('en-GB')} &bull; ${dur}
+          </div>`;
+        }).join('')
+      : '<div style="font-size:0.78rem;color:var(--text-dim);padding:4px 0">No clock entries yet.</div>';
   }
 
   window.showModal('jobModal');
@@ -970,6 +995,53 @@ export function initJobs() {
   getEl('jobDeleteBtn')?.addEventListener('click', () => { if (_openJobId) deleteJob(_openJobId); });
   getEl('jobPrintBtn')?.addEventListener('click', () => { if (_openJobId) printJobCard(_openJobId); });
   getEl('jobInvoiceBtn')?.addEventListener('click', () => { if (_openJobId) createInvoiceFromJob(_openJobId); });
+
+  // Save VHC — persists checklist data as part of the job record
+  getEl('saveVhcBtn')?.addEventListener('click', saveJob);
+
+  // Add note to comms log
+  getEl('addJobNoteBtn')?.addEventListener('click', async () => {
+    const text = getEl('jobNoteText')?.value?.trim();
+    if (!text || !_openJobId) return;
+    const note = {
+      type:    'note',
+      message: text,
+      sentAt:  new Date().toISOString(),
+      sentBy:  window._currentUser?.email?.split('@')[0] || 'Staff'
+    };
+    try {
+      await fsUpdate('jobs', _openJobId, {
+        commLog:   firebase.firestore.FieldValue.arrayUnion(note),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      const j = window._jobsData.find(x => x.id === _openJobId);
+      if (j) { j.commLog = j.commLog || []; j.commLog.push(note); renderCommsTab(j.commLog); }
+      const el = getEl('jobNoteText'); if (el) el.value = '';
+      showToast('Note added', 'success');
+    } catch (e) {
+      showToast('Failed to add note', 'error');
+    }
+  });
+
+  // Clock On
+  getEl('clockOnBtn')?.addEventListener('click', () => {
+    if (!_openJobId) return;
+    const user     = window._currentUser || {};
+    const techName = user.displayName || user.email?.split('@')[0] || 'Technician';
+    const techId   = user.uid || 'unknown';
+    window.clockOn?.(_openJobId, techId, techName);
+  });
+
+  // Clock Off — find the active session for this job
+  getEl('clockOffBtn')?.addEventListener('click', async () => {
+    if (!_openJobId) return;
+    try {
+      const snap = await garageRef('technician_sessions')
+        .where('jobId', '==', _openJobId).where('endTime', '==', null).limit(1).get();
+      if (snap.empty) { showToast('No active clock session for this job', 'info'); return; }
+      window.clockOff?.(snap.docs[0].id, _openJobId);
+    } catch { showToast('Failed to clock off', 'error'); }
+  });
 
   loadJobs();
 }
