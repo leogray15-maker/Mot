@@ -137,7 +137,5 @@ function renderRevenueTable(jobs) {
     </tr>`).join('');
 }
 
-function esc(str) { if (!str) return ''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
 window.sectionLoaders = window.sectionLoaders || {};
 window.sectionLoaders['revenue'] = loadRevenue;

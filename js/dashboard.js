@@ -128,7 +128,7 @@ async function loadAccount() {
 }
 
 function checkTrialStatus() {
-  const status    = _accountData.status || sessionStorage.getItem('planStatus') || 'trial';
+  const status    = _accountData.status || sessionStorage.getItem('planStatus') || 'active';
   const trialEnd  = _accountData.trialEndsAt;
   const plan      = _accountData.plan || sessionStorage.getItem('plan') || 'enterprise';
 
