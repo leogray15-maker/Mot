@@ -247,6 +247,12 @@ document.getElementById('invoiceDetailModal')?.addEventListener('click', e => { 
 window.sectionLoaders = window.sectionLoaders || {};
 window.sectionLoaders['invoices'] = loadInvoicesSection;
 
+// openInvoiceModal — called by jobs.js "Generate Invoice" button
+window.openInvoiceModal = async (existingId, jobId) => {
+  if (jobId) await createInvoiceFromJob(jobId);
+  else if (existingId) viewInvoiceModal(existingId);
+};
+
 Object.assign(window, {
   createInvoiceFromJob, updateInvoiceStatus, deleteInvoice,
   viewInvoiceModal, sendInvoiceWA, printInvoice

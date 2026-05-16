@@ -128,7 +128,7 @@ async function loadAccount() {
 }
 
 function checkTrialStatus() {
-  const status    = _accountData.status || sessionStorage.getItem('planStatus') || 'trial';
+  const status    = _accountData.status || sessionStorage.getItem('planStatus') || 'active';
   const trialEnd  = _accountData.trialEndsAt;
   const plan      = _accountData.plan || sessionStorage.getItem('plan') || 'enterprise';
 
@@ -300,7 +300,7 @@ function loadSection(section) {
     mot:           () => import('./mot-tracker.js').then(m => m.initMotTracker?.()).catch(() => loadMOTTracker()),
     parts:         () => import('./parts.js').then(m => m.initParts?.()).catch(e => console.warn(e)),
     reminders:     () => import('./reminders-engine.js').then(m => m.initReminders?.()).catch(e => console.warn(e)),
-    settings:      () => import('./settings.js').catch(() => loadSettingsFallback()),
+    settings:      () => { window.sectionLoaders?.settings?.() || loadSettingsFallback(); },
     users:         () => import('./multi-user.js').then(m => m.initUsers?.()).catch(e => console.warn(e)),
     team:          loadTeam
   };
@@ -360,8 +360,8 @@ function setupCloseOfDay() {
 // ——— AI Assistant ———
 
 function setupAIAssistant() {
-  const btn   = document.getElementById('aiAssistantBtn');
-  const panel = document.getElementById('aiAssistantPanel');
+  const btn   = document.getElementById('aiBtn');
+  const panel = document.getElementById('aiPanel');
   if (!btn) return;
 
   if (!checkPlanAccess('ai')) {
@@ -375,12 +375,26 @@ function setupAIAssistant() {
       return;
     }
     panel?.classList.toggle('open');
+    const overlay = document.getElementById('aiOverlay');
     if (panel?.classList.contains('open')) {
+      if (overlay) overlay.style.display = '';
       import('./ai-assistant.js').catch(() => {});
+    } else {
+      if (overlay) overlay.style.display = 'none';
     }
   });
 
-  document.getElementById('aiPanelClose')?.addEventListener('click', () => panel?.classList.remove('open'));
+  document.getElementById('closeAiPanel')?.addEventListener('click', () => {
+    panel?.classList.remove('open');
+    const overlay = document.getElementById('aiOverlay');
+    if (overlay) overlay.style.display = 'none';
+  });
+
+  document.getElementById('aiOverlay')?.addEventListener('click', () => {
+    panel?.classList.remove('open');
+    const overlay = document.getElementById('aiOverlay');
+    if (overlay) overlay.style.display = 'none';
+  });
 }
 
 // ——— Onboarding checklist ———
@@ -389,52 +403,52 @@ async function checkOnboarding() {
   const wrapper = document.getElementById('onboardingChecklist');
   if (!wrapper) return;
 
-  // Check if already dismissed
   const settings = getSettings();
   if (settings.onboardingDismissed) { wrapper.style.display = 'none'; return; }
 
   try {
-    const gid = getGarageId();
     const [custSnap, bookSnap, teamSnap] = await Promise.all([
       garageRef('customers').limit(1).get(),
       garageRef('bookings').limit(1).get(),
       garageRef('team').limit(1).get()
     ]);
 
-    const hasCustomers   = !custSnap.empty;
-    const hasBookings    = !bookSnap.empty;
-    const hasSettings    = !!(settings.logoUrl && settings.address);
-    const hasTeamMembers = !teamSnap.empty;
+    const checks = {
+      'ob-settings': !!(settings.garageName && settings.address),
+      'ob-logo':     !!(settings.logoUrl),
+      'ob-customer': !custSnap.empty,
+      'ob-booking':  !bookSnap.empty,
+      'ob-mot':      !!(settings.motReminderTemplate || settings.reminderTemplate),
+      'ob-team':     !teamSnap.empty,
+      'ob-link':     !!(settings.bookingPageUrl || settings.siteURL),
+    };
 
-    const steps = [
-      { id: 'step-customers',   done: hasCustomers,   label: 'Add your first customer' },
-      { id: 'step-bookings',    done: hasBookings,     label: 'Create a booking' },
-      { id: 'step-settings',    done: hasSettings,     label: 'Set logo & address in Settings' },
-      { id: 'step-team',        done: hasTeamMembers,  label: 'Invite a team member' }
-    ];
+    const total = Object.keys(checks).length;
+    const done  = Object.values(checks).filter(Boolean).length;
 
-    const allDone = steps.every(s => s.done);
-    if (allDone) {
+    if (done === total) {
       wrapper.style.display = 'none';
       garageRef('settings').doc('config').update({ onboardingDismissed: true }).catch(() => {});
       return;
     }
 
-    const list = document.getElementById('onboardingSteps');
-    if (list) {
-      list.innerHTML = steps.map(s => `
-        <li class="onboarding-step ${s.done ? 'done' : ''}">
-          <i class="fas ${s.done ? 'fa-check-circle' : 'fa-circle'}"></i>
-          <span>${esc(s.label)}</span>
-        </li>`).join('');
-    }
+    Object.entries(checks).forEach(([id, isDone]) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const cb = el.querySelector('input[type="checkbox"]');
+      if (cb) cb.checked = isDone;
+      el.classList.toggle('done', isDone);
+    });
+
+    const bar = document.getElementById('onboardingBar');
+    if (bar) bar.style.width = `${Math.round((done / total) * 100)}%`;
 
     wrapper.style.display = '';
 
-    document.getElementById('dismissOnboarding')?.addEventListener('click', async () => {
+    document.getElementById('dismissOnboarding')?.addEventListener('click', () => {
       wrapper.style.display = 'none';
       garageRef('settings').doc('config').update({ onboardingDismissed: true }).catch(() => {});
-    });
+    }, { once: true });
 
   } catch (e) {
     console.warn('checkOnboarding error', e);
@@ -740,27 +754,43 @@ window._viewEnquiry = id => {
       <div class="detail-item"><label>Submitted</label><p>${formatDateTime(e.createdAt || e.date)}</p></div>
       <div class="detail-item"><label>Status</label><p><span class="badge ${statusBadge(e.status)}">${esc(e.status)}</span></p></div>
     </div>
-    ${e.message ? `<div class="detail-item"><label>Message</label><p>${esc(e.message)}</p></div>` : ''}`;
-  const modal = document.getElementById('enquiryDetailModal');
-  modal?.classList.add('open');
+    ${e.message ? `<div class="detail-item" style="grid-column:1/-1"><label>Message</label><p style="white-space:pre-wrap">${esc(e.message)}</p></div>` : ''}
+    <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn-primary" onclick="window._convertToBooking('${esc(e.id)}');window.closeModal('enquiryDetailModal')">
+        <i class="fas fa-calendar-plus"></i> Convert to Booking
+      </button>
+      <button class="btn-secondary" onclick="window._updateEnquiryStatus('${esc(e.id)}','contacted')">
+        Mark Contacted
+      </button>
+      <button class="btn-danger" onclick="window._deleteEnquiry('${esc(e.id)}');window.closeModal('enquiryDetailModal')">
+        <i class="fas fa-trash"></i> Delete
+      </button>
+    </div>`;
+  showModal('enquiryDetailModal');
 };
 
 window._convertToBooking = id => {
   const e = (window._enquiriesData || []).find(x => x.id === id);
   if (!e) return;
   navigate('bookings');
-  // Pre-fill booking modal after a tick
+  // Open React booking modal with pre-filled data via custom event
   setTimeout(() => {
-    const prefill = { customerName: e.name, phone: e.phone, email: e.email, reg: e.reg, service: e.service, date: e.preferredDate, fromEnquiryId: id };
-    window._prefillBookingModal?.(prefill);
-  }, 300);
+    window.dispatchEvent(new CustomEvent('openNewBooking', {
+      detail: {
+        date:         e.preferredDate || new Date().toISOString().slice(0, 10),
+        time:         '09:00',
+        customerName: e.name,
+        vehicleReg:   e.reg,
+        serviceType:  e.service,
+        phone:        e.phone,
+        fromEnquiryId: id,
+      }
+    }));
+  }, 350);
 };
 
-document.getElementById('closeEnquiryModal')?.addEventListener('click', () =>
-  document.getElementById('enquiryDetailModal')?.classList.remove('open'));
-document.getElementById('enquiryDetailModal')?.addEventListener('click', e => {
-  if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
-});
+document.getElementById('closeEnquiryModal')?.addEventListener('click', () => closeModal('enquiryDetailModal'));
+document.getElementById('closeEnquiryModalFooter')?.addEventListener('click', () => closeModal('enquiryDetailModal'));
 
 // ——— MOT Tracker (in-dashboard fallback) ———
 
@@ -887,6 +917,13 @@ window.loadSection       = loadSection;
 window.showUpgradeModal  = showUpgradeModal;
 window.checkPlanAccess   = checkPlanAccess;
 window.statusBadge       = statusBadge;
+
+window.saveSettings = async function(updated) {
+  const gid = getGarageId();
+  if (!gid) throw new Error('No garageId');
+  window._settings = updated;
+  await garageRef('settings').doc('config').set(updated, { merge: true });
+};
 window._enquiriesData    = window._enquiriesData || [];
 
 // ——— Dashboard init ———

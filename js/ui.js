@@ -271,3 +271,24 @@ window.hideSkeleton   = hideSkeleton;
 window.showEmptyState = showEmptyState;
 window.updateBadge    = updateBadge;
 window.openSection    = openSection;
+
+// ——— Global delegated handlers ———
+
+document.addEventListener('click', e => {
+  // Close modal via [data-modal] attribute (modal-close buttons, cancel buttons)
+  const closer = e.target.closest('[data-modal]');
+  if (closer) {
+    closeModal(closer.dataset.modal);
+    return;
+  }
+
+  // Switch tabs via .modal-tab[data-tab] (customer, enquiry, and other standard modals)
+  const tabBtn = e.target.closest('.modal-tab[data-tab]');
+  if (tabBtn) {
+    const overlay = tabBtn.closest('.modal-overlay, .modal-panel');
+    if (!overlay) return;
+    const tabId = tabBtn.dataset.tab;
+    overlay.querySelectorAll('.modal-tab').forEach(b => b.classList.toggle('active', b === tabBtn));
+    overlay.querySelectorAll('.modal-tab-content').forEach(p => p.classList.toggle('active', p.id === tabId));
+  }
+});
