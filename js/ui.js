@@ -238,19 +238,25 @@ export function updateBadge(id, count) {
  * @param {string} name  The data-section value to activate
  */
 export function openSection(name) {
-  // Toggle active class on nav items
-  document.querySelectorAll('.nav-item[data-section]').forEach(el => {
+  // Toggle active on sidebar nav links (both .sidebar-link and .nav-item)
+  document.querySelectorAll('.sidebar-link[data-section], .nav-item[data-section]').forEach(el => {
     el.classList.toggle('active', el.dataset.section === name);
   });
 
-  // Show the matching section panel, hide all others
+  // Show matching .section-page (id="page-{name}"), hide all others
+  document.querySelectorAll('.section-page').forEach(el => {
+    const match = el.id === `page-${name}`;
+    el.classList.toggle('active', match);
+    el.hidden = !match;
+  });
+
+  // Legacy: also handle .section[data-section]
   document.querySelectorAll('.section[data-section]').forEach(el => {
     const match = el.dataset.section === name;
     el.classList.toggle('active', match);
     el.hidden = !match;
   });
 
-  // Persist for soft refresh
   try { sessionStorage.setItem('activeSection', name); } catch (_) {}
 }
 
