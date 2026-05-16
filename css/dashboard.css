@@ -2132,3 +2132,13 @@ tbody tr:hover { background: rgba(255,255,255,0.02); }
 @media (max-width: 600px) {
   .detail-grid { grid-template-columns: 1fr; }
 }
+
+/* ===========================
+   JOB CARD TAB PANELS
+   =========================== */
+
+.job-tab-panel { display: none; padding-top: 16px; }
+.job-tab-panel.active { display: block; }
+
+/* Support .open class as alias for .active on modal-overlays */
+.modal-overlay.open { display: flex !important; }

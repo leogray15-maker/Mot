@@ -513,7 +513,7 @@ async function openJobModal(id) {
       : '';
   }
 
-  modal.classList.add('open');
+  window.showModal('jobModal');
   switchJobTab('vehicle');
 }
 
@@ -721,11 +721,11 @@ async function triggerVRMLookup() {
 // ——— Switch tab ———
 function switchJobTab(tab) {
   _activeJobTab = tab;
-  document.querySelectorAll('.job-tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('#jobModal .job-tab-panel').forEach(p => p.classList.remove('active'));
   const panel = getEl(`jobTab_${tab}`);
   if (panel) panel.classList.add('active');
-  document.querySelectorAll('.tab-btn').forEach(b => {
-    b.classList.toggle('active', b.textContent.toLowerCase() === tab || b.onclick?.toString().includes(`'${tab}'`));
+  document.querySelectorAll('#jobModal .tab-btn').forEach(b => {
+    b.classList.toggle('active', b.onclick?.toString().includes(`'${tab}'`));
   });
 }
 
@@ -834,8 +834,7 @@ async function deleteJob(id) {
     window._jobsData = window._jobsData.filter(j => j.id !== id);
     if (_jobView === 'kanban') renderKanban(window._jobsData);
     else renderJobList(window._jobsData);
-    const modal = getEl('jobModal');
-    if (modal && modal.classList.contains('open')) modal.classList.remove('open');
+    window.closeModal('jobModal');
     showToast('Job card deleted', 'info');
   } catch (err) {
     showToast('Failed to delete job', 'error');
@@ -928,8 +927,7 @@ function printJobCard(id) {
 async function createInvoiceFromJob(jobId) {
   if (typeof window.openInvoiceModal === 'function') {
     window.openInvoiceModal(null, jobId);
-    const modal = getEl('jobModal');
-    if (modal) modal.classList.remove('open');
+    window.closeModal('jobModal');
   } else {
     showToast('Invoice module not loaded', 'error');
   }
@@ -967,8 +965,7 @@ export function initJobs() {
   getEl('newJobBtn')?.addEventListener('click', () => openJobModal(null));
   getEl('saveJobBtn')?.addEventListener('click', saveJob);
 
-  getEl('jobModalClose')?.addEventListener('click', () => getEl('jobModal')?.classList.remove('open'));
-  getEl('jobModal')?.addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('open'); });
+  // Modal close is handled globally by ui.js data-modal delegated handler
 
   getEl('jobDeleteBtn')?.addEventListener('click', () => { if (_openJobId) deleteJob(_openJobId); });
   getEl('jobPrintBtn')?.addEventListener('click', () => { if (_openJobId) printJobCard(_openJobId); });

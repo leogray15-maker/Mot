@@ -912,133 +912,102 @@
 <!-- Job Modal -->
 <div class="modal-overlay" id="jobModal" style="display:none">
   <div class="modal-panel modal-xl">
-    <div class="modal-header"><h3 id="jobModalTitle">New Job Card</h3><button class="modal-close" data-modal="jobModal"><i class="fas fa-times"></i></button></div>
-    <div class="modal-tabs">
-      <button class="modal-tab active" data-tab="job-vehicle">Vehicle</button>
-      <button class="modal-tab" data-tab="job-details">Job Details</button>
-      <button class="modal-tab" data-tab="job-parts">Parts &amp; Labour</button>
-      <button class="modal-tab" data-tab="job-vhc">VHC</button>
-      <button class="modal-tab" data-tab="job-approvals">Approvals</button>
-      <button class="modal-tab" data-tab="job-comms">Communications</button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="jobId">
-      <!-- Vehicle Tab -->
-      <div class="modal-tab-content active" id="job-vehicle">
-        <div class="form-grid">
-          <div class="form-group"><label>Registration</label><div class="input-with-btn"><input type="text" id="jobReg" class="form-input" data-vrm="true" placeholder="AB12 CDE"><button type="button" class="btn-sm btn-secondary" id="jobVrmLookup"><i class="fas fa-search"></i> Lookup</button></div></div>
-          <div class="form-group"><label>Make</label><input type="text" id="jobMake" class="form-input"></div>
-          <div class="form-group"><label>Model</label><input type="text" id="jobModel" class="form-input"></div>
-          <div class="form-group"><label>Year</label><input type="text" id="jobYear" class="form-input"></div>
-          <div class="form-group"><label>Fuel Type</label><input type="text" id="jobFuel" class="form-input"></div>
-          <div class="form-group"><label>Colour</label><input type="text" id="jobColour" class="form-input"></div>
-          <div class="form-group"><label>Engine CC</label><input type="text" id="jobEngineCC" class="form-input"></div>
-          <div class="form-group"><label>Mileage</label><input type="number" id="jobMileage" class="form-input"></div>
-          <div class="form-group"><label>MOT Expiry</label><input type="date" id="jobMotExpiry" class="form-input"><div id="jobMotCountdown" class="mot-countdown"></div></div>
-          <div class="form-group"><label>Customer</label><input type="text" id="jobCustomerSearch" class="form-input" placeholder="Search customer…"><div id="jobCustomerAutocomplete" class="autocomplete-list" style="display:none"></div><input type="hidden" id="jobCustomerId"></div>
-        </div>
+    <div class="modal-header">
+      <div>
+        <h3 id="jobModalTitle">New Job Card</h3>
+        <div id="jobStatusBanner" style="margin-top:4px;font-size:0.82rem;display:flex;gap:8px;align-items:center"></div>
       </div>
-      <!-- Job Details Tab -->
-      <div class="modal-tab-content" id="job-details">
-        <div class="form-grid">
-          <div class="form-group"><label>Service Type</label>
-            <select id="jobService" class="form-input">
-              <option value="MOT">MOT Test</option>
-              <option value="Full Service">Full Service</option>
-              <option value="Interim Service">Interim Service</option>
-              <option value="Tyres">Tyres</option>
-              <option value="Brakes">Brakes</option>
-              <option value="Diagnostics">Diagnostics</option>
-              <option value="Exhaust">Exhaust</option>
-              <option value="Suspension">Suspension</option>
-              <option value="Electrical">Electrical</option>
-              <option value="Bodywork">Bodywork</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-          <div class="form-group"><label>Assigned Technician</label><input type="text" id="jobTech" class="form-input"></div>
-          <div class="form-group"><label>Bay</label><select id="jobBay" class="form-input"><option value="1">Bay 1</option><option value="2">Bay 2</option><option value="3">Bay 3</option><option value="4">Bay 4</option></select></div>
-          <div class="form-group"><label>Status</label>
-            <select id="jobStatus" class="form-input">
-              <option value="waiting">Waiting</option>
-              <option value="in_progress">In Progress</option>
-              <option value="awaiting_parts">Awaiting Parts</option>
-              <option value="pending_payment">Pending Payment</option>
-              <option value="complete">Complete</option>
-            </select>
-          </div>
-          <div class="form-group"><label>Estimated Hours</label><input type="number" id="jobEstHours" class="form-input" step="0.5" min="0"></div>
-          <div class="form-group"><label>Priority</label><select id="jobPriority" class="form-input"><option value="normal">Normal</option><option value="high">High</option><option value="urgent">Urgent</option></select></div>
-          <div class="form-group form-full"><label>Work Description</label><textarea id="jobDescription" class="form-input" rows="3" placeholder="Describe work to be carried out…"></textarea></div>
-          <div class="form-group form-full"><label>Internal Notes</label><textarea id="jobNotes" class="form-input" rows="2"></textarea></div>
-        </div>
-        <!-- Clock section -->
-        <div class="clock-section">
-          <div class="clock-buttons">
-            <button type="button" class="btn-success" id="clockOnBtn"><i class="fas fa-play"></i> Clock On</button>
+      <div style="display:flex;gap:6px;align-items:center">
+        <button class="btn-sm btn-secondary" id="jobPrintBtn" title="Print"><i class="fas fa-print"></i></button>
+        <button class="btn-sm btn-secondary" id="jobDeleteBtn" title="Delete" style="color:var(--red)"><i class="fas fa-trash"></i></button>
+        <button class="modal-close" data-modal="jobModal" aria-label="Close">×</button>
+      </div>
+    </div>
+    <div class="modal-tabs" id="jobTabBar">
+      <button class="tab-btn active" onclick="switchJobTab('vehicle')">Vehicle</button>
+      <button class="tab-btn" onclick="switchJobTab('job')">Job</button>
+      <button class="tab-btn" onclick="switchJobTab('parts')">Parts</button>
+      <button class="tab-btn" onclick="switchJobTab('labour')">Labour</button>
+      <button class="tab-btn" onclick="switchJobTab('vhc')">VHC</button>
+      <button class="tab-btn" onclick="switchJobTab('approvals')">Approvals</button>
+      <button class="tab-btn" onclick="switchJobTab('comms')">Comms</button>
+    </div>
+    <div class="modal-body" style="padding-top:0">
+      <input type="hidden" id="jobId">
+
+      <!-- Vehicle -->
+      <div class="job-tab-panel active" id="jobTab_vehicle">
+        <div id="jobVehicleContent"></div>
+      </div>
+
+      <!-- Job Details -->
+      <div class="job-tab-panel" id="jobTab_job">
+        <div id="jobDetailsContent"></div>
+        <div class="clock-section" style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.07)">
+          <div class="clock-buttons" style="display:flex;gap:8px;margin-bottom:8px">
+            <button type="button" class="btn-primary" id="clockOnBtn"><i class="fas fa-play"></i> Clock On</button>
             <button type="button" class="btn-danger" id="clockOffBtn"><i class="fas fa-stop"></i> Clock Off</button>
           </div>
-          <div id="jobTimeDisplay" class="time-display">Total: 0h 0m | Quoted: 0h</div>
+          <div id="jobTimeDisplay" style="font-size:0.82rem;color:var(--text-dim);margin-bottom:6px">Total: 0h 0m | Quoted: 0h</div>
           <div id="clockLogList"></div>
         </div>
       </div>
-      <!-- Parts & Labour Tab -->
-      <div class="modal-tab-content" id="job-parts">
-        <div class="parts-section">
-          <div class="parts-header">
-            <h4>Parts</h4>
-            <button type="button" class="btn-sm btn-primary" id="addPartRowBtn"><i class="fas fa-plus"></i> Add Part</button>
-          </div>
-          <div class="table-wrap">
-            <table class="data-table" id="jobPartsTable">
-              <thead><tr><th>Part Name</th><th>Qty</th><th>Cost (£)</th><th>Sale (£)</th><th>Total</th><th></th></tr></thead>
-              <tbody id="jobPartsBody"></tbody>
-            </table>
-          </div>
-        </div>
-        <div class="labour-section">
-          <h4>Labour</h4>
-          <div class="form-grid">
-            <div class="form-group"><label>Labour Hours</label><input type="number" id="jobLabourHours" class="form-input" step="0.25" min="0" value="0"></div>
-            <div class="form-group"><label>Labour Rate (£/hr)</label><input type="number" id="jobLabourRate" class="form-input" value="65"></div>
-          </div>
-        </div>
-        <div class="job-totals">
-          <div class="total-row"><span>Parts Subtotal</span><span id="partsSubtotal">£0.00</span></div>
-          <div class="total-row"><span>Labour</span><span id="labourTotal">£0.00</span></div>
-          <div class="total-row total-vat"><span>VAT (20%)</span><span id="jobVat">£0.00</span></div>
+
+      <!-- Parts -->
+      <div class="job-tab-panel" id="jobTab_parts">
+        <div id="jobPartsTabContent"></div>
+        <div class="job-totals" style="margin-top:16px">
+          <div class="total-row"><span>Parts</span><span id="jobPartsTotal">£0.00</span></div>
+          <div class="total-row"><span>Labour</span><span id="jobLabourTotal">£0.00</span></div>
+          <div class="total-row"><span>Subtotal</span><span id="jobSubtotal">£0.00</span></div>
+          <div class="total-row total-vat"><span>VAT (20%)</span><span id="jobVAT">—</span></div>
           <div class="total-row total-grand"><span>Total</span><span id="jobTotal">£0.00</span></div>
         </div>
-        <div class="job-action-btns">
-          <button type="button" class="btn-secondary" id="sendApprovalBtn"><i class="fas fa-camera"></i> Send for Approval</button>
-          <button type="button" class="btn-primary" id="generateInvoiceBtn"><i class="fas fa-file-invoice-pound"></i> Generate Invoice</button>
-          <button type="button" class="btn-secondary" id="sendVhcBtn"><i class="fas fa-clipboard-check"></i> Send VHC Report</button>
+        <div class="job-action-btns" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="btn-primary" id="jobInvoiceBtn"><i class="fas fa-file-invoice-pound"></i> Generate Invoice</button>
+          <button type="button" class="btn-secondary" onclick="window.sendVhcReport?.(_openJobId)"><i class="fas fa-clipboard-check"></i> Send VHC</button>
         </div>
       </div>
-      <!-- VHC Tab -->
-      <div class="modal-tab-content" id="job-vhc">
-        <div id="vhcChecklist"></div>
-        <div class="vhc-footer" style="margin-top:16px">
-          <div class="form-group"><label>Mechanic Sign-off</label><input type="text" id="vhcMechanicName" class="form-input" placeholder="Technician name"></div>
-          <button type="button" class="btn-primary" id="saveVhcBtn"><i class="fas fa-clipboard-check"></i> Save &amp; Generate Report</button>
+
+      <!-- Labour -->
+      <div class="job-tab-panel" id="jobTab_labour">
+        <div id="jobLabourContent"></div>
+        <div class="job-totals" style="margin-top:16px">
+          <div class="total-row"><span>Labour</span><span id="jobLabourTotalL">—</span></div>
+          <div class="total-row total-grand"><span>Total (incl. parts)</span><span id="jobTotalL">—</span></div>
         </div>
       </div>
-      <!-- Approvals Tab -->
-      <div class="modal-tab-content" id="job-approvals">
-        <div id="jobApprovalsList"></div>
+
+      <!-- VHC -->
+      <div class="job-tab-panel" id="jobTab_vhc">
+        <div id="jobVHCContent"></div>
+        <div style="margin-top:16px;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+          <div class="form-group" style="margin:0;flex:1;min-width:180px">
+            <label>Mechanic Sign-off</label>
+            <input type="text" id="vhcMechanicName" class="form-input" placeholder="Technician name">
+          </div>
+          <button type="button" class="btn-primary" id="saveVhcBtn"><i class="fas fa-clipboard-check"></i> Save VHC Report</button>
+        </div>
       </div>
-      <!-- Communications Tab -->
-      <div class="modal-tab-content" id="job-comms">
-        <div id="jobCommsTimeline"></div>
-        <div class="add-note-form">
-          <textarea id="jobNoteText" class="form-input" rows="2" placeholder="Add a note…"></textarea>
-          <button type="button" class="btn-primary" id="addJobNoteBtn"><i class="fas fa-plus"></i> Add Note</button>
+
+      <!-- Approvals -->
+      <div class="job-tab-panel" id="jobTab_approvals">
+        <div id="jobApprovalsContent"></div>
+      </div>
+
+      <!-- Comms -->
+      <div class="job-tab-panel" id="jobTab_comms">
+        <div id="jobCommsContent"></div>
+        <div style="margin-top:16px">
+          <textarea id="jobNoteText" class="form-input" rows="2" placeholder="Add a note or log a communication…"></textarea>
+          <button type="button" class="btn-primary" id="addJobNoteBtn" style="margin-top:8px"><i class="fas fa-plus"></i> Add Note</button>
         </div>
       </div>
     </div>
+
     <div class="modal-footer">
       <button class="btn-secondary" data-modal="jobModal">Cancel</button>
-      <button class="btn-primary" id="saveJobBtn">Save Job Card</button>
+      <button class="btn-primary" id="saveJobBtn"><i class="fas fa-save"></i> Save Job Card</button>
     </div>
   </div>
 </div>
@@ -1133,6 +1102,28 @@
       <button class="btn-secondary" data-modal="invoiceModal">Cancel</button>
       <button class="btn-primary" id="saveInvoiceBtn">Save Invoice</button>
     </div>
+  </div>
+</div>
+
+<!-- Invoice Detail Modal -->
+<div class="modal-overlay" id="invoiceDetailModal" style="display:none">
+  <div class="modal-panel modal-lg">
+    <div class="modal-header">
+      <h3><i class="fas fa-file-invoice-pound" style="margin-right:8px;color:var(--green)"></i>Invoice Detail</h3>
+      <button class="modal-close" id="closeInvoiceModal" data-modal="invoiceDetailModal" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body" id="invoiceDetailContent"></div>
+  </div>
+</div>
+
+<!-- VHC Modal -->
+<div class="modal-overlay" id="vhcModal" style="display:none">
+  <div class="modal-panel modal-lg" style="max-height:90vh;overflow-y:auto">
+    <div class="modal-header">
+      <h3><i class="fas fa-clipboard-check" style="margin-right:8px;color:var(--amber)"></i>Vehicle Health Check</h3>
+      <button class="modal-close" id="closeVhcModal" aria-label="Close" onclick="document.getElementById('vhcModal').classList.remove('open');document.getElementById('vhcModal').style.display='none'">×</button>
+    </div>
+    <div class="modal-body" id="vhcModalContent"></div>
   </div>
 </div>
 
