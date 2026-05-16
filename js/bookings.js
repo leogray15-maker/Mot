@@ -176,13 +176,6 @@ if (document.getElementById('publicBookingPage')) {
       const phoneEl = document.getElementById('confirmPhone');
       if (phoneEl) phoneEl.textContent = s.phone || '07749 207399';
 
-      // WA confirmation to customer
-      const custNum = bkData.phone.replace(/[\s\-\(\)]/g,'').replace(/^0/,'44');
-      setTimeout(() => window.open(
-        `https://wa.me/${custNum}?text=${encodeURIComponent('Thanks for booking with us! Your ' + bkData.service + ' booking (Ref: ' + ref + ') is confirmed for ' + bkData.date + ' at ' + bkData.time + '. We\'ll call you within 1 hour. — ' + (s.garageName || 'MOT Car Repairs'))}`,
-        '_blank', 'noopener'
-      ), 600);
-
       goStep(5);
     } catch (e) {
       if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-calendar-check"></i> Confirm Booking'; }
