@@ -4,6 +4,7 @@
 
 import { db, garageRef, garageDoc, docsToArr, fsAdd, fsUpdate, fsDel, showSpinner, hideSpinner } from './firebase.js';
 import { getSettings, showToast, formatDate, esc, formatCurrency } from './utils.js';
+import { buildInvoiceWhatsAppMessage, openWhatsApp } from './whatsapp.js';
 window._invoicesData = [];
 
 async function loadInvoicesSection() {
@@ -77,20 +78,25 @@ async function createInvoiceFromJob(jobId) {
 
   const cust = (window._customersData || []).find(c => c.id === j.customerId) || {};
   const vatRate = s.vatRegistered ? 0.2 : 0;
-  const subtotal = parseFloat(j.jobValue || 0);
-  const vatAmount = subtotal * vatRate;
-  const total = subtotal + vatAmount;
+  // Use j.total (parts+labour) as base; fall back to j.subtotal or j.jobValue for legacy data
+  const subtotal = parseFloat(j.subtotal || j.total || j.jobValue || 0);
+  const vatAmount = s.vatRegistered ? parseFloat(j.vatAmount || subtotal * vatRate) : 0;
+  const total = parseFloat(j.total || subtotal + vatAmount);
+
+  // Job date: createdAt may be a Firestore Timestamp
+  const createdDate = j.createdAt?.toDate ? j.createdAt.toDate() : (j.createdAt ? new Date(j.createdAt) : new Date());
+  const jobDateStr = createdDate.toISOString().split('T')[0];
 
   const invoice = {
     invoiceNumber: invoiceNum,
     jobId,
     customerId: j.customerId || '',
     customerName: j.customerName || '',
-    customerPhone: cust.phone || '',
-    customerEmail: cust.email || '',
+    customerPhone: cust.phone || j.customerPhone || '',
+    customerEmail: cust.email || j.customerEmail || '',
     reg: j.reg || '',
     service: j.serviceType || '',
-    date: j.dateIn || new Date().toISOString().split('T')[0],
+    date: jobDateStr,
     items: [
       ...(j.parts || []).map(p => ({ desc: p.name, qty: p.qty, unit: p.cost, total: p.total })),
       { desc: `Labour (${j.labourHours||0}hrs @ £${j.labourRate||0}/hr)`, qty: 1, unit: (j.labourHours||0)*(j.labourRate||0), total: (j.labourHours||0)*(j.labourRate||0) }
@@ -239,8 +245,6 @@ function printInvoice(id) {
   <script>window.onload=()=>window.print();<\/script></body></html>`);
   win.document.close();
 }
-
-function esc(str) { if (!str) return ''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 document.getElementById('closeInvoiceModal')?.addEventListener('click', () => document.getElementById('invoiceDetailModal')?.classList.remove('open'));
 document.getElementById('invoiceDetailModal')?.addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });

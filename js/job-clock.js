@@ -174,10 +174,11 @@ async function checkAutoTimeout() {
 
 // ——— Helpers ———
 export function formatDuration(ms) {
-  const s = Math.floor(ms / 1000);
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  return `${h}h ${m}m`;
+  const total = Math.floor(ms / 1000);
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  return `${h}h ${m}m ${String(s).padStart(2,'0')}s`;
 }
 
 // Expose for job modal

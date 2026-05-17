@@ -1,6 +1,8 @@
 /* ===========================
-   Premier MOT — Extended Settings
+   MOT Car Repairs — Extended Settings
    =========================== */
+
+import { showToast, formatDate } from './utils.js';
 
 const DAYS = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
 const DAY_LABELS = { monday:'Mon',tuesday:'Tue',wednesday:'Wed',thursday:'Thu',friday:'Fri',saturday:'Sat',sunday:'Sun' };
@@ -8,6 +10,13 @@ const DAY_LABELS = { monday:'Mon',tuesday:'Tue',wednesday:'Wed',thursday:'Thu',f
 
 function loadExtendedSettings() {
   const s = window.getSettings();
+
+  // General / garage details
+  const gn = document.getElementById('settingGarageName'); if (gn) gn.value = s.garageName || '';
+  const ph = document.getElementById('settingPhone');      if (ph) ph.value = s.phone      || '';
+  const em = document.getElementById('settingEmail');      if (em) em.value = s.email      || '';
+  const ad = document.getElementById('settingAddress');    if (ad) ad.value = s.address    || '';
+  const dk = document.getElementById('settingDvlaKey');    if (dk) dk.value = s.dvlaApiKey || '';
 
   // WhatsApp template
   const waTpl = document.getElementById('settingWATemplate');
@@ -155,13 +164,16 @@ async function saveExtendedSettings() {
   }
 }
 
-// Hook into navigate for settings section
-document.addEventListener('DOMContentLoaded', () => {
-  // Extend navigate to also call loadExtendedSettings when on settings page
+// ——— Settings module initialisation (runs when lazily loaded) ———
+// DOMContentLoaded has already fired by the time this module is imported,
+// so all setup runs immediately and also self-registers the section loader.
+
+function initSettingsModule() {
+  // Register the section loader override
   if (typeof window.sectionLoaders !== 'undefined') {
-    const origSettingsLoader = window.sectionLoaders['settings'];
+    const orig = window.sectionLoaders['settings'];
     window.sectionLoaders['settings'] = function() {
-      if (origSettingsLoader) origSettingsLoader();
+      if (orig) orig();
       loadExtendedSettings();
     };
   }
@@ -172,12 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Working hours toggle listeners
   DAYS.forEach(day => {
     document.getElementById(`wh_open_${day}`)?.addEventListener('change', () => updateDayRowState(day));
-  });
-
-  // Extended settings form
-  document.getElementById('settingsExtendedForm')?.addEventListener('submit', e => {
-    e.preventDefault();
-    saveExtendedSettings();
   });
 
   // Working hours form
@@ -191,7 +197,17 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('newBlockedDate')?.addEventListener('keypress', e => {
     if (e.key === 'Enter') { e.preventDefault(); addBlockedDate(); }
   });
-});
+
+  // Run immediately since we're already on the settings page when loaded
+  loadExtendedSettings();
+}
+
+// Run either immediately (DOM ready) or after DOMContentLoaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initSettingsModule);
+} else {
+  initSettingsModule();
+}
 
 Object.assign(window, {
   addBlockedDate, removeBlockedDate, toggleVATNumber,

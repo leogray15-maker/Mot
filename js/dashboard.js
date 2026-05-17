@@ -357,32 +357,6 @@ function setupCloseOfDay() {
   });
 }
 
-// ——— AI Assistant ———
-
-function setupAIAssistant() {
-  const btn   = document.getElementById('aiAssistantBtn');
-  const panel = document.getElementById('aiAssistantPanel');
-  if (!btn) return;
-
-  if (!checkPlanAccess('ai')) {
-    btn.title = 'AI Assistant requires Pro or Enterprise plan';
-    btn.classList.add('locked');
-  }
-
-  btn.addEventListener('click', () => {
-    if (!checkPlanAccess('ai')) {
-      showUpgradeModal('The AI Assistant is available on Pro and Enterprise plans.');
-      return;
-    }
-    panel?.classList.toggle('open');
-    if (panel?.classList.contains('open')) {
-      import('./ai-assistant.js').catch(() => {});
-    }
-  });
-
-  document.getElementById('aiPanelClose')?.addEventListener('click', () => panel?.classList.remove('open'));
-}
-
 // ——— Onboarding checklist ———
 
 async function checkOnboarding() {
@@ -880,6 +854,13 @@ async function loadSettingsFallback() {
   });
 }
 
+// ——— Save settings to Firestore ———
+
+export async function saveSettings(settings) {
+  window._settings = settings;
+  await garageRef('settings').doc('config').set(settings, { merge: true });
+}
+
 // ——— Expose navigate globally for cross-module use ———
 
 window.navigate          = navigate;
@@ -887,7 +868,14 @@ window.loadSection       = loadSection;
 window.showUpgradeModal  = showUpgradeModal;
 window.checkPlanAccess   = checkPlanAccess;
 window.statusBadge       = statusBadge;
+window.saveSettings      = saveSettings;
 window._enquiriesData    = window._enquiriesData || [];
+
+// Expose active section for cross-module use
+Object.defineProperty(window, '_currentSection', {
+  get: () => _activeSection,
+  configurable: true
+});
 
 // ——— Dashboard init ———
 
@@ -905,7 +893,6 @@ export async function initDashboard() {
     updateTopbar(user, userData);
     setupSidebar();
     setupCloseOfDay();
-    setupAIAssistant();
     checkOnboarding();
 
     // Topbar logout button (sidebar logoutBtn is handled by auth.js)
