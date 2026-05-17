@@ -356,46 +356,6 @@ function setupCloseOfDay() {
   });
 }
 
-// ——— AI Assistant ———
-
-function setupAIAssistant() {
-  const btn   = document.getElementById('aiBtn');
-  const panel = document.getElementById('aiPanel');
-  if (!btn) return;
-
-  if (!checkPlanAccess('ai')) {
-    btn.title = 'AI Assistant requires Pro or Enterprise plan';
-    btn.classList.add('locked');
-  }
-
-  btn.addEventListener('click', () => {
-    if (!checkPlanAccess('ai')) {
-      showUpgradeModal('The AI Assistant is available on Pro and Enterprise plans.');
-      return;
-    }
-    panel?.classList.toggle('open');
-    const overlay = document.getElementById('aiOverlay');
-    if (panel?.classList.contains('open')) {
-      if (overlay) overlay.style.display = '';
-      import('./ai-assistant.js').catch(() => {});
-    } else {
-      if (overlay) overlay.style.display = 'none';
-    }
-  });
-
-  document.getElementById('closeAiPanel')?.addEventListener('click', () => {
-    panel?.classList.remove('open');
-    const overlay = document.getElementById('aiOverlay');
-    if (overlay) overlay.style.display = 'none';
-  });
-
-  document.getElementById('aiOverlay')?.addEventListener('click', () => {
-    panel?.classList.remove('open');
-    const overlay = document.getElementById('aiOverlay');
-    if (overlay) overlay.style.display = 'none';
-  });
-}
-
 // ——— Onboarding checklist ———
 
 async function checkOnboarding() {
@@ -941,7 +901,6 @@ export async function initDashboard() {
     updateTopbar(user, userData);
     setupSidebar();
     setupCloseOfDay();
-    setupAIAssistant();
     checkOnboarding();
 
     // Topbar logout button (sidebar logoutBtn is handled by auth.js)

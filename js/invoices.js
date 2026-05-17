@@ -4,6 +4,7 @@
 
 import { db, garageRef, garageDoc, docsToArr, fsAdd, fsUpdate, fsDel, showSpinner, hideSpinner } from './firebase.js';
 import { getSettings, showToast, formatDate, esc, formatCurrency } from './utils.js';
+import { buildInvoiceWhatsAppMessage, openWhatsApp } from './whatsapp.js';
 window._invoicesData = [];
 
 async function loadInvoicesSection() {
@@ -77,9 +78,11 @@ async function createInvoiceFromJob(jobId) {
 
   const cust = (window._customersData || []).find(c => c.id === j.customerId) || {};
   const vatRate = s.vatRegistered ? 0.2 : 0;
-  const subtotal = parseFloat(j.jobValue || 0);
-  const vatAmount = subtotal * vatRate;
-  const total = subtotal + vatAmount;
+  const subtotal = parseFloat(j.subtotal || j.total || j.jobValue || 0);
+  const vatAmount = s.vatRegistered ? parseFloat(j.vatAmount || subtotal * vatRate) : 0;
+  const total = parseFloat(j.total || subtotal + vatAmount);
+  const createdDate = j.createdAt?.toDate ? j.createdAt.toDate() : (j.createdAt ? new Date(j.createdAt) : new Date());
+  const jobDateStr = j.dateIn || createdDate.toISOString().split('T')[0];
 
   const invoice = {
     invoiceNumber: invoiceNum,
@@ -90,7 +93,7 @@ async function createInvoiceFromJob(jobId) {
     customerEmail: cust.email || '',
     reg: j.reg || '',
     service: j.serviceType || '',
-    date: j.dateIn || new Date().toISOString().split('T')[0],
+    date: jobDateStr,
     items: [
       ...(j.parts || []).map(p => ({ desc: p.name, qty: p.qty, unit: p.cost, total: p.total })),
       { desc: `Labour (${j.labourHours||0}hrs @ £${j.labourRate||0}/hr)`, qty: 1, unit: (j.labourHours||0)*(j.labourRate||0), total: (j.labourHours||0)*(j.labourRate||0) }

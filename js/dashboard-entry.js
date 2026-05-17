@@ -51,9 +51,6 @@ import { initZRead }        from './z-read.js';
 // ——— Multi-user / teams ———
 import { initUsers, enforceRoleRestrictions } from './multi-user.js';
 
-// ——— AI Assistant ———
-import { initAiAssistant }  from './ai-assistant.js';
-
 // ——— WhatsApp helpers ———
 import './whatsapp.js';
 
@@ -78,5 +75,4 @@ document.addEventListener('DOMContentLoaded', async () => {
   initReports();
   initZRead();
   initUsers();
-  initAiAssistant();
 });
