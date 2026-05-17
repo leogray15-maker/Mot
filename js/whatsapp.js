@@ -3,6 +3,7 @@
    =========================== */
 
 import { db, fsUpdate } from './firebase.js';
+import { showToast, formatDate, getSettings } from './utils.js';
 
 function buildWAPhone(phone) {
   if (!phone) return '';
@@ -12,7 +13,7 @@ function buildWAPhone(phone) {
   return clean;
 }
 
-function openWhatsApp(phone, message) {
+export function openWhatsApp(phone, message) {
   const num = buildWAPhone(phone);
   if (!num) { showToast('No phone number found for this customer', 'error'); return; }
   window.open(`https://wa.me/${num}?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
@@ -20,7 +21,7 @@ function openWhatsApp(phone, message) {
   db.collection('wa_logs').add({ phone: num, snippet: message.slice(0, 120), sentAt: new Date().toISOString() }).catch(() => {});
 }
 
-function buildMOTReminderMessage(customer) {
+export function buildMOTReminderMessage(customer) {
   const s = getSettings();
   const firstName = (customer.name || 'there').split(' ')[0];
   return (s.whatsappTemplate || 'Hi [FirstName], your MOT is due [MOTDueDate] for [Year] [Make] [Model] ([Reg]). Book at [SiteURL] or call [PhoneNumber]. — [GarageName]')
@@ -35,7 +36,7 @@ function buildMOTReminderMessage(customer) {
     .replace(/\[GarageName\]/g, s.garageName   || 'MOT Car Repairs');
 }
 
-function buildReviewRequestMessage(customer) {
+export function buildReviewRequestMessage(customer) {
   const s = getSettings();
   const firstName = (customer.name || 'there').split(' ')[0];
   return (s.reviewTemplate || 'Hi [FirstName], thanks for visiting [GarageName]! We\'d love a Google review: [GoogleReviewLink] — [GarageName]')
@@ -44,13 +45,13 @@ function buildReviewRequestMessage(customer) {
     .replace(/\[GoogleReviewLink\]/g, s.googleReviewLink || 'https://g.page/r/your-review-link');
 }
 
-function buildInvoiceWhatsAppMessage(invoice) {
+export function buildInvoiceWhatsAppMessage(invoice) {
   const s = getSettings();
   const firstName = (invoice.customerName || 'there').split(' ')[0];
   return `Hi ${firstName}, please find your invoice (${invoice.invoiceNumber}) for ${invoice.service || 'our services'} on ${formatDate(invoice.date)}.\n\nTotal: £${(invoice.total || 0).toFixed(2)}${invoice.vatApplied ? ' (inc. VAT)' : ''}.\n\nPlease transfer to: ${s.bankDetails || 'details to follow'}.\n\nThanks — ${s.garageName || 'MOT Car Repairs'}`;
 }
 
-async function sendMOTReminderWA(customerId) {
+export async function sendMOTReminderWA(customerId) {
   const c = window._customersData.find(x => x.id === customerId)
     || await db.collection('customers').doc(customerId).get().then(d => d.exists ? { id: d.id, ...d.data() } : null);
   if (!c) return;
@@ -70,7 +71,7 @@ async function sendMOTReminderWA(customerId) {
   showToast(`MOT reminder sent to ${c.name.split(' ')[0]} via WhatsApp`, 'success');
 }
 
-async function promptReviewRequest(customerId) {
+export async function promptReviewRequest(customerId) {
   const c = window._customersData.find(x => x.id === customerId)
     || await db.collection('customers').doc(customerId).get().then(d => d.exists ? { id: d.id, ...d.data() } : null);
   if (!c || !c.phone) return;
@@ -91,7 +92,7 @@ async function promptReviewRequest(customerId) {
   showToast(`Review request sent to ${c.name.split(' ')[0]}`, 'success');
 }
 
-function getMOTDueForReminder() {
+export function getMOTDueForReminder() {
   const s = getSettings();
   const reminderDays = s.reminderDays || [7, 14, 30];
   const maxDays = Math.max(...reminderDays);
