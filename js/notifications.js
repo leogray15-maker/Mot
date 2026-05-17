@@ -2,13 +2,13 @@
    Premier MOT — Notifications (Firebase)
    =========================== */
 
-import { db, docsToArr } from './firebase.js';
+import { db, garageRef, docsToArr } from './firebase.js';
 
 window._notifData = [];
 
 async function loadNotifications() {
   try {
-    const snap = await db.collection('notifications').orderBy('createdAt','desc').limit(60).get();
+    const snap = await garageRef('notifications').orderBy('createdAt','desc').limit(60).get();
     window._notifData = docsToArr(snap);
   } catch (e) {
     window._notifData = [];
@@ -23,7 +23,7 @@ function addNotification(type, message, section) {
   updateNotifBadge();
   if (document.getElementById('notifDropdown')?.classList.contains('open')) renderNotifDropdown();
   // Fire-and-forget Firestore write
-  db.collection('notifications').add(notif).catch(() => {});
+  try { garageRef('notifications').add(notif); } catch { /* no garageId yet */ }
 }
 
 function updateNotifBadge() {
@@ -77,12 +77,14 @@ function markAllRead() {
   updateNotifBadge();
   renderNotifDropdown();
   // Best-effort batch mark-read in Firestore
-  db.collection('notifications').where('read','==',false).get()
-    .then(snap => {
-      const batch = db.batch();
-      snap.docs.forEach(d => batch.update(d.ref, { read: true }));
-      return batch.commit();
-    }).catch(() => {});
+  try {
+    garageRef('notifications').where('read','==',false).get()
+      .then(snap => {
+        const batch = db.batch();
+        snap.docs.forEach(d => batch.update(d.ref, { read: true }));
+        return batch.commit();
+      }).catch(() => {});
+  } catch { /* no garageId */ }
 }
 
 function clearAllNotifs() {
@@ -90,12 +92,14 @@ function clearAllNotifs() {
   updateNotifBadge();
   renderNotifDropdown();
   // Best-effort delete in Firestore
-  db.collection('notifications').get()
-    .then(snap => {
-      const batch = db.batch();
-      snap.docs.forEach(d => batch.delete(d.ref));
-      return batch.commit();
-    }).catch(() => {});
+  try {
+    garageRef('notifications').get()
+      .then(snap => {
+        const batch = db.batch();
+        snap.docs.forEach(d => batch.delete(d.ref));
+        return batch.commit();
+      }).catch(() => {});
+  } catch { /* no garageId */ }
 }
 
 function timeAgo(iso) {

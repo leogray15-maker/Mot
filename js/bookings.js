@@ -2,7 +2,7 @@
    MOT Car Repairs — Bookings (Firebase)
    =========================== */
 
-import { db, docsToArr, fsAdd, fsUpdate, fsDel, showSpinner, hideSpinner } from './firebase.js';
+import { db, garageRef, docsToArr, fsAdd, fsUpdate, fsDel, showSpinner, hideSpinner } from './firebase.js';
 window._bookingsData = window._bookingsData || [];
 
 function genBookingRef() {
@@ -52,6 +52,7 @@ if (document.getElementById('publicBookingPage')) {
   function esc(s) { return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
 
   // Load settings + existing bookings for slot availability
+  const _publicGarageId = new URLSearchParams(window.location.search).get('garage') || 'mot-car-repairs-poole';
   async function initPublicBooking() {
     const defaultWH = {
       monday:    { open: true,  start: '08:00', end: '18:00' },
@@ -64,8 +65,8 @@ if (document.getElementById('publicBookingPage')) {
     };
     try {
       const [settingsSnap, bookingsSnap] = await Promise.all([
-        db.collection('garages/mot-car-repairs-poole/settings').doc('config').get(),
-        db.collection('garages/mot-car-repairs-poole/bookings').get()
+        db.collection(`garages/${_publicGarageId}/settings`).doc('config').get(),
+        db.collection(`garages/${_publicGarageId}/bookings`).get()
       ]);
       const stored = settingsSnap.exists ? settingsSnap.data() : {};
       // Deep-merge so missing/empty workingHours always falls back to sensible defaults
@@ -169,7 +170,7 @@ if (document.getElementById('publicBookingPage')) {
     const ref = genBookingRef();
     const booking = { ref, ...bkData, status: 'Confirmed', createdAt: new Date().toISOString() };
     try {
-      await db.collection('garages/mot-car-repairs-poole/bookings').add(booking);
+      await db.collection(`garages/${_publicGarageId}/bookings`).add(booking);
       const s = window._settings || {};
       const refEl = document.getElementById('bookingRefDisplay');
       if (refEl) refEl.textContent = ref;
@@ -220,7 +221,7 @@ function loadBookingsSection() {
     else renderBookingsList();
   }
 
-  _bookingsUnsub = db.collection('bookings')
+  _bookingsUnsub = garageRef('bookings')
     .orderBy('createdAt', 'desc')
     .onSnapshot(snap => {
       window._bookingsData = docsToArr(snap);
@@ -239,7 +240,7 @@ function loadBookingsSection() {
       hideSpinner('page-bookings');
       // Fall back to a one-time read so the section still shows data
       try {
-        const snap = await db.collection('bookings').orderBy('createdAt', 'desc').get();
+        const snap = await garageRef('bookings').orderBy('createdAt', 'desc').get();
         window._bookingsData = docsToArr(snap);
         updateBookingsBadge();
         if (dashBookingView === 'calendar') renderBookingCalendar();
