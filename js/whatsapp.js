@@ -12,7 +12,7 @@ function buildWAPhone(phone) {
   return clean;
 }
 
-function openWhatsApp(phone, message) {
+export function openWhatsApp(phone, message) {
   const num = buildWAPhone(phone);
   if (!num) { showToast('No phone number found for this customer', 'error'); return; }
   window.open(`https://wa.me/${num}?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
@@ -44,7 +44,7 @@ function buildReviewRequestMessage(customer) {
     .replace(/\[GoogleReviewLink\]/g, s.googleReviewLink || 'https://g.page/r/your-review-link');
 }
 
-function buildInvoiceWhatsAppMessage(invoice) {
+export function buildInvoiceWhatsAppMessage(invoice) {
   const s = getSettings();
   const firstName = (invoice.customerName || 'there').split(' ')[0];
   return `Hi ${firstName}, please find your invoice (${invoice.invoiceNumber}) for ${invoice.service || 'our services'} on ${formatDate(invoice.date)}.\n\nTotal: £${(invoice.total || 0).toFixed(2)}${invoice.vatApplied ? ' (inc. VAT)' : ''}.\n\nPlease transfer to: ${s.bankDetails || 'details to follow'}.\n\nThanks — ${s.garageName || 'MOT Car Repairs'}`;
