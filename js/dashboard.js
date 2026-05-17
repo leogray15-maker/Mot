@@ -357,32 +357,6 @@ function setupCloseOfDay() {
   });
 }
 
-// ——— AI Assistant ———
-
-function setupAIAssistant() {
-  const btn   = document.getElementById('aiAssistantBtn');
-  const panel = document.getElementById('aiAssistantPanel');
-  if (!btn) return;
-
-  if (!checkPlanAccess('ai')) {
-    btn.title = 'AI Assistant requires Pro or Enterprise plan';
-    btn.classList.add('locked');
-  }
-
-  btn.addEventListener('click', () => {
-    if (!checkPlanAccess('ai')) {
-      showUpgradeModal('The AI Assistant is available on Pro and Enterprise plans.');
-      return;
-    }
-    panel?.classList.toggle('open');
-    if (panel?.classList.contains('open')) {
-      import('./ai-assistant.js').catch(() => {});
-    }
-  });
-
-  document.getElementById('aiPanelClose')?.addEventListener('click', () => panel?.classList.remove('open'));
-}
-
 // ——— Onboarding checklist ———
 
 async function checkOnboarding() {
@@ -919,7 +893,6 @@ export async function initDashboard() {
     updateTopbar(user, userData);
     setupSidebar();
     setupCloseOfDay();
-    setupAIAssistant();
     checkOnboarding();
 
     // Topbar logout button (sidebar logoutBtn is handled by auth.js)
