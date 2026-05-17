@@ -2,7 +2,7 @@
    GarageOS — Reports Suite
    =========================== */
 
-import { garageRef, docsToArr } from './firebase.js';
+import firebase, { garageRef, docsToArr } from './firebase.js';
 import { showToast, formatDate, formatCurrency, esc } from './utils.js';
 
 let currentReportData = [];
@@ -334,7 +334,12 @@ async function getInvoices(range) {
 }
 
 async function getJobs(range) {
-  const snap = await garageRef('jobs').where('dateIn','>=',range.from).where('dateIn','<=',range.to).get();
+  const from = new Date(range.from + 'T00:00:00');
+  const to   = new Date(range.to   + 'T23:59:59');
+  const snap = await garageRef('jobs')
+    .where('createdAt', '>=', firebase.firestore.Timestamp.fromDate(from))
+    .where('createdAt', '<=', firebase.firestore.Timestamp.fromDate(to))
+    .get();
   return docsToArr(snap);
 }
 

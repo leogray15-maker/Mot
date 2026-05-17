@@ -11,12 +11,21 @@ async function loadRevenue() {
   showSpinner('page-revenue');
   let jobs = [];
   try {
-    const snap = await garageRef('jobs').where('status', 'in', ['Complete', 'complete', 'completed', 'Completed']).get();
-    jobs = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(j => parseFloat(j.jobValue || 0) >= 0);
+    const snap = await garageRef('jobs').where('status', 'in', ['complete', 'Complete', 'completed', 'Completed']).get();
+    jobs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   } catch (e) {
     showToast('Failed to load revenue data', 'error');
   }
   hideSpinner('page-revenue');
+
+  // Normalise createdAt (Firestore Timestamp or ISO string) to JS Date
+  function jobDate(j) {
+    if (!j.createdAt) return new Date(0);
+    if (j.createdAt.toDate) return j.createdAt.toDate();
+    return new Date(j.createdAt);
+  }
+  // Use total field (parts + labour + VAT) as the job value
+  function jobVal(j) { return parseFloat(j.total || j.jobValue || 0); }
 
   const now = new Date();
   const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -24,31 +33,22 @@ async function loadRevenue() {
   const thisWeekStart  = new Date(now); thisWeekStart.setDate(now.getDate() - now.getDay());
   const lastWeekStart  = new Date(thisWeekStart); lastWeekStart.setDate(lastWeekStart.getDate() - 7);
 
-  const thisMonth = jobs.filter(j => new Date(j.dateIn) >= thisMonthStart);
-  const lastMonth = jobs.filter(j => new Date(j.dateIn) >= lastMonthStart && new Date(j.dateIn) < thisMonthStart);
-  const thisWeek  = jobs.filter(j => new Date(j.dateIn) >= thisWeekStart);
-  const lastWeek  = jobs.filter(j => new Date(j.dateIn) >= lastWeekStart && new Date(j.dateIn) < thisWeekStart);
+  const thisMonth = jobs.filter(j => jobDate(j) >= thisMonthStart);
+  const lastMonth = jobs.filter(j => jobDate(j) >= lastMonthStart && jobDate(j) < thisMonthStart);
 
-  const sum = arr => arr.reduce((t, j) => t + (parseFloat(j.jobValue) || 0), 0);
+  const sum = arr => arr.reduce((t, j) => t + jobVal(j), 0);
 
   const thisMonthRev = sum(thisMonth);
-  const lastMonthRev = sum(lastMonth);
-  const thisWeekRev  = sum(thisWeek);
-  const lastWeekRev  = sum(lastWeek);
   const avgJobVal    = jobs.length > 0 ? sum(jobs) / jobs.length : 0;
-  const projectedMonth = thisMonth.length > 0
-    ? (thisMonthRev / now.getDate()) * new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
-    : 0;
 
-  // HTML IDs: revTotal, revJobs, revAvg, revOutstanding
   setText('revTotal',       '£' + thisMonthRev.toFixed(2));
   setText('revJobs',        thisMonth.length);
-  setText('revAvg',         avgJobVal > 0 ? '£' + avgJobVal.toFixed(2) : '£0.00');
+  setText('revAvg',         '£' + avgJobVal.toFixed(2));
   setText('revOutstanding', '£' + (sum(jobs) - sum(thisMonth)).toFixed(2));
 
-  renderMonthlyChart(jobs);
-  renderServiceChart(jobs);
-  renderRevenueTable(jobs);
+  renderMonthlyChart(jobs, jobDate, jobVal);
+  renderServiceChart(jobs, jobVal);
+  renderRevenueTable(jobs, jobDate, jobVal);
 }
 
 function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
@@ -62,7 +62,7 @@ function renderDelta(id, pct) {
   el.className = 'stat-delta ' + (n >= 0 ? 'up' : 'down');
 }
 
-function renderMonthlyChart(jobs) {
+function renderMonthlyChart(jobs, jobDate, jobVal) {
   const canvas = document.getElementById('revenueChart');
   if (!canvas) return;
   if (revenueCharts.line) revenueCharts.line.destroy();
@@ -74,8 +74,8 @@ function renderMonthlyChart(jobs) {
   });
 
   const data = months.map(m =>
-    jobs.filter(j => { const d = new Date(j.dateIn); return d.getFullYear() === m.year && d.getMonth() === m.month; })
-      .reduce((t, j) => t + (parseFloat(j.jobValue) || 0), 0)
+    jobs.filter(j => { const d = jobDate(j); return d.getFullYear() === m.year && d.getMonth() === m.month; })
+      .reduce((t, j) => t + jobVal(j), 0)
   );
 
   revenueCharts.line = new Chart(canvas, {
@@ -95,13 +95,13 @@ function renderMonthlyChart(jobs) {
   });
 }
 
-function renderServiceChart(jobs) {
+function renderServiceChart(jobs, jobVal) {
   const canvas = document.getElementById('serviceChart');
   if (!canvas) return;
   if (revenueCharts.donut) revenueCharts.donut.destroy();
 
   const serviceMap = {};
-  jobs.forEach(j => { const k = j.serviceType || 'Other'; serviceMap[k] = (serviceMap[k] || 0) + (parseFloat(j.jobValue) || 0); });
+  jobs.forEach(j => { const k = j.serviceType || 'Other'; serviceMap[k] = (serviceMap[k] || 0) + jobVal(j); });
 
   const labels = Object.keys(serviceMap);
   if (labels.length === 0) return;
@@ -119,21 +119,21 @@ function renderServiceChart(jobs) {
   });
 }
 
-function renderRevenueTable(jobs) {
+function renderRevenueTable(jobs, jobDate, jobVal) {
   const tbody = document.getElementById('recentJobsTbody');
   if (!tbody) return;
-  const recent = [...jobs].sort((a, b) => new Date(b.dateIn) - new Date(a.dateIn)).slice(0, 15);
+  const recent = [...jobs].sort((a, b) => jobDate(b) - jobDate(a)).slice(0, 15);
   if (recent.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" class="table-empty"><i class="fas fa-chart-bar"></i>No completed jobs with values yet.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="table-empty"><i class="fas fa-chart-bar"></i>No completed jobs yet.</td></tr>`;
     return;
   }
   tbody.innerHTML = recent.map(j => `
     <tr>
-      <td class="td-muted">${formatDate(j.dateIn)}</td>
+      <td class="td-muted">${formatDate(jobDate(j).toISOString())}</td>
       <td class="td-name">${esc(j.customerName || '—')}</td>
       <td>${esc(j.serviceType || '—')}</td>
       <td class="td-mono">${esc(j.reg || '—')}</td>
-      <td style="color:var(--green);font-weight:700">£${parseFloat(j.jobValue || 0).toFixed(2)}</td>
+      <td style="color:var(--green);font-weight:700">£${jobVal(j).toFixed(2)}</td>
     </tr>`).join('');
 }
 

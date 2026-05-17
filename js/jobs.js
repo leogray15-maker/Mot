@@ -765,6 +765,7 @@ function collectJobFormData() {
     subtotal:      tots.subtotal,
     vatAmount:     tots.vatAmount,
     total:         tots.total,
+    jobValue:      tots.total,   // alias so revenue/invoice modules can read either field
     vhcData,
     clockLog:      collectClockLog()
   };
