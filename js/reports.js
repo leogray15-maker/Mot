@@ -82,7 +82,7 @@ function renderReportOutput(title, data, columns) {
 async function dailyRevenue(range) {
   const invs = await getInvoices(range);
   const byDate = {};
-  invs.filter(i => i.status === 'paid').forEach(i => {
+  invs.filter(i => i.paymentStatus === 'Paid').forEach(i => {
     const d = i.paidAt?.toDate ? i.paidAt.toDate().toISOString().split('T')[0] : (i.date||'');
     byDate[d] = (byDate[d]||0) + (i.total||0);
   });
@@ -95,7 +95,7 @@ async function dailyRevenue(range) {
 
 async function weeklySummary(range) {
   const [invs, jobs, bookings] = await Promise.all([getInvoices(range), getJobs(range), getBookings(range)]);
-  const paid = invs.filter(i => i.status === 'paid');
+  const paid = invs.filter(i => i.paymentStatus === 'Paid');
   return {
     title: `Weekly Summary (${range.from} to ${range.to})`,
     columns: [{ key:'metric', label:'Metric' }, { key:'value', label:'Value' }],
@@ -112,7 +112,7 @@ async function weeklySummary(range) {
 
 async function monthlyPnL(range) {
   const invs = await getInvoices(range);
-  const paid = invs.filter(i => i.status === 'paid');
+  const paid = invs.filter(i => i.paymentStatus === 'Paid');
   const income    = paid.reduce((s,i)=>s+(i.total||0), 0);
   const partsCost = paid.reduce((s,i)=>s+(i.partsCost||0), 0);
   const labour    = paid.reduce((s,i)=>s+(i.labourTotal||0), 0);
@@ -132,7 +132,7 @@ async function monthlyPnL(range) {
 
 async function vatReport(range) {
   const invs = await getInvoices(range);
-  const paid = invs.filter(i => i.status === 'paid');
+  const paid = invs.filter(i => i.paymentStatus === 'Paid');
   const netSales = paid.reduce((s,i)=>s+((i.total||0)-(i.vatAmount||0)), 0);
   const vatOut   = paid.reduce((s,i)=>s+(i.vatAmount||0), 0);
   return {
@@ -256,7 +256,7 @@ async function opportunitiesReport(range) {
 }
 
 async function agedDebtors() {
-  const invs = await garageRef('invoices').where('status','in',['sent','overdue','partially_paid']).get().then(s => docsToArr(s));
+  const invs = await garageRef('invoices').where('paymentStatus','in',['Unpaid','Overdue']).get().then(s => docsToArr(s));
   const now = Date.now();
   const aged = { '0-30': [], '31-60': [], '60+': [] };
   invs.forEach(i => {

@@ -82,7 +82,6 @@
       </div>
       <div class="topbar-right">
         <button class="topbar-btn" id="closeOfDayBtn" style="display:none" title="Close of Day"><i class="fas fa-cash-register"></i> Z-Read</button>
-        <button class="topbar-btn ai-btn" id="aiBtn" title="AI Assistant (Pro)"><i class="fas fa-sparkles"></i></button>
         <div class="notif-wrap">
           <button class="notif-bell" id="notifBell" aria-label="Notifications">
             <i class="fas fa-bell"></i>
@@ -119,7 +118,7 @@
           <div class="onboarding-progress"><div class="onboarding-bar" id="onboardingBar" style="width:0%"></div></div>
           <div class="onboarding-items">
             <label class="onboarding-item" id="ob-settings"><input type="checkbox" disabled> <i class="fas fa-gear"></i> Add your garage details <a href="#" data-section="settings">(Settings)</a></label>
-            <label class="onboarding-item" id="ob-logo"><input type="checkbox" disabled> <i class="fas fa-image"></i> Upload your logo <a href="#" data-section="settings">(Settings → Branding)</a></label>
+            <label class="onboarding-item" id="ob-logo"><input type="checkbox" disabled> <i class="fas fa-image"></i> Upload your logo <a href="#" data-section="settings">(Settings → General)</a></label>
             <label class="onboarding-item" id="ob-customer"><input type="checkbox" disabled> <i class="fas fa-user-plus"></i> Add your first customer <a href="#" data-section="customers">(Customers)</a></label>
             <label class="onboarding-item" id="ob-booking"><input type="checkbox" disabled> <i class="fas fa-calendar-plus"></i> Create your first booking <a href="#" data-section="bookings">(Bookings)</a></label>
             <label class="onboarding-item" id="ob-mot"><input type="checkbox" disabled> <i class="fas fa-car"></i> Set up MOT reminder templates <a href="#" data-section="settings">(Settings)</a></label>
@@ -612,12 +611,10 @@
         <div class="section-header"><h2>Settings</h2></div>
         <div class="tab-bar" id="settingsTabBar">
           <button class="tab-btn active" data-tab="general">General</button>
-          <button class="tab-btn" data-tab="branding">Branding</button>
           <button class="tab-btn" data-tab="notifications">Notifications</button>
           <button class="tab-btn" data-tab="booking">Booking</button>
           <button class="tab-btn" data-tab="financial">Financial</button>
           <button class="tab-btn" data-tab="apikeys">API Keys</button>
-          <button class="tab-btn" data-tab="subscription">Subscription</button>
         </div>
 
         <!-- General -->
@@ -632,25 +629,6 @@
               <div class="form-group form-full"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save</button></div>
             </div>
           </form>
-        </div>
-
-        <!-- Branding -->
-        <div class="settings-tab-panel" data-panel="branding">
-          <div class="card">
-            <div class="card-header"><h3>Branding</h3></div>
-            <div class="form-grid" style="padding:0 20px 20px">
-              <div class="form-group form-full">
-                <label>Logo URL</label>
-                <input type="url" id="settingLogoUrl" class="form-input" placeholder="https://…/logo.png">
-                <small style="color:var(--text-dim)">Link to your logo image (hosted externally or Firebase Storage)</small>
-              </div>
-              <div class="form-group form-full">
-                <label>Site / Landing Page URL</label>
-                <input type="url" id="settingSiteURL" class="form-input" placeholder="https://yourgarage.com">
-              </div>
-              <div class="form-group form-full"><button class="btn-primary" onclick="window.saveBrandingSettings()"><i class="fas fa-save"></i> Save Branding</button></div>
-            </div>
-          </div>
         </div>
 
         <!-- Notifications -->
@@ -772,21 +750,6 @@
           </div>
         </div>
 
-        <!-- Subscription -->
-        <div class="settings-tab-panel" data-panel="subscription">
-          <div class="card">
-            <div class="card-header"><h3>Subscription &amp; Plan</h3></div>
-            <div style="padding:20px">
-              <p>Current plan: <strong id="currentPlanLabel">Enterprise</strong></p>
-              <p style="color:var(--text-dim);font-size:0.875rem;margin-top:8px">To manage your subscription, contact support or visit your billing portal.</p>
-              <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
-                <button class="btn-primary" onclick="window.showUpgradeModal()"><i class="fas fa-arrow-up"></i> Upgrade Plan</button>
-                <a href="mailto:support@motcarrepairs.com" class="btn-secondary"><i class="fas fa-envelope"></i> Contact Support</a>
-              </div>
-            </div>
-          </div>
-        </div>
-
       </div>
 
       <!-- ======================== USERS ======================== -->
@@ -898,6 +861,14 @@
       </form>
     </div>
     <div class="modal-footer"><button class="btn-secondary" data-modal="bookingModal">Cancel</button><button class="btn-primary" id="saveBookingBtn">Save Booking</button></div>
+  </div>
+</div>
+
+<!-- Booking Detail Modal -->
+<div class="modal-overlay" id="bookingDetailModal">
+  <div class="modal-panel modal-md">
+    <div class="modal-header"><h3>Booking Details</h3><button class="modal-close" id="closeBookingModal"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body" id="bookingDetailContent"></div>
   </div>
 </div>
 
@@ -1132,26 +1103,6 @@
     </div>
   </div>
 </div>
-
-<!-- AI Assistant Panel -->
-<div id="aiPanel" class="ai-panel">
-  <div class="ai-header">
-    <div class="ai-title"><i class="fas fa-sparkles"></i> AI Assistant</div>
-    <button class="btn-icon" id="closeAiPanel"><i class="fas fa-times"></i></button>
-  </div>
-  <div class="ai-body" id="aiMessages">
-    <div class="ai-welcome">
-      <i class="fas fa-sparkles ai-welcome-icon"></i>
-      <h4>Hi! I'm your AI Business Assistant</h4>
-      <p>Ask me anything about your garage — revenue, bookings, customer reminders, or draft WhatsApp messages.</p>
-    </div>
-  </div>
-  <div class="ai-footer">
-    <input type="text" id="aiInput" class="ai-input" placeholder="Ask anything… e.g. 'Give me a morning briefing'">
-    <button class="btn-primary" id="aiSendBtn"><i class="fas fa-paper-plane"></i></button>
-  </div>
-</div>
-<div id="aiOverlay" class="ai-overlay" style="display:none"></div>
 
 <!-- Toast Container -->
 <div id="toastContainer" class="toast-container"></div>
