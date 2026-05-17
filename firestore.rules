@@ -2,58 +2,119 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    function isSuperAdmin() {
+      return request.auth != null && request.auth.uid == 'q8Zob2UIzUSRosbkg1fZz7zHWwk1';
+    }
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function getUser() {
+      return get(/databases/$(database)/documents/platform_users/$(request.auth.uid)).data;
+    }
+    function getUserGarageId() {
+      return getUser().garageId;
+    }
+    function getUserRole() {
+      return getUser().role;
+    }
+    function isGarageStaff(garageId) {
+      return isSignedIn() && (isSuperAdmin() || getUserGarageId() == garageId);
+    }
+    function isOwnerOrAdmin(garageId) {
+      return isSignedIn() && (isSuperAdmin() || (getUserGarageId() == garageId && getUserRole() in ['owner', 'admin']));
+    }
+
     // ——— Top-level account records ———
     match /accounts/{garageId} {
-      allow read: if request.auth != null &&
-        (request.auth.uid == resource.data.ownerUid ||
-         getUserGarageId() == garageId);
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null &&
-        request.auth.uid == resource.data.ownerUid;
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update: if isOwnerOrAdmin(garageId) || (isSignedIn() && resource.data.ownerUid == request.auth.uid);
+      allow delete: if isSuperAdmin();
     }
 
     // ——— Platform user profiles ———
     match /platform_users/{userId} {
-      allow read, write: if request.auth != null &&
-        request.auth.uid == userId;
+      allow read: if isSuperAdmin() || (isSignedIn() && request.auth.uid == userId);
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isSuperAdmin() || (isSignedIn() && request.auth.uid == userId);
+      allow delete: if isSuperAdmin();
     }
 
-    // ——— Public booking form — unauthenticated creates allowed ———
-    match /garages/mot-car-repairs-poole/bookings/{bookingId} {
+    // ——— Admin lead captures (public contact/landing forms) ———
+    match /admin_leads/{leadId} {
       allow create: if true;
-      allow read, update, delete: if request.auth != null &&
-        getUserGarageId() == 'mot-car-repairs-poole';
+      allow read, update, delete: if isSuperAdmin();
     }
 
-    // ——— Public enquiry forms — unauthenticated creates allowed ———
-    match /garages/mot-car-repairs-poole/enquiries/{enquiryId} {
-      allow create: if true;
-      allow read, update, delete: if request.auth != null &&
-        getUserGarageId() == 'mot-car-repairs-poole';
+    // ——— Top-level notifications (legacy — prefer garage-scoped) ———
+    match /notifications/{notifId} {
+      allow read, write: if isSignedIn();
     }
 
-    // ——— Settings — public read for slot availability check ———
-    match /garages/mot-car-repairs-poole/settings/{docId} {
+    // ——— WhatsApp send logs ———
+    match /wa_logs/{logId} {
+      allow create: if isSignedIn();
+      allow read: if isSignedIn();
+      allow update, delete: if isSuperAdmin();
+    }
+
+    // ——— Per-garage settings — public read for booking availability ———
+    match /garages/{garageId}/settings/{docId} {
       allow read: if true;
-      allow write: if request.auth != null &&
-        getUserGarageId() == 'mot-car-repairs-poole';
+      allow write: if isGarageStaff(garageId);
     }
 
-    // ——— All other tenant-scoped data ———
-    match /garages/{garageId}/{document=**} {
-      allow read, write: if request.auth != null &&
-        getUserGarageId() == garageId;
+    // ——— Bookings — public create for online booking form ———
+    match /garages/{garageId}/bookings/{bookingId} {
+      allow create: if true;
+      allow read, update, delete: if isGarageStaff(garageId);
     }
 
-    // ——— VHC reports — public read ———
+    // ——— Enquiries — public create for contact/enquiry forms ———
+    match /garages/{garageId}/enquiries/{enquiryId} {
+      allow create: if true;
+      allow read, update, delete: if isGarageStaff(garageId);
+    }
+
+    // ——— VHC reports — public read so customers can view their report ———
     match /garages/{garageId}/vhc_reports/{vhcId} {
       allow read: if true;
-      allow write: if request.auth != null &&
-        getUserGarageId() == garageId;
+      allow write: if isGarageStaff(garageId);
     }
 
-    function getUserGarageId() {
-      return get(/databases/$(database)/documents/platform_users/$(request.auth.uid)).data.garageId;
+    // ——— Customers — public read for customer portal ———
+    match /garages/{garageId}/customers/{customerId} {
+      allow read: if true;
+      allow create, update, delete: if isGarageStaff(garageId);
+    }
+
+    // ——— Jobs — public read for customer portal ———
+    match /garages/{garageId}/jobs/{jobId} {
+      allow read: if true;
+      allow create, update, delete: if isGarageStaff(garageId);
+    }
+
+    // ——— Invoices — public read for customer portal ———
+    match /garages/{garageId}/invoices/{invoiceId} {
+      allow read: if true;
+      allow create, update, delete: if isGarageStaff(garageId);
+    }
+
+    // ——— Team members — staff read, owner/admin write ———
+    match /garages/{garageId}/team/{memberId} {
+      allow read: if isGarageStaff(garageId);
+      allow create, update, delete: if isOwnerOrAdmin(garageId);
+    }
+
+    // ——— Z-reads / end-of-day — staff read, owner/admin write ———
+    match /garages/{garageId}/z_reads/{zReadId} {
+      allow read: if isGarageStaff(garageId);
+      allow create, update, delete: if isOwnerOrAdmin(garageId);
+    }
+
+    // ——— All other garage sub-collections (notifications, technician_sessions, etc.) ———
+    match /garages/{garageId}/{document=**} {
+      allow read, write: if isGarageStaff(garageId);
     }
   }
 }
