@@ -83,7 +83,6 @@
       </div>
       <div class="topbar-right">
         <button class="topbar-btn" id="closeOfDayBtn" style="display:none" title="Close of Day"><i class="fas fa-cash-register"></i> Z-Read</button>
-        <button class="topbar-btn ai-btn" id="aiBtn" title="AI Assistant (Pro)"><i class="fas fa-sparkles"></i></button>
         <div class="notif-wrap">
           <button class="notif-bell" id="notifBell" aria-label="Notifications">
             <i class="fas fa-bell"></i>
@@ -120,7 +119,7 @@
           <div class="onboarding-progress"><div class="onboarding-bar" id="onboardingBar" style="width:0%"></div></div>
           <div class="onboarding-items">
             <label class="onboarding-item" id="ob-settings"><input type="checkbox" disabled> <i class="fas fa-gear"></i> Add your garage details <a href="#" data-section="settings">(Settings)</a></label>
-            <label class="onboarding-item" id="ob-logo"><input type="checkbox" disabled> <i class="fas fa-image"></i> Upload your logo <a href="#" data-section="settings">(Settings → Branding)</a></label>
+            <label class="onboarding-item" id="ob-logo"><input type="checkbox" disabled> <i class="fas fa-image"></i> Add your garage details <a href="#" data-section="settings">(Settings → General)</a></label>
             <label class="onboarding-item" id="ob-customer"><input type="checkbox" disabled> <i class="fas fa-user-plus"></i> Add your first customer <a href="#" data-section="customers">(Customers)</a></label>
             <label class="onboarding-item" id="ob-booking"><input type="checkbox" disabled> <i class="fas fa-calendar-plus"></i> Create your first booking <a href="#" data-section="bookings">(Bookings)</a></label>
             <label class="onboarding-item" id="ob-mot"><input type="checkbox" disabled> <i class="fas fa-car"></i> Set up MOT reminder templates <a href="#" data-section="settings">(Settings)</a></label>
@@ -620,14 +619,128 @@
         <div class="section-header"><h2>Settings</h2></div>
         <div class="tab-bar" id="settingsTabBar">
           <button class="tab-btn active" data-tab="general">General</button>
-          <button class="tab-btn" data-tab="branding">Branding</button>
           <button class="tab-btn" data-tab="notifications">Notifications</button>
           <button class="tab-btn" data-tab="booking">Booking</button>
           <button class="tab-btn" data-tab="financial">Financial</button>
           <button class="tab-btn" data-tab="apikeys">API Keys</button>
-          <button class="tab-btn" data-tab="subscription">Subscription</button>
         </div>
-        <div id="settingsContent"></div>
+
+        <!-- General Tab -->
+        <div class="settings-tab-content active" id="stab-general">
+          <form id="settingsGeneralForm" class="card" style="padding:24px;margin-top:16px">
+            <h3 style="margin-bottom:16px">Garage Details</h3>
+            <div class="form-grid">
+              <div class="form-group"><label>Garage Name</label><input type="text" id="settingGarageName" class="form-input" placeholder="MOT Car Repairs"></div>
+              <div class="form-group"><label>Phone</label><input type="text" id="settingPhone" class="form-input" placeholder="07749 207399"></div>
+              <div class="form-group"><label>Email</label><input type="email" id="settingEmail" class="form-input" placeholder="info@motcarrepairs.co.uk"></div>
+              <div class="form-group form-full"><label>Address</label><input type="text" id="settingAddress" class="form-input" placeholder="123 High Street, Poole, BH15 1AB"></div>
+            </div>
+            <div class="form-group" style="margin-top:16px">
+              <label>Google Review Link</label>
+              <input type="url" id="settingGoogleLink" class="form-input" placeholder="https://g.page/r/...">
+            </div>
+            <div class="form-group" style="margin-top:16px">
+              <label>WhatsApp Message Template</label>
+              <textarea id="settingWATemplate" class="form-input" rows="3" placeholder="Hi [FirstName], your MOT is due…"></textarea>
+              <small style="color:var(--text-dim)">Variables: [FirstName] [MOTDueDate] [Year] [Make] [Model] [Reg] [SiteURL] [PhoneNumber] [GarageName]</small>
+            </div>
+            <div class="form-group" style="margin-top:16px">
+              <label>Review Request Template</label>
+              <textarea id="settingReviewTemplate" class="form-input" rows="2" placeholder="Thanks for visiting [GarageName]…"></textarea>
+            </div>
+            <button type="submit" class="btn-primary" style="margin-top:16px"><i class="fas fa-save"></i> Save Settings</button>
+          </form>
+        </div>
+
+        <!-- Notifications Tab -->
+        <div class="settings-tab-content" id="stab-notifications" style="display:none">
+          <div class="card" style="padding:24px;margin-top:16px">
+            <h3 style="margin-bottom:16px">Reminder Days</h3>
+            <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px">Send MOT/service reminders this many days before the due date.</p>
+            <div style="display:flex;gap:16px;flex-wrap:wrap">
+              <label class="toggle-label"><input type="checkbox" id="reminderDay7"> 7 days before</label>
+              <label class="toggle-label"><input type="checkbox" id="reminderDay14"> 14 days before</label>
+              <label class="toggle-label"><input type="checkbox" id="reminderDay30"> 30 days before</label>
+            </div>
+            <button class="btn-primary" style="margin-top:20px" onclick="saveExtendedSettings()"><i class="fas fa-save"></i> Save</button>
+          </div>
+        </div>
+
+        <!-- Booking Tab -->
+        <div class="settings-tab-content" id="stab-booking" style="display:none">
+          <div class="card" style="padding:24px;margin-top:16px">
+            <h3 style="margin-bottom:16px">Booking Settings</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Max Bookings per Slot</label>
+                <input type="number" id="settingMaxSlots" class="form-input" min="1" max="10" value="2">
+              </div>
+              <div class="form-group">
+                <label>Site URL (for booking links)</label>
+                <input type="url" id="settingSiteURL" class="form-input" placeholder="https://yoursite.co.uk">
+              </div>
+            </div>
+            <h3 style="margin:24px 0 16px">Working Hours</h3>
+            <form id="settingsHoursForm">
+              <div id="whGrid">
+                <div class="wh-row" id="wh-row-monday"><span class="wh-day-name">Monday</span><input type="time" id="wh_start_monday" class="wh-time-input"><input type="time" id="wh_end_monday" class="wh-time-input"><label style="display:flex;align-items:center;gap:6px;font-size:0.82rem;cursor:pointer;white-space:nowrap"><input type="checkbox" id="wh_open_monday" onchange="updateDayRowState('monday')"> Open</label></div>
+                <div class="wh-row" id="wh-row-tuesday"><span class="wh-day-name">Tuesday</span><input type="time" id="wh_start_tuesday" class="wh-time-input"><input type="time" id="wh_end_tuesday" class="wh-time-input"><label style="display:flex;align-items:center;gap:6px;font-size:0.82rem;cursor:pointer;white-space:nowrap"><input type="checkbox" id="wh_open_tuesday" onchange="updateDayRowState('tuesday')"> Open</label></div>
+                <div class="wh-row" id="wh-row-wednesday"><span class="wh-day-name">Wednesday</span><input type="time" id="wh_start_wednesday" class="wh-time-input"><input type="time" id="wh_end_wednesday" class="wh-time-input"><label style="display:flex;align-items:center;gap:6px;font-size:0.82rem;cursor:pointer;white-space:nowrap"><input type="checkbox" id="wh_open_wednesday" onchange="updateDayRowState('wednesday')"> Open</label></div>
+                <div class="wh-row" id="wh-row-thursday"><span class="wh-day-name">Thursday</span><input type="time" id="wh_start_thursday" class="wh-time-input"><input type="time" id="wh_end_thursday" class="wh-time-input"><label style="display:flex;align-items:center;gap:6px;font-size:0.82rem;cursor:pointer;white-space:nowrap"><input type="checkbox" id="wh_open_thursday" onchange="updateDayRowState('thursday')"> Open</label></div>
+                <div class="wh-row" id="wh-row-friday"><span class="wh-day-name">Friday</span><input type="time" id="wh_start_friday" class="wh-time-input"><input type="time" id="wh_end_friday" class="wh-time-input"><label style="display:flex;align-items:center;gap:6px;font-size:0.82rem;cursor:pointer;white-space:nowrap"><input type="checkbox" id="wh_open_friday" onchange="updateDayRowState('friday')"> Open</label></div>
+                <div class="wh-row" id="wh-row-saturday"><span class="wh-day-name">Saturday</span><input type="time" id="wh_start_saturday" class="wh-time-input"><input type="time" id="wh_end_saturday" class="wh-time-input"><label style="display:flex;align-items:center;gap:6px;font-size:0.82rem;cursor:pointer;white-space:nowrap"><input type="checkbox" id="wh_open_saturday" onchange="updateDayRowState('saturday')"> Open</label></div>
+                <div class="wh-row" id="wh-row-sunday"><span class="wh-day-name">Sunday</span><input type="time" id="wh_start_sunday" class="wh-time-input"><input type="time" id="wh_end_sunday" class="wh-time-input"><label style="display:flex;align-items:center;gap:6px;font-size:0.82rem;cursor:pointer;white-space:nowrap"><input type="checkbox" id="wh_open_sunday" onchange="updateDayRowState('sunday')"> Open</label></div>
+              </div>
+              <h3 style="margin:24px 0 16px">Blocked Dates</h3>
+              <div id="blockedDatesList" style="margin-bottom:12px"></div>
+              <div style="display:flex;gap:8px">
+                <input type="date" id="newBlockedDate" class="form-input" style="flex:1">
+                <button type="button" id="addBlockedDateBtn" class="btn-secondary"><i class="fas fa-plus"></i> Block Date</button>
+              </div>
+              <button type="submit" class="btn-primary" style="margin-top:20px"><i class="fas fa-save"></i> Save Hours</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Financial Tab -->
+        <div class="settings-tab-content" id="stab-financial" style="display:none">
+          <div class="card" style="padding:24px;margin-top:16px">
+            <h3 style="margin-bottom:16px">Financial Settings</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Labour Rate (£/hr)</label>
+                <input type="number" id="settingLabourRate" class="form-input" min="0" step="0.01" value="65">
+              </div>
+              <div class="form-group">
+                <label style="display:flex;align-items:center;gap:8px">
+                  <input type="checkbox" id="settingVAT" onchange="toggleVATNumber()"> VAT Registered
+                </label>
+              </div>
+              <div class="form-group" id="vatNumberRow" style="display:none">
+                <label>VAT Number</label>
+                <input type="text" id="settingVATNumber" class="form-input" placeholder="GB123456789">
+              </div>
+            </div>
+            <div class="form-group" style="margin-top:16px">
+              <label>Bank Details (shown on invoices)</label>
+              <textarea id="settingBankDetails" class="form-input" rows="3" placeholder="Sort Code: 00-00-00 | Account: 12345678 | Payee: MOT Car Repairs"></textarea>
+            </div>
+            <button class="btn-primary" style="margin-top:16px" onclick="saveExtendedSettings()"><i class="fas fa-save"></i> Save</button>
+          </div>
+        </div>
+
+        <!-- API Keys Tab -->
+        <div class="settings-tab-content" id="stab-apikeys" style="display:none">
+          <div class="card" style="padding:24px;margin-top:16px">
+            <h3 style="margin-bottom:8px">API Keys</h3>
+            <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:20px">Keys are stored securely in your garage settings and never shared.</p>
+            <div class="form-group">
+              <label>DVLA API Key (VRM Lookups)</label>
+              <input type="password" id="settingDvlaKey" class="form-input" placeholder="•••••••••••••••">
+            </div>
+            <button class="btn-primary" style="margin-top:16px" onclick="saveApiKeys()"><i class="fas fa-save"></i> Save API Keys</button>
+          </div>
+        </div>
       </div>
 
       <!-- ======================== USERS ======================== -->
@@ -969,28 +1082,104 @@
   </div>
 </div>
 
-<!-- AI Assistant Panel -->
-<div id="aiPanel" class="ai-panel">
-  <div class="ai-header">
-    <div class="ai-title"><i class="fas fa-sparkles"></i> AI Assistant</div>
-    <button class="btn-icon" id="closeAiPanel"><i class="fas fa-times"></i></button>
-  </div>
-  <div class="ai-body" id="aiMessages">
-    <div class="ai-welcome">
-      <i class="fas fa-sparkles ai-welcome-icon"></i>
-      <h4>Hi! I'm your AI Business Assistant</h4>
-      <p>Ask me anything about your garage — revenue, bookings, customer reminders, or draft WhatsApp messages.</p>
-    </div>
-  </div>
-  <div class="ai-footer">
-    <input type="text" id="aiInput" class="ai-input" placeholder="Ask anything… e.g. 'Give me a morning briefing'">
-    <button class="btn-primary" id="aiSendBtn"><i class="fas fa-paper-plane"></i></button>
+<!-- Booking Detail Modal -->
+<div class="modal-overlay" id="bookingDetailModal">
+  <div class="modal-panel modal-md">
+    <div class="modal-header"><h3>Booking Details</h3><button class="modal-close" id="closeBookingModal"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body" id="bookingDetailContent"></div>
   </div>
 </div>
-<div id="aiOverlay" class="ai-overlay" style="display:none"></div>
+
+<!-- Invoice Detail Modal -->
+<div class="modal-overlay" id="invoiceDetailModal">
+  <div class="modal-panel modal-lg">
+    <div class="modal-header"><h3>Invoice</h3><button class="modal-close" id="closeInvoiceModal"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body" id="invoiceDetailContent"></div>
+  </div>
+</div>
+
+<!-- VHC Modal -->
+<div class="modal-overlay" id="vhcModal">
+  <div class="modal-panel modal-xl">
+    <div class="modal-header"><h3>Vehicle Health Check</h3><button class="modal-close" id="closeVhcModal"><i class="fas fa-times"></i></button></div>
+    <div class="modal-body" id="vhcModalContent" style="max-height:70vh;overflow-y:auto"></div>
+  </div>
+</div>
 
 <!-- Toast Container -->
 <div id="toastContainer" class="toast-container"></div>
+
+<script>
+// ——— Settings tabs ———
+(function() {
+  function initSettingsTabs() {
+    const bar = document.getElementById('settingsTabBar');
+    if (!bar) return;
+    bar.querySelectorAll('.tab-btn[data-tab]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        bar.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.settings-tab-content').forEach(c => c.style.display = 'none');
+        const target = document.getElementById('stab-' + btn.dataset.tab);
+        if (target) target.style.display = '';
+      });
+    });
+  }
+
+  // General settings form submit
+  document.addEventListener('DOMContentLoaded', () => {
+    initSettingsTabs();
+
+    document.getElementById('settingsGeneralForm')?.addEventListener('submit', e => {
+      e.preventDefault();
+      const s = window.getSettings ? window.getSettings() : (window._settings || {});
+      s.garageName      = document.getElementById('settingGarageName')?.value || s.garageName;
+      s.phone           = document.getElementById('settingPhone')?.value       || s.phone;
+      s.email           = document.getElementById('settingEmail')?.value       || s.email;
+      s.address         = document.getElementById('settingAddress')?.value     || s.address;
+      s.googleReviewLink= document.getElementById('settingGoogleLink')?.value  || '';
+      s.whatsappTemplate= document.getElementById('settingWATemplate')?.value  || s.whatsappTemplate;
+      s.reviewTemplate  = document.getElementById('settingReviewTemplate')?.value || s.reviewTemplate;
+      window._settings = s;
+      if (window.saveSettings) {
+        window.saveSettings(s).then(() => {
+          if (window.showToast) window.showToast('Settings saved', 'success');
+        }).catch(() => {
+          if (window.showToast) window.showToast('Failed to save settings', 'error');
+        });
+      }
+    });
+
+    // API keys save
+    window.saveApiKeys = function() {
+      const s = window.getSettings ? window.getSettings() : (window._settings || {});
+      s.dvlaApiKey = document.getElementById('settingDvlaKey')?.value || s.dvlaApiKey;
+      window._settings = s;
+      if (window.saveSettings) {
+        window.saveSettings(s).then(() => {
+          if (window.showToast) window.showToast('API keys saved', 'success');
+        });
+      }
+    };
+  });
+})();
+
+// ——— Modal overlay close helpers ———
+function closeModalEl(el) {
+  if (!el) return;
+  el.classList.remove('open', 'active');
+  el.style.display = 'none';
+}
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('modal-overlay')) closeModalEl(e.target);
+});
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.modal-close');
+  if (!btn) return;
+  const modal = btn.closest('.modal-overlay');
+  if (modal) closeModalEl(modal);
+});
+</script>
 
 <script type="module" src="/js/dashboard-entry.js"></script>
 </body>

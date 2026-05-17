@@ -3,7 +3,8 @@
    =========================== */
 
 import { db, garageRef, garageDoc, getGarageId, docsToArr, fsAdd, fsUpdate, showSpinner, hideSpinner } from './firebase.js';
-import firebase from 'firebase/compat/app';
+import firebase from './firebase.js';
+import { showToast } from './utils.js';
 
 // ——— VHC Checklist Definition ———
 

@@ -4,6 +4,7 @@
 
 import { db, garageRef, garageDoc, docsToArr, fsAdd, fsUpdate, fsDel, showSpinner, hideSpinner } from './firebase.js';
 import { getSettings, showToast, formatDate, esc, formatCurrency } from './utils.js';
+import { buildInvoiceWhatsAppMessage, openWhatsApp } from './whatsapp.js';
 window._invoicesData = [];
 
 async function loadInvoicesSection() {
@@ -239,8 +240,6 @@ function printInvoice(id) {
   <script>window.onload=()=>window.print();<\/script></body></html>`);
   win.document.close();
 }
-
-function esc(str) { if (!str) return ''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 document.getElementById('closeInvoiceModal')?.addEventListener('click', () => document.getElementById('invoiceDetailModal')?.classList.remove('open'));
 document.getElementById('invoiceDetailModal')?.addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });

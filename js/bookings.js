@@ -2,7 +2,8 @@
    MOT Car Repairs — Bookings (Firebase)
    =========================== */
 
-import { db, docsToArr, fsAdd, fsUpdate, fsDel, showSpinner, hideSpinner } from './firebase.js';
+import { db, garageRef, docsToArr, fsAdd, fsUpdate, fsDel, showSpinner, hideSpinner } from './firebase.js';
+import { showToast, getSettings } from './utils.js';
 window._bookingsData = window._bookingsData || [];
 
 function genBookingRef() {
@@ -227,7 +228,7 @@ function loadBookingsSection() {
     else renderBookingsList();
   }
 
-  _bookingsUnsub = db.collection('bookings')
+  _bookingsUnsub = garageRef('bookings')
     .orderBy('createdAt', 'desc')
     .onSnapshot(snap => {
       window._bookingsData = docsToArr(snap);
@@ -246,7 +247,7 @@ function loadBookingsSection() {
       hideSpinner('page-bookings');
       // Fall back to a one-time read so the section still shows data
       try {
-        const snap = await db.collection('bookings').orderBy('createdAt', 'desc').get();
+        const snap = await garageRef('bookings').orderBy('createdAt', 'desc').get();
         window._bookingsData = docsToArr(snap);
         updateBookingsBadge();
         if (dashBookingView === 'calendar') renderBookingCalendar();

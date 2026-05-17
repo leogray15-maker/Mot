@@ -1840,6 +1840,10 @@ tbody tr:hover { background: rgba(255,255,255,0.02); }
   min-height: 32px;
 }
 
+/* Settings tabs */
+.settings-tab-content { display: none; }
+.settings-tab-content.active { display: block; }
+
 .blocked-date-tag {
   display: inline-flex;
   align-items: center;
@@ -1965,7 +1969,7 @@ tbody tr:hover { background: rgba(255,255,255,0.02); }
   align-items: center; justify-content: center;
   padding: 20px;
 }
-.modal-overlay.active, .modal-overlay[style*="display: flex"] { display: flex !important; }
+.modal-overlay.active, .modal-overlay.open, .modal-overlay[style*="display: flex"] { display: flex !important; }
 .modal-panel {
   background: var(--dark-2);
   border: 1px solid var(--border-strong);

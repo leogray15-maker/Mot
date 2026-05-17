@@ -3,7 +3,7 @@
    =========================== */
 
 import { db, garageRef, showSpinner, hideSpinner } from './firebase.js';
-import { formatDate, esc } from './utils.js';
+import { showToast, formatDate, esc } from './utils.js';
 
 let revenueCharts = {};
 
@@ -11,8 +11,8 @@ async function loadRevenue() {
   showSpinner('page-revenue');
   let jobs = [];
   try {
-    const snap = await garageRef('jobs').where('status', 'in', ['Complete', 'complete', 'completed']).get();
-    jobs = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(j => j.jobValue > 0);
+    const snap = await garageRef('jobs').where('status', 'in', ['Complete', 'complete', 'completed', 'Completed']).get();
+    jobs = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(j => parseFloat(j.jobValue || 0) >= 0);
   } catch (e) {
     showToast('Failed to load revenue data', 'error');
   }
@@ -136,8 +136,6 @@ function renderRevenueTable(jobs) {
       <td style="color:var(--green);font-weight:700">£${parseFloat(j.jobValue || 0).toFixed(2)}</td>
     </tr>`).join('');
 }
-
-function esc(str) { if (!str) return ''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 window.sectionLoaders = window.sectionLoaders || {};
 window.sectionLoaders['revenue'] = loadRevenue;

@@ -880,6 +880,13 @@ async function loadSettingsFallback() {
   });
 }
 
+// ——— Save settings to Firestore ———
+
+export async function saveSettings(settings) {
+  window._settings = settings;
+  await garageRef('settings').doc('config').set(settings, { merge: true });
+}
+
 // ——— Expose navigate globally for cross-module use ———
 
 window.navigate          = navigate;
@@ -887,7 +894,14 @@ window.loadSection       = loadSection;
 window.showUpgradeModal  = showUpgradeModal;
 window.checkPlanAccess   = checkPlanAccess;
 window.statusBadge       = statusBadge;
+window.saveSettings      = saveSettings;
 window._enquiriesData    = window._enquiriesData || [];
+
+// Expose active section for cross-module use
+Object.defineProperty(window, '_currentSection', {
+  get: () => _activeSection,
+  configurable: true
+});
 
 // ——— Dashboard init ———
 
