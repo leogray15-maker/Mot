@@ -36,8 +36,7 @@ import { initVhcSection }   from './vhc.js';
 // ——— Opportunities & pipeline ———
 import { initOpportunities } from './opportunities.js';
 
-// ——— Fleet & parts ———
-import { initFleet }        from './fleet.js';
+// ——— Parts ———
 import { initParts }        from './parts.js';
 
 // ——— MOT, reminders, comms ———
@@ -73,7 +72,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   initApprovals();
   initVhcSection();
   initOpportunities();
-  initFleet();
   initParts();
   initMotTracker();
   initReminders();

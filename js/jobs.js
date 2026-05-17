@@ -16,7 +16,7 @@ let _jobSearch        = '';
 let _jobStatusFilter  = 'all';
 let _jobSortField     = 'createdAt';
 let _jobSortDir       = 'desc';
-let _jobView          = 'list'; // 'list' | 'kanban'
+let _jobView          = 'kanban'; // 'list' | 'kanban'
 let _openJobId        = null;   // currently open modal job id
 let _activeJobTab     = 'vehicle';
 let _partRowIdx       = 0;
@@ -132,7 +132,7 @@ async function loadJobs() {
 
 // ——— Render Kanban ———
 function renderKanban(jobs) {
-  const container = getEl('jobKanbanBoard');
+  const container = getEl('jobsKanban');
   if (!container) return;
 
   const q = _jobSearch.toLowerCase();
@@ -220,7 +220,7 @@ function renderJobList(jobs) {
     return 0;
   });
 
-  const tbody = getEl('jobsBody');
+  const tbody = getEl('jobsTbody');
   if (!tbody) return;
   if (filtered.length === 0) {
     tbody.innerHTML = `<tr><td colspan="9" class="table-empty"><i class="fas fa-screwdriver-wrench"></i>No job cards found.</td></tr>`;
@@ -961,8 +961,8 @@ async function createInvoiceFromJob(jobId) {
 // ——— View toggle ———
 function setJobView(view) {
   _jobView = view;
-  const kanban = getEl('jobKanbanBoard');
-  const list   = getEl('jobsTableWrap');
+  const kanban = getEl('jobsKanban');
+  const list   = getEl('jobsListView');
   const btnList   = getEl('jobViewList');
   const btnKanban = getEl('jobViewKanban');
   if (kanban) kanban.style.display = view === 'kanban' ? '' : 'none';
@@ -983,10 +983,18 @@ function sortJobList(field) {
 // ——— Init ———
 export function initJobs() {
   // Event listeners (guards against missing elements during lazy load)
-  getEl('jobSearch')?.addEventListener('input', e => { _jobSearch = e.target.value; renderJobList(window._jobsData); });
+  getEl('jobSearch')?.addEventListener('input', e => { _jobSearch = e.target.value; if (_jobView === 'kanban') renderKanban(window._jobsData); else renderJobList(window._jobsData); });
   getEl('jobStatusFilter')?.addEventListener('change', e => { _jobStatusFilter = e.target.value; renderJobList(window._jobsData); });
   getEl('jobViewList')?.addEventListener('click', () => setJobView('list'));
   getEl('jobViewKanban')?.addEventListener('click', () => setJobView('kanban'));
+  // Also wire up data-view toggle buttons in the jobs section header
+  document.querySelectorAll('#page-jobs .view-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#page-jobs .view-toggle').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      setJobView(btn.dataset.view);
+    });
+  });
   getEl('newJobBtn')?.addEventListener('click', () => openJobModal(null));
   getEl('saveJobBtn')?.addEventListener('click', saveJob);
 
