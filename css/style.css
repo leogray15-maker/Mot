@@ -1644,8 +1644,10 @@ ul { list-style: none; }
 
 @media (max-width: 768px) {
   .why-grid { grid-template-columns: 1fr; gap: 40px; }
-  .hero-ctas { flex-direction: column; align-items: flex-start; }
+  .hero-ctas { flex-direction: column; align-items: center; }
   .hero-section { padding: 100px 20px 60px; }
+  .hero-inner { text-align: center; }
+  .hero-inner .section-sub { margin: 0 auto; }
 }
 
 /* ===========================
