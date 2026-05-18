@@ -1208,6 +1208,7 @@ ul { list-style: none; }
   display: grid;
   grid-template-columns: auto 1fr;
   transition: all var(--transition);
+  scroll-margin-top: 100px;
 }
 
 .service-full-card:hover {
