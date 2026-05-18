@@ -13,10 +13,6 @@
 <!-- NAV -->
 <nav class="nav" id="mainNav">
   <div class="nav-inner">
-    <a href="index.html" class="nav-logo">
-      <span class="logo-main">MOT Car Repairs</span>
-      <span class="logo-sub">Poole, Dorset &middot; Est. 2004</span>
-    </a>
     <div class="nav-links">
       <a href="index.html" class="active">Home</a>
       <a href="services.html">Services</a>
@@ -24,7 +20,9 @@
       <a href="booking.html" class="nav-book-link"><i class="fas fa-calendar-check"></i> Book Online</a>
     </div>
     <button class="btn btn-primary nav-cta open-modal">Book Now</button>
-    <img src="/images/logo.png" alt="MOT Car Repairs" onerror="this.style.display='none'" style="height:54px;width:auto;display:block;margin-left:12px;flex-shrink:0">
+    <a href="index.html" style="display:flex;align-items:center;flex-shrink:0;margin-left:12px">
+      <img src="/images/logo.png" alt="MOT Car Repairs" style="height:62px;width:auto;display:block" onerror="this.parentElement.innerHTML='<span style=\'font-weight:900;color:#fff;font-size:1rem\'>MOT Car Repairs</span>'">
+    </a>
     <button class="nav-hamburger" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
