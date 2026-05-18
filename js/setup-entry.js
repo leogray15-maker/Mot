@@ -65,13 +65,13 @@ if (form) {
           maxBookingsPerSlot: 2,
           reminderDays:       [7, 14, 30],
           workingHours: {
-            monday:    { open: true,  start: '08:00', end: '18:00' },
-            tuesday:   { open: true,  start: '08:00', end: '18:00' },
-            wednesday: { open: true,  start: '08:00', end: '18:00' },
-            thursday:  { open: true,  start: '08:00', end: '18:00' },
-            friday:    { open: true,  start: '08:00', end: '17:30' },
-            saturday:  { open: true,  start: '08:00', end: '13:00' },
-            sunday:    { open: false, start: '09:00', end: '13:00' }
+            monday:    { open: true,  start: '08:30', end: '18:00' },
+            tuesday:   { open: true,  start: '08:30', end: '18:00' },
+            wednesday: { open: true,  start: '08:30', end: '18:00' },
+            thursday:  { open: true,  start: '08:30', end: '18:00' },
+            friday:    { open: true,  start: '08:30', end: '18:00' },
+            saturday:  { open: true,  start: '08:00', end: '17:00' },
+            sunday:    { open: true,  start: '08:30', end: '14:00' }
           },
           blockedDates:     [],
           bankDetails:      '',
