@@ -173,3 +173,11 @@ document.querySelectorAll('input[type="date"]').forEach(input => {
   const today = new Date().toISOString().split('T')[0];
   input.setAttribute('min', today);
 });
+
+// Centre anchor target on screen when landing via hash link (e.g. services.html#brakes)
+if (location.hash) {
+  window.addEventListener('load', () => {
+    const target = document.querySelector(location.hash);
+    if (target) target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  });
+}
