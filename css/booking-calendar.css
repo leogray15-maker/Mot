@@ -1,0 +1,199 @@
+/* ===========================
+   Booking Calendar — FullCalendar Dark Theme
+   Overrides FullCalendar defaults to match GarageOS slate/zinc palette
+   =========================== */
+
+.booking-calendar-wrap {
+  padding: 0;
+}
+
+/* ── Core FullCalendar variables ── */
+.fc {
+  --fc-border-color:               rgba(255,255,255,0.07);
+  --fc-button-bg-color:            #1f1f1f;
+  --fc-button-border-color:        rgba(255,255,255,0.12);
+  --fc-button-text-color:          #e2e2e2;
+  --fc-button-hover-bg-color:      #272727;
+  --fc-button-hover-border-color:  rgba(255,255,255,0.2);
+  --fc-button-active-bg-color:     #e02020;
+  --fc-button-active-border-color: #e02020;
+  --fc-button-active-text-color:   #fff;
+  --fc-highlight-color:            rgba(224,32,32,0.13);
+  --fc-today-bg-color:             rgba(224,32,32,0.05);
+  --fc-neutral-bg-color:           #171717;
+  --fc-neutral-text-color:         #909090;
+  --fc-non-business-color:         rgba(0,0,0,0.25);
+  --fc-small-font-size:            0.78rem;
+  --fc-event-text-color:           #fff;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size:   0.875rem;
+  color:       #e2e2e2;
+}
+
+/* ── Borders ── */
+.fc-theme-standard .fc-scrollgrid,
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-color: rgba(255,255,255,0.07);
+}
+
+/* ── Text ── */
+.fc .fc-col-header-cell-cushion,
+.fc .fc-daygrid-day-number,
+.fc .fc-timegrid-slot-label-cushion {
+  color:           #909090;
+  text-decoration: none;
+}
+
+.fc .fc-toolbar-title {
+  font-size:   1rem;
+  font-weight: 700;
+  color:       #e2e2e2;
+}
+
+/* ── Toolbar buttons ── */
+.fc .fc-button-primary {
+  background:    #1f1f1f;
+  border-color:  rgba(255,255,255,0.12);
+  color:         #e2e2e2;
+  font-size:     0.8rem;
+  padding:       5px 11px;
+  border-radius: 6px;
+  font-weight:   500;
+  transition:    all 0.15s ease;
+}
+.fc .fc-button-primary:hover:not(:disabled) {
+  background:   #272727;
+  border-color: rgba(255,255,255,0.22);
+  color:        #fff;
+}
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background:   #e02020;
+  border-color: #e02020;
+  color:        #fff;
+  box-shadow:   none;
+}
+.fc .fc-button-primary:focus {
+  box-shadow: 0 0 0 2px rgba(224,32,32,0.35);
+  outline:    none;
+}
+
+/* ── Time grid ── */
+.fc-timegrid-slot {
+  height: 38px;
+}
+.fc-timegrid-slot-minor {
+  border-top-style: dotted;
+  border-color:     rgba(255,255,255,0.04);
+}
+
+/* ── Now indicator ── */
+.fc .fc-timegrid-now-indicator-line {
+  border-color: #e02020;
+}
+.fc .fc-timegrid-now-indicator-arrow {
+  border-color: #e02020;
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+
+/* ── Selection highlight ── */
+.fc-highlight {
+  background: rgba(224,32,32,0.13) !important;
+}
+
+/* ── Events ── */
+.fc-event {
+  border:        none !important;
+  border-radius: 5px;
+  cursor:        pointer;
+  box-shadow:    inset 0 0 0 1px rgba(255,255,255,0.1);
+  transition:    filter 0.1s;
+}
+.fc-event:hover {
+  filter:   brightness(1.12);
+  z-index:  5;
+}
+.fc-event .fc-event-main {
+  padding: 2px 5px;
+}
+.fc-event-title {
+  font-size:   0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow:    hidden;
+  text-overflow: ellipsis;
+}
+.fc-event-time {
+  font-size:   0.72rem;
+  opacity:     0.8;
+}
+
+/* ── Column header ── */
+.fc-col-header-cell {
+  background: #171717;
+  padding:    6px 0;
+}
+.fc-col-header-cell-cushion {
+  font-weight:    600;
+  font-size:      0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* ── Grid backgrounds ── */
+.fc-timegrid-body,
+.fc-scrollgrid-section-body .fc-scroller {
+  background: #111111;
+}
+.fc-daygrid-day {
+  background: #111111;
+}
+.fc-daygrid-day:hover {
+  background: #171717;
+}
+
+/* ── Day number (month view) ── */
+.fc-daygrid-day-number {
+  font-size: 0.78rem;
+}
+.fc-day-today .fc-daygrid-day-number {
+  background:    #e02020;
+  color:         #fff !important;
+  border-radius: 50%;
+  width:         22px;
+  height:        22px;
+  display:       flex;
+  align-items:   center;
+  justify-content: center;
+  margin:        4px;
+}
+
+/* ── More events link ── */
+.fc-daygrid-more-link {
+  color:     #e02020;
+  font-size: 0.75rem;
+}
+
+/* ── Responsive mobile ── */
+@media (max-width: 640px) {
+  .fc .fc-toolbar {
+    flex-direction: column;
+    align-items:    flex-start;
+    gap:            8px;
+  }
+  .fc .fc-toolbar-title {
+    font-size: 0.9rem;
+  }
+  .fc .fc-button-primary {
+    font-size: 0.72rem;
+    padding:   4px 8px;
+  }
+  .fc-timegrid-slot {
+    height: 30px;
+  }
+  .booking-calendar-wrap {
+    overflow-x: auto;
+  }
+}

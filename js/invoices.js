@@ -78,22 +78,19 @@ async function createInvoiceFromJob(jobId) {
 
   const cust = (window._customersData || []).find(c => c.id === j.customerId) || {};
   const vatRate = s.vatRegistered ? 0.2 : 0;
-  // Use j.total (parts+labour) as base; fall back to j.subtotal or j.jobValue for legacy data
   const subtotal = parseFloat(j.subtotal || j.total || j.jobValue || 0);
   const vatAmount = s.vatRegistered ? parseFloat(j.vatAmount || subtotal * vatRate) : 0;
   const total = parseFloat(j.total || subtotal + vatAmount);
-
-  // Job date: createdAt may be a Firestore Timestamp
   const createdDate = j.createdAt?.toDate ? j.createdAt.toDate() : (j.createdAt ? new Date(j.createdAt) : new Date());
-  const jobDateStr = createdDate.toISOString().split('T')[0];
+  const jobDateStr = j.dateIn || createdDate.toISOString().split('T')[0];
 
   const invoice = {
     invoiceNumber: invoiceNum,
     jobId,
     customerId: j.customerId || '',
     customerName: j.customerName || '',
-    customerPhone: cust.phone || j.customerPhone || '',
-    customerEmail: cust.email || j.customerEmail || '',
+    customerPhone: cust.phone || '',
+    customerEmail: cust.email || '',
     reg: j.reg || '',
     service: j.serviceType || '',
     date: jobDateStr,
@@ -246,11 +243,18 @@ function printInvoice(id) {
   win.document.close();
 }
 
+
 document.getElementById('closeInvoiceModal')?.addEventListener('click', () => document.getElementById('invoiceDetailModal')?.classList.remove('open'));
 document.getElementById('invoiceDetailModal')?.addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
 
 window.sectionLoaders = window.sectionLoaders || {};
 window.sectionLoaders['invoices'] = loadInvoicesSection;
+
+// openInvoiceModal — called by jobs.js "Generate Invoice" button
+window.openInvoiceModal = async (existingId, jobId) => {
+  if (jobId) await createInvoiceFromJob(jobId);
+  else if (existingId) viewInvoiceModal(existingId);
+};
 
 Object.assign(window, {
   createInvoiceFromJob, updateInvoiceStatus, deleteInvoice,

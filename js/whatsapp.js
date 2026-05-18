@@ -17,7 +17,6 @@ export function openWhatsApp(phone, message) {
   const num = buildWAPhone(phone);
   if (!num) { showToast('No phone number found for this customer', 'error'); return; }
   window.open(`https://wa.me/${num}?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
-  // Fire-and-forget WA log
   db.collection('wa_logs').add({ phone: num, snippet: message.slice(0, 120), sentAt: new Date().toISOString() }).catch(() => {});
 }
 

@@ -7,6 +7,16 @@ import { showToast, formatDate, esc } from './utils.js';
 
 let revenueCharts = {};
 
+function jobDate(j) {
+  if (!j.createdAt) return j.dateIn ? new Date(j.dateIn) : new Date(0);
+  if (j.createdAt.toDate) return j.createdAt.toDate();
+  return new Date(j.createdAt);
+}
+
+function jobVal(j) {
+  return parseFloat(j.total || j.jobValue || 0);
+}
+
 async function loadRevenue() {
   showSpinner('page-revenue');
   let jobs = [];
@@ -18,23 +28,11 @@ async function loadRevenue() {
   }
   hideSpinner('page-revenue');
 
-  // Normalise createdAt (Firestore Timestamp or ISO string) to JS Date
-  function jobDate(j) {
-    if (!j.createdAt) return new Date(0);
-    if (j.createdAt.toDate) return j.createdAt.toDate();
-    return new Date(j.createdAt);
-  }
-  // Use total field (parts + labour + VAT) as the job value
-  function jobVal(j) { return parseFloat(j.total || j.jobValue || 0); }
-
   const now = new Date();
   const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const thisWeekStart  = new Date(now); thisWeekStart.setDate(now.getDate() - now.getDay());
-  const lastWeekStart  = new Date(thisWeekStart); lastWeekStart.setDate(lastWeekStart.getDate() - 7);
 
   const thisMonth = jobs.filter(j => jobDate(j) >= thisMonthStart);
-  const lastMonth = jobs.filter(j => jobDate(j) >= lastMonthStart && jobDate(j) < thisMonthStart);
 
   const sum = arr => arr.reduce((t, j) => t + jobVal(j), 0);
 
@@ -46,23 +44,14 @@ async function loadRevenue() {
   setText('revAvg',         '£' + avgJobVal.toFixed(2));
   setText('revOutstanding', '£' + (sum(jobs) - sum(thisMonth)).toFixed(2));
 
-  renderMonthlyChart(jobs, jobDate, jobVal);
-  renderServiceChart(jobs, jobVal);
-  renderRevenueTable(jobs, jobDate, jobVal);
+  renderMonthlyChart(jobs);
+  renderServiceChart(jobs);
+  renderRevenueTable(jobs);
 }
 
 function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
 
-function renderDelta(id, pct) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  if (pct === null) { el.textContent = 'No prior data'; el.className = 'stat-delta'; return; }
-  const n = parseFloat(pct);
-  el.textContent = (n >= 0 ? '▲' : '▼') + ' ' + Math.abs(pct) + '% vs last period';
-  el.className = 'stat-delta ' + (n >= 0 ? 'up' : 'down');
-}
-
-function renderMonthlyChart(jobs, jobDate, jobVal) {
+function renderMonthlyChart(jobs) {
   const canvas = document.getElementById('revenueChart');
   if (!canvas) return;
   if (revenueCharts.line) revenueCharts.line.destroy();
@@ -95,7 +84,7 @@ function renderMonthlyChart(jobs, jobDate, jobVal) {
   });
 }
 
-function renderServiceChart(jobs, jobVal) {
+function renderServiceChart(jobs) {
   const canvas = document.getElementById('serviceChart');
   if (!canvas) return;
   if (revenueCharts.donut) revenueCharts.donut.destroy();
@@ -119,7 +108,7 @@ function renderServiceChart(jobs, jobVal) {
   });
 }
 
-function renderRevenueTable(jobs, jobDate, jobVal) {
+function renderRevenueTable(jobs) {
   const tbody = document.getElementById('recentJobsTbody');
   if (!tbody) return;
   const recent = [...jobs].sort((a, b) => jobDate(b) - jobDate(a)).slice(0, 15);
