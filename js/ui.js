@@ -238,19 +238,25 @@ export function updateBadge(id, count) {
  * @param {string} name  The data-section value to activate
  */
 export function openSection(name) {
-  // Toggle active class on nav items
-  document.querySelectorAll('.nav-item[data-section]').forEach(el => {
+  // Toggle active on sidebar nav links (both .sidebar-link and .nav-item)
+  document.querySelectorAll('.sidebar-link[data-section], .nav-item[data-section]').forEach(el => {
     el.classList.toggle('active', el.dataset.section === name);
   });
 
-  // Show the matching section panel, hide all others
+  // Show matching .section-page (id="page-{name}"), hide all others
+  document.querySelectorAll('.section-page').forEach(el => {
+    const match = el.id === `page-${name}`;
+    el.classList.toggle('active', match);
+    el.hidden = !match;
+  });
+
+  // Legacy: also handle .section[data-section]
   document.querySelectorAll('.section[data-section]').forEach(el => {
     const match = el.dataset.section === name;
     el.classList.toggle('active', match);
     el.hidden = !match;
   });
 
-  // Persist for soft refresh
   try { sessionStorage.setItem('activeSection', name); } catch (_) {}
 }
 
@@ -265,3 +271,24 @@ window.hideSkeleton   = hideSkeleton;
 window.showEmptyState = showEmptyState;
 window.updateBadge    = updateBadge;
 window.openSection    = openSection;
+
+// ——— Global delegated handlers ———
+
+document.addEventListener('click', e => {
+  // Close modal via [data-modal] attribute (modal-close buttons, cancel buttons)
+  const closer = e.target.closest('[data-modal]');
+  if (closer) {
+    closeModal(closer.dataset.modal);
+    return;
+  }
+
+  // Switch tabs via .modal-tab[data-tab] (customer, enquiry, and other standard modals)
+  const tabBtn = e.target.closest('.modal-tab[data-tab]');
+  if (tabBtn) {
+    const overlay = tabBtn.closest('.modal-overlay, .modal-panel');
+    if (!overlay) return;
+    const tabId = tabBtn.dataset.tab;
+    overlay.querySelectorAll('.modal-tab').forEach(b => b.classList.toggle('active', b === tabBtn));
+    overlay.querySelectorAll('.modal-tab-content').forEach(p => p.classList.toggle('active', p.id === tabId));
+  }
+});

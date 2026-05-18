@@ -3,7 +3,8 @@
    =========================== */
 
 import { db, garageRef, garageDoc, getGarageId, docsToArr, fsAdd, fsUpdate, showSpinner, hideSpinner } from './firebase.js';
-import firebase from 'firebase/compat/app';
+import firebase from './firebase.js';
+import { showToast } from './utils.js';
 
 // ——— VHC Checklist Definition ———
 
@@ -81,7 +82,7 @@ export async function loadVhcList() {
 }
 
 function renderVhcList() {
-  const tbody = document.getElementById('vhcBody');
+  const tbody = document.getElementById('vhcTbody');
   if (!tbody) return;
   if (window._vhcData.length === 0) {
     tbody.innerHTML = `<tr><td colspan="7" class="table-empty"><i class="fas fa-clipboard-check"></i>No VHC reports yet. Open a job card and run the VHC checklist.</td></tr>`;

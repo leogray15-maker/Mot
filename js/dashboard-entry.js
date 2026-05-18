@@ -14,11 +14,13 @@ import './notifications.js';    // addNotification, badge
 
 // ——— Settings (loaded early so other modules can call getSettings()) ———
 import { initSettings } from './dashboard.js';
+import './settings.js';          // registers extended settings section loader
 
 // ——— Core CRM modules (self-register via window.sectionLoaders) ———
 import './enquiries.js';
 import './customers.js';
 import './bookings.js';
+import './booking-calendar-mount.js'; // React FullCalendar — overrides bookings section
 import { initJobs }         from './jobs.js';
 import './invoices.js';
 import './revenue.js';
@@ -34,8 +36,7 @@ import { initVhcSection }   from './vhc.js';
 // ——— Opportunities & pipeline ———
 import { initOpportunities } from './opportunities.js';
 
-// ——— Fleet & parts ———
-import { initFleet }        from './fleet.js';
+// ——— Parts ———
 import { initParts }        from './parts.js';
 
 // ——— MOT, reminders, comms ———
@@ -49,9 +50,6 @@ import { initZRead }        from './z-read.js';
 
 // ——— Multi-user / teams ———
 import { initUsers, enforceRoleRestrictions } from './multi-user.js';
-
-// ——— AI Assistant ———
-import { initAiAssistant }  from './ai-assistant.js';
 
 // ——— WhatsApp helpers ———
 import './whatsapp.js';
@@ -71,12 +69,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   initApprovals();
   initVhcSection();
   initOpportunities();
-  initFleet();
   initParts();
   initMotTracker();
   initReminders();
   initReports();
   initZRead();
   initUsers();
-  initAiAssistant();
 });

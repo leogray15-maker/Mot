@@ -2,13 +2,15 @@
    Premier MOT — Invoices (Firebase)
    =========================== */
 
-import { db, docsToArr, fsAdd, fsUpdate, fsDel, showSpinner, hideSpinner } from './firebase.js';
+import { db, garageRef, garageDoc, docsToArr, fsAdd, fsUpdate, fsDel, showSpinner, hideSpinner } from './firebase.js';
+import { getSettings, showToast, formatDate, esc, formatCurrency } from './utils.js';
+import { buildInvoiceWhatsAppMessage, openWhatsApp } from './whatsapp.js';
 window._invoicesData = [];
 
 async function loadInvoicesSection() {
   showSpinner('page-invoices');
   try {
-    const snap = await db.collection('invoices').orderBy('createdAt','desc').get();
+    const snap = await garageRef('invoices').orderBy('createdAt','desc').get();
     window._invoicesData = docsToArr(snap);
   } catch (e) {
     showToast('Failed to load invoices', 'error');
@@ -19,7 +21,7 @@ async function loadInvoicesSection() {
 
 function renderInvoicesList() {
   const invoices = [...window._invoicesData];
-  const tbody = document.getElementById('invoicesBody');
+  const tbody = document.getElementById('invoicesTbody');
   if (!tbody) return;
   if (invoices.length === 0) {
     tbody.innerHTML = `<tr><td colspan="7" class="table-empty"><i class="fas fa-file-invoice-pound"></i>No invoices yet. Create one from a completed job card.</td></tr>`;
@@ -49,7 +51,7 @@ function renderInvoicesList() {
 }
 
 async function getNextInvoiceNumber() {
-  const ref = db.collection('settings').doc('config');
+  const ref = garageRef('settings').doc('config');
   const num = await db.runTransaction(async t => {
     const doc = await t.get(ref);
     const n = (doc.exists ? (doc.data().invoiceCounter || 0) : 0) + 1;
@@ -62,7 +64,7 @@ async function getNextInvoiceNumber() {
 
 async function createInvoiceFromJob(jobId) {
   const j = (window._jobsData || []).find(x => x.id === jobId)
-    || await db.collection('jobs').doc(jobId).get().then(d => d.exists ? { id: d.id, ...d.data() } : null);
+    || await garageDoc('jobs', jobId).get().then(d => d.exists ? { id: d.id, ...d.data() } : null);
   if (!j) { showToast('Job not found', 'error'); return; }
 
   const s = getSettings();
@@ -76,9 +78,11 @@ async function createInvoiceFromJob(jobId) {
 
   const cust = (window._customersData || []).find(c => c.id === j.customerId) || {};
   const vatRate = s.vatRegistered ? 0.2 : 0;
-  const subtotal = parseFloat(j.jobValue || 0);
-  const vatAmount = subtotal * vatRate;
-  const total = subtotal + vatAmount;
+  const subtotal = parseFloat(j.subtotal || j.total || j.jobValue || 0);
+  const vatAmount = s.vatRegistered ? parseFloat(j.vatAmount || subtotal * vatRate) : 0;
+  const total = parseFloat(j.total || subtotal + vatAmount);
+  const createdDate = j.createdAt?.toDate ? j.createdAt.toDate() : (j.createdAt ? new Date(j.createdAt) : new Date());
+  const jobDateStr = j.dateIn || createdDate.toISOString().split('T')[0];
 
   const invoice = {
     invoiceNumber: invoiceNum,
@@ -89,7 +93,7 @@ async function createInvoiceFromJob(jobId) {
     customerEmail: cust.email || '',
     reg: j.reg || '',
     service: j.serviceType || '',
-    date: j.dateIn || new Date().toISOString().split('T')[0],
+    date: jobDateStr,
     items: [
       ...(j.parts || []).map(p => ({ desc: p.name, qty: p.qty, unit: p.cost, total: p.total })),
       { desc: `Labour (${j.labourHours||0}hrs @ £${j.labourRate||0}/hr)`, qty: 1, unit: (j.labourHours||0)*(j.labourRate||0), total: (j.labourHours||0)*(j.labourRate||0) }
@@ -239,13 +243,18 @@ function printInvoice(id) {
   win.document.close();
 }
 
-function esc(str) { if (!str) return ''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 document.getElementById('closeInvoiceModal')?.addEventListener('click', () => document.getElementById('invoiceDetailModal')?.classList.remove('open'));
 document.getElementById('invoiceDetailModal')?.addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
 
 window.sectionLoaders = window.sectionLoaders || {};
 window.sectionLoaders['invoices'] = loadInvoicesSection;
+
+// openInvoiceModal — called by jobs.js "Generate Invoice" button
+window.openInvoiceModal = async (existingId, jobId) => {
+  if (jobId) await createInvoiceFromJob(jobId);
+  else if (existingId) viewInvoiceModal(existingId);
+};
 
 Object.assign(window, {
   createInvoiceFromJob, updateInvoiceStatus, deleteInvoice,

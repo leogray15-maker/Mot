@@ -53,6 +53,32 @@ ul { list-style: none; }
   padding: 0 20px;
 }
 
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(245,158,11,0.08);
+  color: var(--red-light);
+  border: 1px solid rgba(245,158,11,0.22);
+  padding: 5px 16px 5px 5px;
+  border-radius: 28px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.badge-rank {
+  background: var(--red);
+  color: var(--black);
+  font-size: 0.72rem;
+  font-weight: 900;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
 .section-tag {
   display: inline-block;
   background: rgba(245,158,11,0.15);
@@ -126,7 +152,7 @@ ul { list-style: none; }
   border-color: var(--border-red);
 }
 .btn-ghost:hover {
-  background: rgba(224,32,32,0.1);
+  background: rgba(245,158,11,0.1);
   border-color: var(--red);
 }
 
@@ -162,8 +188,19 @@ ul { list-style: none; }
 
 .nav-logo {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   line-height: 1.1;
+  text-decoration: none;
+}
+
+.nav-logo-img {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 480px) {
+  .nav-logo-img { height: 38px; }
 }
 
 .nav-logo .logo-main {
@@ -1139,7 +1176,7 @@ ul { list-style: none; }
   transform: translateX(-50%);
   width: 600px;
   height: 300px;
-  background: radial-gradient(ellipse, rgba(224,32,32,0.1) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(245,158,11,0.1) 0%, transparent 70%);
 }
 
 .page-hero h1 { position: relative; }
@@ -1583,4 +1620,12 @@ ul { list-style: none; }
   .why-grid { grid-template-columns: 1fr; gap: 40px; }
   .hero-ctas { flex-direction: column; align-items: flex-start; }
   .hero-section { padding: 100px 20px 60px; }
+}
+
+/* ===========================
+   REVIEWS SECTION EXTRAS
+   =========================== */
+
+@media (min-width: 640px) {
+  .rating-divider { display: block !important; }
 }

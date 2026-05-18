@@ -80,8 +80,8 @@ if (loginForm) {
 
       // 3. Read account document for plan / trial status
       let garageName = '';
-      let plan       = 'starter';
-      let status     = 'trial';
+      let plan       = 'enterprise';
+      let status     = 'active';
 
       if (garageId) {
         try {
@@ -89,8 +89,8 @@ if (loginForm) {
           if (accSnap.exists) {
             const acc = accSnap.data();
             garageName = acc.garageName || acc.name || '';
-            plan       = acc.plan   || 'starter';
-            status     = acc.status || 'trial';
+            plan       = acc.plan   || 'enterprise';
+            status     = acc.status || 'active';
           }
         } catch (accErr) {
           console.warn('Could not read account doc', accErr);

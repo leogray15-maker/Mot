@@ -16,7 +16,7 @@ let _jobSearch        = '';
 let _jobStatusFilter  = 'all';
 let _jobSortField     = 'createdAt';
 let _jobSortDir       = 'desc';
-let _jobView          = 'list'; // 'list' | 'kanban'
+let _jobView          = 'kanban'; // 'list' | 'kanban'
 let _openJobId        = null;   // currently open modal job id
 let _activeJobTab     = 'vehicle';
 let _partRowIdx       = 0;
@@ -132,7 +132,7 @@ async function loadJobs() {
 
 // ——— Render Kanban ———
 function renderKanban(jobs) {
-  const container = getEl('jobKanbanBoard');
+  const container = getEl('jobsKanban');
   if (!container) return;
 
   const q = _jobSearch.toLowerCase();
@@ -220,7 +220,7 @@ function renderJobList(jobs) {
     return 0;
   });
 
-  const tbody = getEl('jobsBody');
+  const tbody = getEl('jobsTbody');
   if (!tbody) return;
   if (filtered.length === 0) {
     tbody.innerHTML = `<tr><td colspan="9" class="table-empty"><i class="fas fa-screwdriver-wrench"></i>No job cards found.</td></tr>`;
@@ -453,6 +453,7 @@ function renderLabourTab(j) {
 // ——— Open job modal ———
 async function openJobModal(id) {
   _openJobId = id;
+  window._currentOpenJobId = id;   // expose for inline onclicks
   _activeJobTab = 'vehicle';
   _partRowIdx = 0;
 
@@ -513,7 +514,31 @@ async function openJobModal(id) {
       : '';
   }
 
-  modal.classList.add('open');
+  // Populate clock display
+  const timeDisplay = getEl('jobTimeDisplay');
+  if (timeDisplay) {
+    const actualH = j?.actualHours || 0;
+    const quotedH = j?.estimatedHours || 0;
+    const h = Math.floor(actualH);
+    const m = Math.round((actualH - h) * 60);
+    timeDisplay.textContent = `Total: ${h}h ${m}m | Quoted: ${quotedH}h`;
+  }
+  const clockLogList = getEl('clockLogList');
+  if (clockLogList) {
+    const log = j?.clockLog || [];
+    clockLogList.innerHTML = log.length
+      ? log.map(entry => {
+          const start = entry.startTime?.toDate ? entry.startTime.toDate() : new Date(entry.startTime || 0);
+          const dur   = entry.duration ? `${Math.floor(entry.duration / 60)}h ${entry.duration % 60}m` : '—';
+          return `<div style="font-size:0.78rem;color:var(--text-dim);padding:3px 0">
+            <i class="fas fa-user-hard-hat"></i> ${esc(entry.techName || '—')} &bull;
+            ${start.toLocaleDateString('en-GB')} &bull; ${dur}
+          </div>`;
+        }).join('')
+      : '<div style="font-size:0.78rem;color:var(--text-dim);padding:4px 0">No clock entries yet.</div>';
+  }
+
+  window.showModal('jobModal');
   switchJobTab('vehicle');
 }
 
@@ -721,11 +746,11 @@ async function triggerVRMLookup() {
 // ——— Switch tab ———
 function switchJobTab(tab) {
   _activeJobTab = tab;
-  document.querySelectorAll('.job-tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('#jobModal .job-tab-panel').forEach(p => p.classList.remove('active'));
   const panel = getEl(`jobTab_${tab}`);
   if (panel) panel.classList.add('active');
-  document.querySelectorAll('.tab-btn').forEach(b => {
-    b.classList.toggle('active', b.textContent.toLowerCase() === tab || b.onclick?.toString().includes(`'${tab}'`));
+  document.querySelectorAll('#jobModal .tab-btn').forEach(b => {
+    b.classList.toggle('active', b.onclick?.toString().includes(`'${tab}'`));
   });
 }
 
@@ -765,6 +790,7 @@ function collectJobFormData() {
     subtotal:      tots.subtotal,
     vatAmount:     tots.vatAmount,
     total:         tots.total,
+    jobValue:      tots.total,   // alias so revenue/invoice modules can read either field
     vhcData,
     clockLog:      collectClockLog()
   };
@@ -834,8 +860,7 @@ async function deleteJob(id) {
     window._jobsData = window._jobsData.filter(j => j.id !== id);
     if (_jobView === 'kanban') renderKanban(window._jobsData);
     else renderJobList(window._jobsData);
-    const modal = getEl('jobModal');
-    if (modal && modal.classList.contains('open')) modal.classList.remove('open');
+    window.closeModal('jobModal');
     showToast('Job card deleted', 'info');
   } catch (err) {
     showToast('Failed to delete job', 'error');
@@ -928,8 +953,7 @@ function printJobCard(id) {
 async function createInvoiceFromJob(jobId) {
   if (typeof window.openInvoiceModal === 'function') {
     window.openInvoiceModal(null, jobId);
-    const modal = getEl('jobModal');
-    if (modal) modal.classList.remove('open');
+    window.closeModal('jobModal');
   } else {
     showToast('Invoice module not loaded', 'error');
   }
@@ -938,8 +962,8 @@ async function createInvoiceFromJob(jobId) {
 // ——— View toggle ———
 function setJobView(view) {
   _jobView = view;
-  const kanban = getEl('jobKanbanBoard');
-  const list   = getEl('jobsTableWrap');
+  const kanban = getEl('jobsKanban');
+  const list   = getEl('jobsListView');
   const btnList   = getEl('jobViewList');
   const btnKanban = getEl('jobViewKanban');
   if (kanban) kanban.style.display = view === 'kanban' ? '' : 'none';
@@ -960,19 +984,73 @@ function sortJobList(field) {
 // ——— Init ———
 export function initJobs() {
   // Event listeners (guards against missing elements during lazy load)
-  getEl('jobSearch')?.addEventListener('input', e => { _jobSearch = e.target.value; renderJobList(window._jobsData); });
+  getEl('jobSearch')?.addEventListener('input', e => { _jobSearch = e.target.value; if (_jobView === 'kanban') renderKanban(window._jobsData); else renderJobList(window._jobsData); });
   getEl('jobStatusFilter')?.addEventListener('change', e => { _jobStatusFilter = e.target.value; renderJobList(window._jobsData); });
   getEl('jobViewList')?.addEventListener('click', () => setJobView('list'));
   getEl('jobViewKanban')?.addEventListener('click', () => setJobView('kanban'));
+  // Also wire up data-view toggle buttons in the jobs section header
+  document.querySelectorAll('#page-jobs .view-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#page-jobs .view-toggle').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      setJobView(btn.dataset.view);
+    });
+  });
   getEl('newJobBtn')?.addEventListener('click', () => openJobModal(null));
   getEl('saveJobBtn')?.addEventListener('click', saveJob);
 
-  getEl('jobModalClose')?.addEventListener('click', () => getEl('jobModal')?.classList.remove('open'));
-  getEl('jobModal')?.addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('open'); });
+  // Modal close is handled globally by ui.js data-modal delegated handler
 
   getEl('jobDeleteBtn')?.addEventListener('click', () => { if (_openJobId) deleteJob(_openJobId); });
   getEl('jobPrintBtn')?.addEventListener('click', () => { if (_openJobId) printJobCard(_openJobId); });
   getEl('jobInvoiceBtn')?.addEventListener('click', () => { if (_openJobId) createInvoiceFromJob(_openJobId); });
+
+  // Save VHC — persists checklist data as part of the job record
+  getEl('saveVhcBtn')?.addEventListener('click', saveJob);
+
+  // Add note to comms log
+  getEl('addJobNoteBtn')?.addEventListener('click', async () => {
+    const text = getEl('jobNoteText')?.value?.trim();
+    if (!text || !_openJobId) return;
+    const note = {
+      type:    'note',
+      message: text,
+      sentAt:  new Date().toISOString(),
+      sentBy:  window._currentUser?.email?.split('@')[0] || 'Staff'
+    };
+    try {
+      await fsUpdate('jobs', _openJobId, {
+        commLog:   firebase.firestore.FieldValue.arrayUnion(note),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      const j = window._jobsData.find(x => x.id === _openJobId);
+      if (j) { j.commLog = j.commLog || []; j.commLog.push(note); renderCommsTab(j.commLog); }
+      const el = getEl('jobNoteText'); if (el) el.value = '';
+      showToast('Note added', 'success');
+    } catch (e) {
+      showToast('Failed to add note', 'error');
+    }
+  });
+
+  // Clock On
+  getEl('clockOnBtn')?.addEventListener('click', () => {
+    if (!_openJobId) return;
+    const user     = window._currentUser || {};
+    const techName = user.displayName || user.email?.split('@')[0] || 'Technician';
+    const techId   = user.uid || 'unknown';
+    window.clockOn?.(_openJobId, techId, techName);
+  });
+
+  // Clock Off — find the active session for this job
+  getEl('clockOffBtn')?.addEventListener('click', async () => {
+    if (!_openJobId) return;
+    try {
+      const snap = await garageRef('technician_sessions')
+        .where('jobId', '==', _openJobId).where('endTime', '==', null).limit(1).get();
+      if (snap.empty) { showToast('No active clock session for this job', 'info'); return; }
+      window.clockOff?.(snap.docs[0].id, _openJobId);
+    } catch { showToast('Failed to clock off', 'error'); }
+  });
 
   loadJobs();
 }
