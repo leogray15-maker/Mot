@@ -1474,9 +1474,16 @@ ul { list-style: none; }
 
   .service-full-card { grid-template-columns: 1fr; }
   .service-full-accent { width: 100%; height: 4px; }
+  .service-full-body { padding: 20px; }
+  .services-full { padding: 48px 16px; }
 
-  .service-full-header { flex-direction: column; }
+  .service-full-header { flex-direction: column; gap: 12px; }
   .service-full-price { text-align: left; }
+
+  .service-includes { grid-template-columns: 1fr; }
+
+  .service-cta-row { flex-direction: column; }
+  .service-cta-row .btn { width: 100%; justify-content: center; }
 
   .modal { border-radius: var(--radius); }
   .modal-header, .modal-body { padding-left: 20px; padding-right: 20px; }
