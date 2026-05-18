@@ -183,7 +183,7 @@ ul { list-style: none; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 90px;
+  height: 110px;
   position: relative;
 }
 
@@ -198,7 +198,7 @@ ul { list-style: none; }
 }
 
 .nav-logo-center img {
-  height: 80px;
+  height: 100px;
   width: auto;
   display: block;
 }
@@ -1475,8 +1475,8 @@ ul { list-style: none; }
 @media (max-width: 768px) {
   .nav-links, .nav-cta { display: none; }
   .nav-hamburger { display: flex; }
-  .nav-logo-center img { height: 60px; }
-  .nav-inner { height: 72px; }
+  .nav-logo-center img { height: 78px; }
+  .nav-inner { height: 88px; }
 
   .hero h1 { font-size: 2.2rem; }
   .hero-actions { flex-direction: column; align-items: flex-start; }
