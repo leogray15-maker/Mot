@@ -1204,13 +1204,15 @@ ul { list-style: none; }
 .services-full {
   padding: 80px 20px;
   background: var(--black);
+  text-align: center;
 }
 
 .services-full-grid {
-  max-width: 1200px;
+  max-width: 900px;
   margin: 0 auto;
   display: grid;
   gap: 32px;
+  text-align: left;
 }
 
 .service-full-card {
